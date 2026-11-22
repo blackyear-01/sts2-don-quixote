@@ -4,3 +4,5 @@ build/
 *.user
 .vs/
 assets/art/heavy_backup/
+__pycache__/
+*.pyc
