@@ -1,0 +1,17 @@
+{
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.title": "堂吉诃德",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.titleObject": "堂吉诃德",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.description": "一代眷属，拉曼却血魔一族的长老，拉曼却领的创造者。\n以硬血凝成长枪，为血脉的荣耀冲锋。",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.pronounSubject": "她",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.pronounObject": "她",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.pronounPossessive": "她的",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.possessiveAdjective": "她的",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.cardsModifierTitle": "堂吉诃德卡牌",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.cardsModifierDescription": "堂吉诃德的卡牌现在会出现在奖励和商店中。",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.eventDeathPrevention": "堂吉诃德以硬血支撑着身体：骑士的决斗还没有结束！",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.goldMonologue": "金币？这定是献给拉曼却领的贡品。",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.aromaPrinciple": "血的气味，比任何香膏都要芬芳。",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.bestiaryQuote": "又一位决斗对象！看枪！",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.banter.alive.endTurnPing": "桑丘！还有冒险在等着我们！快点！",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.banter.dead.endTurnPing": "……桑丘……我等着你。"
+}

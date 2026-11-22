@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <!--
+      程序集简单名必须与创意工坊模组 3764112372（另一位作者的堂吉诃德，程序集名
+      Donquixote）区分开：.NET 的 AssemblyLoadContext 判断“同名程序集已加载”时
+      不区分大小写，DonQuixote / Donquixote 会互相顶掉，导致后加载的一方抛出
+      System.IO.FileLoadException。这里改成独有名字，DLL 文件名仍由下面的
+      DonQuixote_CopyModDll 目标写回 DonQuixote.dll（游戏按 modId + ".dll" 找文件）。
+    -->
+    <AssemblyName>DonQuixoteCiallo</AssemblyName>
+    <RootNamespace>DonQuixote</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <RestorePackagesPath>D:\sts2mod\tools\pkgs</RestorePackagesPath>
+    <RitsuLibReferenceTarget>0.113.0</RitsuLibReferenceTarget>
+    <NoWarn>$(NoWarn);CS8618;CS0169</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="sts2">
+      <HintPath>D:\Steam\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64\sts2.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="GodotSharp">
+      <HintPath>D:\Steam\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64\GodotSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>D:\Steam\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Import Project="D:\Steam\steamapps\workshop\content\2868840\3747602295\RitsuLib.References.props" />
+
+  <!-- 程序集名是 DonQuixoteCiallo，但游戏的模组加载器只会找 <modId>.dll，故构建后再复制一份 DonQuixote.dll。 -->
+  <Target Name="DonQuixote_CopyModDll" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)DonQuixote.dll" />
+  </Target>
+
+</Project>

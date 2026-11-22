@@ -1,0 +1,8 @@
+{
+  "DON_QUIXOTE_ENCHANTMENT_DON_QUIXOTE_INDESTRUCTIBLE_CARD.title": "Indestructible Card",
+  "DON_QUIXOTE_ENCHANTMENT_DON_QUIXOTE_INDESTRUCTIBLE_CARD.description": "When this card would be Exhausted or Ethereal, it is auto-played and put into your discard pile instead, but its final damage is reduced by 80%.\nSkill cards without a target will point at the leftmost enemy; Power cards are not put into your discard pile after being auto-played.",
+  "DON_QUIXOTE_ENCHANTMENT_DON_QUIXOTE_INDESTRUCTIBLE_CARD.extraCardText": "Indestructible Card",
+  "DON_QUIXOTE_ENCHANTMENT_INDESTRUCTIBLE_CARD.title": "Indestructible Card",
+  "DON_QUIXOTE_ENCHANTMENT_INDESTRUCTIBLE_CARD.description": "When this card would be Exhausted or Ethereal, it is auto-played and put into your discard pile instead, but its final damage is reduced by 80%.\nSkill cards without a target will point at the leftmost enemy; Power cards are not put into your discard pile after being auto-played.",
+  "DON_QUIXOTE_ENCHANTMENT_INDESTRUCTIBLE_CARD.extraCardText": "Indestructible Card"
+}

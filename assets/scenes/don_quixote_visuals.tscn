@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=3 uid="{{UID:scene}}"]
+
+[ext_resource type="Script" uid="uid://cghtlla3sw0po" path="res://src/Core/Nodes/Combat/NCreatureVisuals.cs" id="1_vis"]
+[ext_resource type="Texture2D" uid="{{UID:idle}}" path="res://DonQuixote/images/char/idle.png" id="2_idle"]
+
+[node name="DonQuixoteVisuals" type="Node2D"]
+script = ExtResource("1_vis")
+
+[node name="Visuals" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -276)
+texture = ExtResource("2_idle")
+
+[node name="Bounds" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_left = -136.0
+offset_top = -552.0
+offset_right = 136.0
+mouse_filter = 2
+
+[node name="VfxSpawnPosition" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -300)
+
+[node name="CenterPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -276)
+
+[node name="IntentPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -600)
+
+[node name="TalkPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -520)
+
+[node name="OrbPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -330)

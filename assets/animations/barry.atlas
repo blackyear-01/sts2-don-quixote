@@ -1,0 +1,173 @@
+barry.png
+size: 2048,3276
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+idle
+  rotate: false
+  xy: 0, 0
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+guard
+  rotate: false
+  xy: 422, 0
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+hurt
+  rotate: false
+  xy: 844, 0
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+atk0
+  rotate: false
+  xy: 1266, 0
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+atk1
+  rotate: false
+  xy: 0, 546
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+atk2
+  rotate: false
+  xy: 422, 546
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+atk3
+  rotate: false
+  xy: 844, 546
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath0
+  rotate: false
+  xy: 1266, 546
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath1
+  rotate: false
+  xy: 0, 1092
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath2
+  rotate: false
+  xy: 422, 1092
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath3
+  rotate: false
+  xy: 844, 1092
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath4
+  rotate: false
+  xy: 1266, 1092
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath5
+  rotate: false
+  xy: 0, 1638
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath6
+  rotate: false
+  xy: 422, 1638
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath7
+  rotate: false
+  xy: 844, 1638
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath8
+  rotate: false
+  xy: 1266, 1638
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath9
+  rotate: false
+  xy: 0, 2184
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath10
+  rotate: false
+  xy: 422, 2184
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath11
+  rotate: false
+  xy: 844, 2184
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath12
+  rotate: false
+  xy: 1266, 2184
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath13
+  rotate: false
+  xy: 0, 2730
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath14
+  rotate: false
+  xy: 422, 2730
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+oath15
+  rotate: false
+  xy: 844, 2730
+  size: 422, 546
+  orig: 422, 546
+  offset: 0, 0
+  index: -1
+die
+  rotate: false
+  xy: 1266, 2730
+  size: 376, 165
+  orig: 376, 165
+  offset: 0, 0
+  index: -1

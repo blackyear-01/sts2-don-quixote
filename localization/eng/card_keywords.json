@@ -1,0 +1,10 @@
+{
+  "DON_QUIXOTE_KEYWORD_BLOOD_FORGE.title": "Bloodforge X",
+  "DON_QUIXOTE_KEYWORD_BLOOD_FORGE.description": "Spend X [gold]Hardblood[/gold] when playing this card; you may still play it without enough [gold]Hardblood[/gold].\nThe first time you Bloodforge each combat, add a [gold]Knight's Lance[/gold] to your hand; your [gold]Knight's Lance[/gold] and Lance Gorged on Blood deal X more damage.\nIf you lack [gold]Hardblood[/gold], each [gold]Hardblood[/gold] actually spent adds 1 more damage.",
+  "DON_QUIXOTE_KEYWORD_TECHNIQUE.title": "Technique X",
+  "DON_QUIXOTE_KEYWORD_TECHNIQUE.description": "The first time you use Technique each combat, add a [gold]Knight's Lance[/gold] to your hand; your [gold]Knight's Lance[/gold] and Lance Gorged on Blood attack X additional times.",
+  "DON_QUIXOTE_KEYWORD_AMPLIFY.title": "Amplify X",
+  "DON_QUIXOTE_KEYWORD_AMPLIFY.description": "The first time you Amplify each combat, add a [gold]Knight's Lance[/gold] to your hand; your [gold]Knight's Lance[/gold] gains X [gold]Blood Armor[/gold] and X [gold]Shimmering【Bloodfiend】[/gold], and your Lance Gorged on Blood triggers [red]Bleed[/red] X additional times.",
+  "DON_QUIXOTE_KEYWORD_KNIGHT.title": "Knight",
+  "DON_QUIXOTE_KEYWORD_KNIGHT.description": "Deals +50% damage to enemies with [gold]Duel Target[/gold]."
+}

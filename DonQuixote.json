@@ -1,0 +1,18 @@
+{
+  "id": "DonQuixote",
+  "name": "堂吉诃德 Don Quixote",
+  "author": "暗黑年华Ciallo~",
+  "description": "堂吉诃德：一代眷属，拉·曼却血魔一族的长老，拉·曼却领的创造者，桑丘等人的亲族。\n\n人物来源于边狱巴士，卡图由边狱巴士灰机wiki获取，部分卡图来源于网图。",
+  "pck_name": "DonQuixote",
+  "version": "0.1.0",
+  "has_pck": true,
+  "has_dll": true,
+  "dependencies": [
+    {
+      "id": "STS2-RitsuLib",
+      "min_version": "0.6.10"
+    }
+  ],
+  "affects_gameplay": true,
+  "min_game_version": "v0.113.0"
+}

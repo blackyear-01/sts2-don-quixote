@@ -1,0 +1,688 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using DonQuixote.Powers;
+using MegaCrit.Sts2.Core.CardSelection;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.ValueProps;
+using STS2RitsuLib.Interop.AutoRegistration;
+using STS2RitsuLib.Scaffolding.Content;
+
+namespace DonQuixote.Cards;
+
+/// <summary>
+/// 骑士长枪：只能由「血铸 / 技巧 / 增幅」放进手牌。
+/// 保留、打出后返回手牌；血铸加伤害、技巧加攻击段数、增幅加血铠与摇曳。
+/// </summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteKnightLance : ModCardTemplate, IDonQuixoteCorruptible, IDonQuixoteTokenCard
+{
+    /// <summary>卡面插画（资源\卡牌\骑士长枪.png）。</summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/knight_lance.png";
+
+    public DonQuixoteKnightLance()
+        : base(2, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy)
+    {
+    }
+
+public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixoteKeywords.DonQuixote_Knight, CardKeyword.Retain };
+
+    public int DonQuixote_CorruptAt => DonQuixoteLance.DonQuixote_CorruptionThreshold;
+
+    public CardModel DonQuixote_CorruptedCanonical => ModelDb.Card<DonQuixoteBloodFeastLance>();
+
+    public CardModel DonQuixote_CorruptedVersion(Player DonQuixote_owner)
+    {
+        return CardScope.CreateCard(ModelDb.Card<DonQuixoteBloodFeastLance>(), DonQuixote_owner);
+    }
+
+    protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
+    {
+        new DamageVar(3m, ValueProp.Move),
+        new DynamicVar("Corruption", 40m),
+        new DynamicVar("Hits", 1m),
+        new DynamicVar("Armor", 3m),
+        new DynamicVar("Wavering", 3m),
+    };
+
+    /// <summary>打出后回到手牌（照抄原版「粒子墙」ParticleWall 的写法）。</summary>
+    protected override CardLocation GetResultLocationForCardPlay()
+    {
+        CardLocation DonQuixote_location = base.GetResultLocationForCardPlay();
+        if (DonQuixote_location.pileType == PileType.Discard)
+        {
+            DonQuixote_location.pileType = PileType.Hand;
+        }
+
+        return DonQuixote_location;
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature?.CombatState == null)
+        {
+            return;
+        }
+
+        Creature DonQuixote_owner = Owner.Creature;
+        // 打出时闪一下「举枪突刺」的立绘（资源\人物\长枪.png）
+        DonQuixoteLancePose.DonQuixote_Play(DonQuixote_owner);
+        int DonQuixote_bonus = DonQuixoteLance.DonQuixote_ForgeBonus(DonQuixote_owner);
+        int DonQuixote_hits = 1 + DonQuixoteLance.DonQuixote_TechniqueBonus(DonQuixote_owner);
+        // 基础值用常量：DynamicVars 里的数字只负责卡面显示，避免重复加成
+        decimal DonQuixote_damage = 3m + DonQuixote_bonus;
+
+        for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_hits; DonQuixote_i++)
+        {
+            if (DonQuixote_play.Target == null || DonQuixote_play.Target.IsDead)
+            {
+                break;
+            }
+
+            await CreatureCmd.Damage(
+                DonQuixote_ctx, DonQuixote_play.Target, DonQuixote_damage, ValueProp.Move, DonQuixote_owner, this, DonQuixote_play);
+        }
+
+        int DonQuixote_amplify = DonQuixoteLance.DonQuixote_AmplifyBonus(DonQuixote_owner);
+        int DonQuixote_armor = 3 + DonQuixote_amplify;
+        int DonQuixote_wavering = 3 + DonQuixote_amplify;
+
+        foreach (Creature DonQuixote_ally in DonQuixoteBloodMagic.DonQuixote_PlayerCreatures(DonQuixote_owner).ToList())
+        {
+            if (DonQuixote_ally.IsDead)
+            {
+                continue;
+            }
+
+            await PowerCmd.Apply<DonQuixotePowerBloodArmor>(
+                DonQuixote_ctx, DonQuixote_ally, DonQuixote_armor, DonQuixote_owner, this, false);
+        }
+
+        await DonQuixoteBloodMagic.DonQuixote_GainWavering(DonQuixote_ctx, DonQuixote_owner, DonQuixote_wavering, this);
+    }
+}
+
+/// <summary>
+/// 饱食鲜血的长枪（骑士长枪的堕落版）：保留、血宴 1、打出后返回手牌、造成 6 点伤害、触发 1 次流血效果。
+/// </summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteBloodFeastLance : DonQuixoteBloodFeastCard, IDonQuixoteCorruptedCard, IDonQuixoteTokenCard
+{
+    /// <summary>卡面插画（资源\卡牌\饱食鲜血的长枪.webp）。</summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_feast_lance.png";
+
+    public DonQuixoteBloodFeastLance()
+        : base(2, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy)
+    {
+    }
+
+public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixoteKeywords.DonQuixote_Knight, CardKeyword.Retain };
+
+    private int DonQuixote_Var(string DonQuixote_name)
+    {
+        DynamicVar DonQuixote_var;
+        return DynamicVars.TryGetValue(DonQuixote_name, out DonQuixote_var) ? DonQuixote_var.IntValue : 0;
+    }
+
+    protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
+    {
+        new DamageVar(6m, ValueProp.Move),
+        new DynamicVar("BloodFeast", 1m),
+        new DynamicVar("Hits", 1m),
+        new DynamicVar("Triggers", 1m),
+    };
+
+    public override int DonQuixote_BloodFeastCost => DonQuixote_Var("BloodFeast");
+
+    /// <summary>打出后回到手牌（照抄原版「粒子墙」ParticleWall 的写法）。</summary>
+    protected override CardLocation GetResultLocationForCardPlay()
+    {
+        CardLocation DonQuixote_location = base.GetResultLocationForCardPlay();
+        if (DonQuixote_location.pileType == PileType.Discard)
+        {
+            DonQuixote_location.pileType = PileType.Hand;
+        }
+
+        return DonQuixote_location;
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature?.CombatState == null)
+        {
+            return;
+        }
+
+        // 血宴 1：条件触发 —— 足 1 点血宴才会触发流血效果，伤害本身不受影响。
+        bool DonQuixote_feastPaid = await DonQuixote_TriggerBloodFeast(DonQuixote_ctx);
+
+        Creature DonQuixote_owner = Owner.Creature;
+        // 打出时闪一下「举枪突刺」的立绘（资源\人物\长枪.png）
+        DonQuixoteLancePose.DonQuixote_Play(DonQuixote_owner);
+        int DonQuixote_bonus = DonQuixoteLance.DonQuixote_ForgeBonus(DonQuixote_owner);
+        int DonQuixote_hits = 1 + DonQuixoteLance.DonQuixote_TechniqueBonus(DonQuixote_owner);
+        // 基础值用常量：DynamicVars 里的数字只负责卡面显示，避免重复加成
+        decimal DonQuixote_damage = 6m + DonQuixote_bonus;
+        bool DonQuixote_all = DonQuixoteLance.DonQuixote_LanceHitsAll(DonQuixote_owner);
+
+        List<Creature> DonQuixote_targets = new List<Creature>();
+        if (DonQuixote_all)
+        {
+            DonQuixote_targets.AddRange(DonQuixoteBloodMagic.DonQuixote_EnemiesOf(DonQuixote_owner));
+        }
+        else if (DonQuixote_play.Target != null)
+        {
+            DonQuixote_targets.Add(DonQuixote_play.Target);
+        }
+
+        int DonQuixote_triggers = 1 + DonQuixoteLance.DonQuixote_AmplifyBonus(DonQuixote_owner);
+
+        foreach (Creature DonQuixote_target in DonQuixote_targets)
+        {
+            if (DonQuixote_target == null || DonQuixote_target.IsDead)
+            {
+                continue;
+            }
+
+            for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_hits; DonQuixote_i++)
+            {
+                if (DonQuixote_target.IsDead)
+                {
+                    break;
+                }
+
+                await CreatureCmd.Damage(
+                    DonQuixote_ctx, DonQuixote_target, DonQuixote_damage, ValueProp.Move, DonQuixote_owner, this, DonQuixote_play);
+            }
+
+            for (int DonQuixote_t = 0; DonQuixote_t < DonQuixote_triggers && DonQuixote_feastPaid; DonQuixote_t++)
+            {
+                if (DonQuixote_target.IsDead)
+                {
+                    break;
+                }
+
+                await DonQuixoteBloodMagic.DonQuixote_TriggerBleed(DonQuixote_ctx, DonQuixote_target, false);
+            }
+        }
+    }
+}
+
+/// <summary>凝聚鲜血：1 费，对自身施加 6 级流血，血铸 3（升级 6）。</summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteCondenseBlood : ModCardTemplate, IDonQuixoteBloodForgeCard
+{
+    public int DonQuixote_ForgeCost => DynamicVars["Forge"].IntValue;
+
+    public DonQuixoteCondenseBlood()
+        : base(1, CardType.Skill, CardRarity.Common, TargetType.Self)
+    {
+    }
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords => new[]
+    {
+        DonQuixoteKeywords.DonQuixote_BloodForge,
+    };
+
+    protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
+    {
+        new DynamicVar("Bleed", 6m),
+        new DynamicVar("Forge", 3m),
+    };
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars["Forge"].UpgradeValueBy(3m);
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature == null)
+        {
+            return;
+        }
+
+        await DonQuixoteBloodMagic.DonQuixote_ApplyBleed(
+            DonQuixote_ctx, Owner.Creature, Owner.Creature, this, DynamicVars["Bleed"].IntValue, 0);
+
+        int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
+            DonQuixote_ctx, Owner.Creature, DynamicVars["Forge"].IntValue, true);
+        await DonQuixoteLance.DonQuixote_Forge(
+            DonQuixote_ctx, Owner, DonQuixote_forgeSpent, this);
+    }
+}
+
+/// <summary>战术技巧：1 费，技巧 1、消耗 1 张牌、丢弃 1 张牌（升级获得保留）。</summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteTacticalTechnique : ModCardTemplate
+{
+    /// <summary>卡面插画（资源\卡牌\战术技巧.webp）。</summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/tactical_technique.png";
+
+    public DonQuixoteTacticalTechnique()
+        : base(1, CardType.Skill, CardRarity.Common, TargetType.Self)
+    {
+    }
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords => new[]
+    {
+        DonQuixoteKeywords.DonQuixote_Technique,
+    };
+
+    protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
+    {
+        new DynamicVar("Technique", 1m),
+    };
+
+    protected override void OnUpgrade()
+    {
+        AddKeyword(CardKeyword.Retain);
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature == null)
+        {
+            return;
+        }
+
+        await DonQuixoteLance.DonQuixote_Technique(DonQuixote_ctx, Owner, DynamicVars["Technique"].IntValue, this);
+
+        CardSelectorPrefs DonQuixote_exhaustPrefs = new CardSelectorPrefs(
+            new LocString("cards", "DON_QUIXOTE_CARD_DON_QUIXOTE_TACTICAL_TECHNIQUE.selectionScreenPrompt"), 1);
+        CardModel DonQuixote_exhaust = (await CardSelectCmd.FromHand(DonQuixote_ctx, Owner, DonQuixote_exhaustPrefs, null, this))
+            .FirstOrDefault();
+        if (DonQuixote_exhaust != null)
+        {
+            await CardCmd.Exhaust(DonQuixote_ctx, DonQuixote_exhaust, false, false);
+        }
+
+        CardModel DonQuixote_discard = (await CardSelectCmd.FromHand(
+                DonQuixote_ctx,
+                Owner,
+                new CardSelectorPrefs(
+                    new LocString("cards", "DON_QUIXOTE_CARD_DON_QUIXOTE_TACTICAL_TECHNIQUE.discardSelectionPrompt"), 1),
+                null,
+                this))
+            .FirstOrDefault();
+        if (DonQuixote_discard != null)
+        {
+            await CardCmd.Discard(DonQuixote_ctx, DonQuixote_discard);
+        }
+    }
+}
+
+/// <summary>如骑士般提供保护：2 费能力，堕落 40，血铸 3 / 技巧 2 / 增幅 5，骑士长枪获得重放 1。</summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteKnightlyProtection : ModCardTemplate, IDonQuixoteCorruptible, IDonQuixoteBloodForgeCard
+{
+    public int DonQuixote_ForgeCost => DynamicVars["Forge"].IntValue;
+
+    public DonQuixoteKnightlyProtection()
+        : base(2, CardType.Power, CardRarity.Rare, TargetType.Self)
+    {
+    }
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords => new[]
+    {
+        DonQuixoteKeywords.DonQuixote_Knight,
+        DonQuixoteKeywords.DonQuixote_BloodForge,
+        DonQuixoteKeywords.DonQuixote_Technique,
+        DonQuixoteKeywords.DonQuixote_Amplify,
+    };
+
+    public int DonQuixote_CorruptAt => DonQuixoteLance.DonQuixote_CorruptionThreshold;
+
+    public CardModel DonQuixote_CorruptedCanonical => ModelDb.Card<DonQuixoteBloodSweep>();
+
+    public CardModel DonQuixote_CorruptedVersion(Player DonQuixote_owner)
+    {
+        return CardScope.CreateCard(ModelDb.Card<DonQuixoteBloodSweep>(), DonQuixote_owner);
+    }
+
+    protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
+    {
+        new DynamicVar("Forge", 3m),
+        new DynamicVar("Technique", 2m),
+        new DynamicVar("Amplify", 5m),
+        new DynamicVar("Corruption", 40m),
+    };
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars["Forge"].UpgradeValueBy(2m);
+        DynamicVars["Amplify"].UpgradeValueBy(5m);
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature == null)
+        {
+            return;
+        }
+
+        // 「重放 1」必须先挂上，再走血铸/技巧/增幅：
+        // 血铸是第一次触发时发骑士长枪的时机，那时若还没有这个状态，
+        // 发出来的长枪 BaseReplayCount 就是 0，之后再也不会补上。
+        await PowerCmd.Apply<DonQuixotePowerKnightProtection>(DonQuixote_ctx, Owner.Creature, 1m, Owner.Creature, this, false);
+
+        int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
+            DonQuixote_ctx, Owner.Creature, DynamicVars["Forge"].IntValue, true);
+        await DonQuixoteLance.DonQuixote_Forge(
+            DonQuixote_ctx, Owner, DonQuixote_forgeSpent, this);
+        await DonQuixoteLance.DonQuixote_Technique(DonQuixote_ctx, Owner, DynamicVars["Technique"].IntValue, this);
+        await DonQuixoteLance.DonQuixote_Amplify(DonQuixote_ctx, Owner, DynamicVars["Amplify"].IntValue, this);
+
+        // 长枪可能早就躺在手里/牌堆里了（之前用血铸拿过），这里统一把重放同步上去。
+        DonQuixoteLance.DonQuixote_RefreshLanceStats(Owner);
+    }
+}
+
+/// <summary>用鲜血荡涤前路（如骑士般提供保护的堕落版）：1 费能力，饱食鲜血的长枪攻击全体敌人。</summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteBloodSweep : ModCardTemplate, IDonQuixoteCorruptedCard, IDonQuixoteBloodForgeCard
+{
+    public int DonQuixote_ForgeCost => DynamicVars["Forge"].IntValue;
+
+    public DonQuixoteBloodSweep()
+        : base(1, CardType.Power, CardRarity.Rare, TargetType.Self)
+    {
+    }
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords => new[]
+    {
+        DonQuixoteKeywords.DonQuixote_BloodForge,
+        DonQuixoteKeywords.DonQuixote_Technique,
+        DonQuixoteKeywords.DonQuixote_Amplify,
+    };
+
+    protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
+    {
+        new DynamicVar("Forge", 2m),
+        new DynamicVar("Technique", 3m),
+        new DynamicVar("Amplify", 1m),
+    };
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars["Forge"].UpgradeValueBy(3m);
+        DynamicVars["Amplify"].UpgradeValueBy(1m);
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature == null)
+        {
+            return;
+        }
+
+        int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
+            DonQuixote_ctx, Owner.Creature, DynamicVars["Forge"].IntValue, true);
+        await DonQuixoteLance.DonQuixote_Forge(
+            DonQuixote_ctx, Owner, DonQuixote_forgeSpent, this);
+        await DonQuixoteLance.DonQuixote_Technique(DonQuixote_ctx, Owner, DynamicVars["Technique"].IntValue, this);
+        await DonQuixoteLance.DonQuixote_Amplify(DonQuixote_ctx, Owner, DynamicVars["Amplify"].IntValue, this);
+        await PowerCmd.Apply<DonQuixotePowerBloodSweep>(DonQuixote_ctx, Owner.Creature, 1m, Owner.Creature, this, false);
+    }
+}
+
+/// <summary>鲜血重铸：2 费能力，每消耗 30 点血宴获得 3 点硬血（升级固有）。</summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteBloodRecast : ModCardTemplate
+{
+    public DonQuixoteBloodRecast()
+        : base(2, CardType.Power, CardRarity.Uncommon, TargetType.Self)
+    {
+    }
+
+    protected override void OnUpgrade()
+    {
+        AddKeyword(CardKeyword.Innate);
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature == null)
+        {
+            return;
+        }
+
+        await PowerCmd.Apply<DonQuixotePowerBloodRecast>(DonQuixote_ctx, Owner.Creature, 1m, Owner.Creature, this, false);
+    }
+}
+
+/// <summary>无法摆脱的可怖的疾病：2 费能力，回合开始时给予全场 2 层流血（升级 3 层并获得保留）。</summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteDreadfulDisease : ModCardTemplate
+{
+    /// <summary>卡面插画（资源\卡牌\无法摆脱的可怖疾病.webp）。</summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/dreadful_disease.png";
+
+    public DonQuixoteDreadfulDisease()
+        : base(2, CardType.Power, CardRarity.Uncommon, TargetType.Self)
+    {
+    }
+
+    protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
+    {
+        new DynamicVar("Layers", 2m),
+    };
+
+    protected override void OnUpgrade()
+    {
+        // 升级后：给予 3 层流血，并获得「保留」。
+        DynamicVars["Layers"].UpgradeValueBy(1m);
+        AddKeyword(CardKeyword.Retain);
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature == null)
+        {
+            return;
+        }
+
+        await PowerCmd.Apply<DonQuixotePowerDreadfulDisease>(
+            DonQuixote_ctx, Owner.Creature, DynamicVars["Layers"].IntValue, Owner.Creature, this, false);
+    }
+}
+
+/// <summary>
+/// 硬血11式-贯穿：3 费，硬血 5、对目标造成 6 点伤害 3 次、施加 4 层流血，
+/// 再触发目标等于其余层数的流血，最后把目标流血层数压到 1 层。
+/// </summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteHardBloodPierce : ModCardTemplate
+{
+    /// <summary>卡面插画（资源\卡牌 对应 png）。</summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_pierce.png";
+
+    public DonQuixoteHardBloodPierce()
+        : base(3, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy)
+    {
+    }
+
+    protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
+    {
+        new DamageVar(6m, ValueProp.Move),
+        new DynamicVar("Hits", 3m),
+        new DynamicVar("Bleed", 4m),
+        new DynamicVar("HardBlood", 5m),
+    };
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars.Damage.UpgradeValueBy(3m);
+        DynamicVars["Bleed"].UpgradeValueBy(2m);
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature == null || DonQuixote_play.Target == null)
+        {
+            return;
+        }
+
+        // 硬血：每消耗 1 点增加 2 点基础伤害。
+        int DonQuixote_consumed = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
+            DonQuixote_ctx, Owner.Creature, DynamicVars["HardBlood"].IntValue);
+        decimal DonQuixote_damage =
+            DynamicVars.Damage.BaseValue + DonQuixoteBloodMagic.DonQuixote_HardBloodDamageBonus(DonQuixote_consumed);
+
+        Creature DonQuixote_target = DonQuixote_play.Target;
+        int DonQuixote_hits = DynamicVars["Hits"].IntValue;
+        for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_hits; DonQuixote_i++)
+        {
+            if (DonQuixote_target.IsDead)
+            {
+                return;
+            }
+
+            await CreatureCmd.Damage(
+                DonQuixote_ctx, DonQuixote_target, DonQuixote_damage, ValueProp.Move, Owner.Creature, this, DonQuixote_play);
+        }
+
+        await DonQuixoteBloodMagic.DonQuixote_ApplyBleed(
+            DonQuixote_ctx, DonQuixote_target, Owner.Creature, this, 0, DynamicVars["Bleed"].IntValue);
+
+        int DonQuixote_layers = DonQuixoteBloodMagic.DonQuixote_BleedLayers(DonQuixote_target);
+        for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_layers && !DonQuixote_target.IsDead; DonQuixote_i++)
+        {
+            await DonQuixoteBloodMagic.DonQuixote_TriggerBleed(DonQuixote_ctx, DonQuixote_target, true);
+        }
+
+        DonQuixotePowerBleedLayers DonQuixote_layersPower =
+            DonQuixoteBloodMagic.DonQuixote_Find<DonQuixotePowerBleedLayers>(DonQuixote_target);
+        if (DonQuixote_layersPower != null && DonQuixote_layersPower.Amount > 1)
+        {
+            await PowerCmd.ModifyAmount(
+                DonQuixote_ctx, DonQuixote_layersPower, -(DonQuixote_layersPower.Amount - 1), Owner.Creature, this, true);
+        }
+    }
+}
+
+/// <summary>
+/// 硬血3式-突袭：2 费，消耗至多 50 点血宴，每消耗 10 点获得 1 点硬血（升级 5 点），
+/// 造成 14 点伤害、获得造成伤害量的血宴、对目标施加 3 层流血。
+/// </summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteHardBloodRaid : ModCardTemplate
+{
+    /// <summary>卡面插画（资源\卡牌 对应 png）。</summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_raid.png";
+
+    public DonQuixoteHardBloodRaid()
+        : base(2, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy)
+    {
+    }
+
+    protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
+    {
+        new DamageVar(14m, ValueProp.Move),
+        new DynamicVar("MaxFeast", 50m),
+        new DynamicVar("FeastPerPoint", 10m),
+        new DynamicVar("Bleed", 3m),
+    };
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars["FeastPerPoint"].UpgradeValueBy(-5m);
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature == null || DonQuixote_play.Target == null)
+        {
+            return;
+        }
+
+        int DonQuixote_spend = await DonQuixoteBloodMagic.DonQuixote_PayBloodFeastUpTo(
+            DonQuixote_ctx, Owner.Creature, DynamicVars["MaxFeast"].IntValue, this);
+        int DonQuixote_per = Math.Max(1, DynamicVars["FeastPerPoint"].IntValue);
+
+        int DonQuixote_hardBlood = DonQuixote_spend / DonQuixote_per;
+        if (DonQuixote_hardBlood > 0)
+        {
+            await PowerCmd.Apply<DonQuixotePowerHardBlood>(
+                DonQuixote_ctx, Owner.Creature, DonQuixote_hardBlood, Owner.Creature, this, false);
+        }
+
+        decimal DonQuixote_before = DonQuixote_play.Target.CurrentHp;
+        await CreatureCmd.Damage(
+            DonQuixote_ctx, DonQuixote_play.Target, DynamicVars.Damage.BaseValue, ValueProp.Move, Owner.Creature, this, DonQuixote_play);
+        decimal DonQuixote_dealt = DonQuixote_before - DonQuixote_play.Target.CurrentHp;
+
+        int DonQuixote_gain = (int)Math.Ceiling(Math.Max(0m, DonQuixote_dealt));
+        if (DonQuixote_gain > 0)
+        {
+            await DonQuixoteBloodMagic.DonQuixote_GainBloodFeast(DonQuixote_ctx, Owner.Creature, DonQuixote_gain, this);
+        }
+
+        if (!DonQuixote_play.Target.IsDead)
+        {
+            await DonQuixoteBloodMagic.DonQuixote_ApplyBleed(
+                DonQuixote_ctx, DonQuixote_play.Target, Owner.Creature, this, 0, DynamicVars["Bleed"].IntValue);
+        }
+    }
+}
+
+/// <summary>
+/// 伤口破坏（公平的决斗的堕落版）：2 费，解除敌方随机 1 个正面增益、施加 1 层伤口破坏，消耗（升级解除 2 个）。
+/// </summary>
+[RegisterCard(typeof(DonQuixoteCardPool))]
+public sealed class DonQuixoteWoundDestruction : ModCardTemplate, IDonQuixoteCorruptedCard
+{
+    public DonQuixoteWoundDestruction()
+        : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.AnyEnemy)
+    {
+    }
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { CardKeyword.Exhaust };
+
+    protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
+    {
+        new DynamicVar("Remove", 1m),
+    };
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars["Remove"].UpgradeValueBy(1m);
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
+    {
+        if (Owner?.Creature == null || DonQuixote_play.Target == null)
+        {
+            return;
+        }
+
+        // 与「公平的决斗」共用同一份黑名单：沙坑（无厌沙虫的吞人计数）、
+        // 多实例状态、本模组状态等都不能解，解掉会让战斗流程/绑定出问题。
+        List<PowerModel> DonQuixote_buffs = DonQuixote_play.Target.Powers
+            .Where(DonQuixote_power => DonQuixote_power != null
+                && DonQuixote_power.Type == PowerType.Buff
+                && DonQuixote_power.Amount > 0
+                && !DonQuixotePowerBlacklist.DonQuixote_IsBlocked(DonQuixote_power))
+            .OrderBy(DonQuixote_power => DonQuixote_power.Id.Entry, StringComparer.Ordinal)
+            .ToList();
+
+        int DonQuixote_remove = DynamicVars["Remove"].IntValue;
+        for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_remove && DonQuixote_i < DonQuixote_buffs.Count; DonQuixote_i++)
+        {
+            await PowerCmd.Remove(DonQuixote_buffs[DonQuixote_i]);
+        }
+
+        await PowerCmd.Apply<DonQuixotePowerWoundDestruction>(
+            DonQuixote_ctx, DonQuixote_play.Target, 1m, Owner.Creature, this, false);
+    }
+}

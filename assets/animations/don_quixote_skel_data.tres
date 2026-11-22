@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://b096yungy38mb"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://gyud11omgjcca" path="res://DonQuixote/animations/don_quixote.spatlas" id="1_atlas"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://kkwkv5xib4bla" path="res://DonQuixote/animations/don_quixote.spjson" id="2_skel"]
+
+[resource]
+atlas_res = ExtResource("1_atlas")
+skeleton_file_res = ExtResource("2_skel")

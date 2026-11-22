@@ -1,0 +1,8 @@
+{
+  "DON_QUIXOTE_ENCHANTMENT_DON_QUIXOTE_INDESTRUCTIBLE_CARD.title": "不可摧毁卡牌",
+  "DON_QUIXOTE_ENCHANTMENT_DON_QUIXOTE_INDESTRUCTIBLE_CARD.description": "此卡被消耗或虚无时，自动打出并进入弃牌堆，不会进入消耗牌堆，但是造成的最终伤害-80%。\n没有具体目标的技能牌会指向最左侧的目标；能力牌被自动打出后不会进入弃牌堆。",
+  "DON_QUIXOTE_ENCHANTMENT_DON_QUIXOTE_INDESTRUCTIBLE_CARD.extraCardText": "不可摧毁卡牌",
+  "DON_QUIXOTE_ENCHANTMENT_INDESTRUCTIBLE_CARD.title": "不可摧毁卡牌",
+  "DON_QUIXOTE_ENCHANTMENT_INDESTRUCTIBLE_CARD.description": "此卡被消耗或虚无时，自动打出并进入弃牌堆，不会进入消耗牌堆，但是造成的最终伤害-80%。\n没有具体目标的技能牌会指向最左侧的目标；能力牌被自动打出后不会进入弃牌堆。",
+  "DON_QUIXOTE_ENCHANTMENT_INDESTRUCTIBLE_CARD.extraCardText": "不可摧毁卡牌"
+}

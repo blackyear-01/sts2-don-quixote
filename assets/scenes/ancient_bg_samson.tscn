@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3 uid="{{UID:scene}}"]
+
+[ext_resource type="Texture2D" uid="{{UID:bg}}" path="res://DonQuixote/images/events/bg_samson.png" id="1_bg"]
+
+[node name="SamsonAncientBackground" type="Control"]
+layout_mode = 3
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Bg" type="TextureRect" parent="."]
+layout_mode = 1
+anchor_left = -0.1
+anchor_top = -0.1
+anchor_right = 1.1
+anchor_bottom = 1.1
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+texture = ExtResource("1_bg")
+
+[node name="Tint" type="ColorRect" parent="."]
+layout_mode = 1
+anchor_left = -0.1
+anchor_top = -0.1
+anchor_right = 1.1
+anchor_bottom = 1.1
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.04, 0.02, 0.07, 0.12)

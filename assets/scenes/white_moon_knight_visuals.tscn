@@ -1,0 +1,47 @@
+[gd_scene load_steps=3 format=3 uid="{{UID:scene}}"]
+
+[ext_resource type="Script" uid="uid://cghtlla3sw0po" path="res://src/Core/Nodes/Combat/NCreatureVisuals.cs" id="1_vis"]
+[ext_resource type="Texture2D" uid="{{UID:idle}}" path="res://DonQuixote/images/creatures/barry_idle.png" id="2_idle"]
+
+; 几何说明（和 tools/barry_frames.py 的输出对应）：
+;   帧画布 422x546，角色踩在画布 y=470 处，脸在画布水平中线。
+;   贴图 scale=1.4 → 角色身高 214*1.4 = 300（和玩家角色一致），
+;   position.y = -(470-273)*1.4 = -276.2，这样脚底正好落在 y=0。
+;   %Bounds 取「角色 + 背后大刀鞘」的范围（高 376），血条与意图图标挂在它上方。
+[node name="WhiteMoonKnightVisuals" type="Node2D"]
+script = ExtResource("1_vis")
+
+[node name="Visuals" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -276.2)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("2_idle")
+
+[node name="Bounds" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_left = -180.0
+offset_top = -376.0
+offset_right = 180.0
+mouse_filter = 2
+
+[node name="VfxSpawnPosition" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -188)
+
+[node name="CenterPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -188)
+
+[node name="IntentPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -410)
+
+[node name="TalkPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -330)
+
+[node name="OrbPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -190)

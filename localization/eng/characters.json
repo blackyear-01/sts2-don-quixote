@@ -1,0 +1,17 @@
+{
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.title": "Don Quixote",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.titleObject": "Don Quixote",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.description": "An elder of the Bloodfiend clan of La Manchaland, creator of La Manchaland.\nShe hardens her blood into a lance and charges for the honour of her lineage.",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.pronounSubject": "she",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.pronounObject": "her",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.pronounPossessive": "her",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.possessiveAdjective": "her",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.cardsModifierTitle": "Don Quixote Cards",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.cardsModifierDescription": "Don Quixote's cards now appear in rewards and shops.",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.eventDeathPrevention": "Don Quixote props herself up on hardened blood. The duel is not over!",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.goldMonologue": "Gold? A tribute for the La Mancha domain, surely.",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.aromaPrinciple": "The scent of blood is sweeter than any balm.",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.bestiaryQuote": "Another duel partner! Have at thee!",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.banter.alive.endTurnPing": "Sancho! Adventure awaits us! Hurry up!",
+  "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER.banter.dead.endTurnPing": "...Sancho... I will wait for you."
+}
