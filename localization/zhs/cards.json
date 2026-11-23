@@ -180,6 +180,7 @@
   "DON_QUIXOTE_CARD_DON_QUIXOTE_ADVENTURE_SIGHT.description": "[gold]堕落[/gold] {Corruption:diff()}。\n造成{Damage:diff()}点伤害。\n施加{Vulnerable:diff()}层[gold]易损[/gold]。\n[red]血宴[/red] {BloodFeast:diff()}：[gold]增幅[/gold] {Amplify:diff()}。\n若造成的伤害大于{DamageAt:diff()}点，获得{FeastGain:diff()}层[red]血宴[/red]。",
   "DON_QUIXOTE_CARD_DON_QUIXOTE_HAZY_MEMORY.title": "朦胧的回忆",
   "DON_QUIXOTE_CARD_DON_QUIXOTE_HAZY_MEMORY.description": "造成{Damage:diff()}点伤害。\n从[gold]消耗牌堆[/gold]选择1张牌加入手牌。\n[red]血宴[/red] {FeastLow:diff()}：获得{Impulse:diff()}层[gold]复还的血之冲动[/gold]。\n[red]血宴[/red] {FeastHigh:diff()}：[gold]技巧[/gold] {Technique:diff()}，[gold]增幅[/gold] {Amplify:diff()}。",
+  "DON_QUIXOTE_CARD_DON_QUIXOTE_HAZY_MEMORY.selectionScreenPrompt": "选择1张牌加入手牌",
   "DON_QUIXOTE_CARD_DON_QUIXOTE_REINFORCE_DEFENSE.title": "加强防御",
   "DON_QUIXOTE_CARD_DON_QUIXOTE_REINFORCE_DEFENSE.description": "{IfUpgraded:show:[gold]摇曳【血魔】[/gold]持续多1回合后减半。\n[gold]血铠[/gold]不再减少。|[gold]摇曳【血魔】[/gold]持续多1回合后减半。}",
   "DON_QUIXOTE_CARD_DON_QUIXOTE_HARD_BLOOD_TEACHING.selectionScreenPrompt": "选择要附魔的卡",

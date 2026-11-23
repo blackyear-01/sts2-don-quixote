@@ -9,7 +9,7 @@
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_KNIGHT_OF_INSTINCT.description": "战斗开始时，向自身施加与计数等量的[gold]堕落值[/gold]（遗物下方显示计数）。\n右键一张手牌：消耗30点[red]血宴[/red]，为其附魔[gold]不可摧毁卡牌[/gold]，并获得30点[red]消耗血宴总数[/red]。",
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_KNIGHT_OF_INSTINCT.flavor": "每一次挥枪，都让骑士更接近本能。",
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_BLOOD_CRYSTAL.title": "血液结晶",
-  "DON_QUIXOTE_RELIC_DON_QUIXOTE_BLOOD_CRYSTAL.description": "回合结束时，根据全体敌方单位的[red]流血[/red]，回复「总[red]流血[/red]强度 × 总层数 × 0.01」的生命。",
+  "DON_QUIXOTE_RELIC_DON_QUIXOTE_BLOOD_CRYSTAL.description": "回合结束时，每个有[red]流血[/red]的敌方单位各回复「[red]流血[/red]强度 × 层数 × 0.01」点生命（向上取整，至少1点）。",
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_BLOOD_CRYSTAL.flavor": "凝固的血，也能重新流动。",
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_SANCHO_FOLLOWER.title": "二代眷属-桑丘",
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_SANCHO_FOLLOWER.description": "每两回合获得2层[gold]摇曳【血魔】[/gold]。",

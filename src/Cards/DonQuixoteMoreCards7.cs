@@ -546,16 +546,25 @@ public sealed class DonQuixoteHazyMemory : ModCardTemplate, IDonQuixoteCorrupted
             .Execute(DonQuixote_ctx);
 
         // 从消耗牌堆里自选 1 张加入手牌（原来是从弃牌堆随机拿 1 张）。
+        //
+        // 用 FromSimpleGrid 而不是 FromCombatPile：原版没有任何卡是「从消耗牌堆选牌」，
+        // NCombatPileCardSelectScreen 对 Exhaust 堆没有验证过；SimpleGrid 是通用卡牌网格，
+        // 只要给它一组牌就行，稳定得多。
         CardPile DonQuixote_exhaust = PileType.Exhaust.GetPile(Owner);
         if (DonQuixote_exhaust != null && DonQuixote_exhaust.Cards.Count > 0)
         {
+            List<CardModel> DonQuixote_choices = DonQuixote_exhaust.Cards.ToList();
+
+            // 提示文本必须有对应的 .selectionScreenPrompt 键，否则该属性会直接抛异常，
+            // 表现为打出后卡牌停在画面中间、选牌界面不出现。
             CardSelectorPrefs DonQuixote_pickPrefs = new CardSelectorPrefs(SelectionScreenPrompt, 1);
             List<CardModel> DonQuixote_picked =
-                (await CardSelectCmd.FromCombatPile(DonQuixote_ctx, DonQuixote_exhaust, Owner, DonQuixote_pickPrefs)).ToList();
+                (await CardSelectCmd.FromSimpleGrid(DonQuixote_ctx, DonQuixote_choices, Owner, DonQuixote_pickPrefs))
+                .ToList();
 
             foreach (CardModel DonQuixote_card in DonQuixote_picked)
             {
-                if (DonQuixote_card == null)
+                if (DonQuixote_card == null || DonQuixote_card.Pile?.Type != PileType.Exhaust)
                 {
                     continue;
                 }

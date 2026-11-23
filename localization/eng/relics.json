@@ -9,7 +9,7 @@
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_KNIGHT_OF_INSTINCT.description": "At the start of combat, apply [gold]Corruption[/gold] equal to its counter (shown under the relic).\nRight-click a card in your hand: spend 30 [red]Bloodfeast[/red] to Enchant it with [gold]Indestructible Card[/gold] and gain 30 [red]Total Bloodfeast Spent[/red].",
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_KNIGHT_OF_INSTINCT.flavor": "Every charge brings the knight closer to instinct.",
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_BLOOD_CRYSTAL.title": "Blood Crystal",
-  "DON_QUIXOTE_RELIC_DON_QUIXOTE_BLOOD_CRYSTAL.description": "At the end of your turn, heal for 0.01 x (total enemy [red]Bleed[/red] x total enemy [red]Bleed[/red] Layers).",
+  "DON_QUIXOTE_RELIC_DON_QUIXOTE_BLOOD_CRYSTAL.description": "At the end of your turn, each enemy with [red]Bleed[/red] heals you for 0.01 x its [red]Bleed[/red] Strength x its [red]Bleed[/red] Layers (rounded up, minimum 1 per enemy).",
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_BLOOD_CRYSTAL.flavor": "Even clotted blood can flow again.",
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_SANCHO_FOLLOWER.title": "Second Generation Kindred - Sancho",
   "DON_QUIXOTE_RELIC_DON_QUIXOTE_SANCHO_FOLLOWER.description": "Every two turns, gain 2 [gold]Shimmering【Bloodfiend】[/gold].",

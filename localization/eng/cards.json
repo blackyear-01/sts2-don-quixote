@@ -179,6 +179,7 @@
   "DON_QUIXOTE_CARD_DON_QUIXOTE_ADVENTURE_SIGHT.title": "Tales of Adventure",
   "DON_QUIXOTE_CARD_DON_QUIXOTE_ADVENTURE_SIGHT.description": "[gold]Corruption[/gold] {Corruption:diff()}.\nDeal {Damage:diff()} damage.\nApply {Vulnerable:diff()} [gold]Vulnerable[/gold].\nWith {BloodFeast:diff()} [red]Bloodfeast[/red]: [gold]Amplify[/gold] {Amplify:diff()}.\nIf this deals more than {DamageAt:diff()} damage, gain {FeastGain:diff()} [red]Bloodfeast[/red].",
   "DON_QUIXOTE_CARD_DON_QUIXOTE_HAZY_MEMORY.title": "Hazy Memory",
+  "DON_QUIXOTE_CARD_DON_QUIXOTE_HAZY_MEMORY.selectionScreenPrompt": "Choose 1 card to put into your hand",
   "DON_QUIXOTE_CARD_DON_QUIXOTE_HAZY_MEMORY.description": "Deal {Damage:diff()} damage.\nChoose 1 card from your [gold]Exhaust[/gold] pile and put it into your hand.\nWith {FeastLow:diff()} [red]Bloodfeast[/red]: gain {Impulse:diff()} [gold]Returning Bloodlust[/gold].\nWith {FeastHigh:diff()} [red]Bloodfeast[/red]: [gold]Technique[/gold] {Technique:diff()}, [gold]Amplify[/gold] {Amplify:diff()}.",
   "DON_QUIXOTE_CARD_DON_QUIXOTE_REINFORCE_DEFENSE.title": "Reinforce Defense",
   "DON_QUIXOTE_CARD_DON_QUIXOTE_REINFORCE_DEFENSE.description": "{IfUpgraded:show:[gold]Shimmering【Bloodfiend】[/gold] lasts 1 more turn before halving.\n[gold]Blood Armor[/gold] no longer decays.|[gold]Shimmering【Bloodfiend】[/gold] lasts 1 more turn before halving.}",

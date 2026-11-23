@@ -343,7 +343,7 @@ public sealed class DonQuixoteKnightOfInstinct : ModRelicTemplate
 
 /// <summary>
 /// 血液结晶（稀有）：回合结束时，按全体敌方单位的流血回血
-/// —— 总流血强度 × 总层数 × 0.01（向上取整）。
+/// —— 每个有流血的敌人各按「强度 × 层数 × 0.01」回复，逐敌向上取整且至少 1 点。
 /// 旧版是「自身流血强度减半 + 按自身强度×层数回血」，新版不再动自身流血。
 /// </summary>
 [RegisterRelic(typeof(DonQuixoteRelicPool))]
@@ -380,38 +380,49 @@ public sealed class DonQuixoteBloodCrystal : ModRelicTemplate
             return;
         }
 
-        int DonQuixote_totalStrength = 0;
-        int DonQuixote_totalLayers = 0;
+        // 逐个敌人结算：只要该敌人身上还有流血，就按下式回复并向上取整，最少 1 点。
+        // 旧版是「全体总强度 × 总层数」再统一取整，两个敌人各只有几点流血时会被算没；
+        // 现在每个敌人都独立向上取整，有流血就一定回血。
+        int DonQuixote_bleedingEnemies = 0;
+        decimal DonQuixote_heal = 0m;
+        System.Text.StringBuilder DonQuixote_detail = new System.Text.StringBuilder();
 
         foreach (Creature DonQuixote_enemy in DonQuixoteStageRules.DonQuixote_LivingEnemies(DonQuixote_me))
         {
-            DonQuixote_totalStrength += DonQuixoteBloodMagic.DonQuixote_BleedStrength(DonQuixote_enemy);
-            DonQuixote_totalLayers += DonQuixoteBloodMagic.DonQuixote_BleedLayers(DonQuixote_enemy);
+            int DonQuixote_strength = DonQuixoteBloodMagic.DonQuixote_BleedStrength(DonQuixote_enemy);
+            int DonQuixote_layers = DonQuixoteBloodMagic.DonQuixote_BleedLayers(DonQuixote_enemy);
+            if (DonQuixote_strength <= 0 || DonQuixote_layers <= 0)
+            {
+                continue;
+            }
+
+            DonQuixote_bleedingEnemies++;
+
+            decimal DonQuixote_raw = DonQuixote_strength * DonQuixote_layers * DonQuixote_HealRate;
+            decimal DonQuixote_part = Math.Ceiling(DonQuixote_raw);
+            if (DonQuixote_part < 1m)
+            {
+                DonQuixote_part = 1m;
+            }
+
+            DonQuixote_heal += DonQuixote_part;
+
+            DonQuixote_detail.Append(" [").Append(DonQuixote_strength).Append('x')
+                .Append(DonQuixote_layers).Append(" raw=").Append(DonQuixote_raw)
+                .Append(" heal=").Append(DonQuixote_part).Append(']');
         }
 
-        if (DonQuixote_totalStrength <= 0 || DonQuixote_totalLayers <= 0)
+        if (DonQuixote_bleedingEnemies == 0 || DonQuixote_heal <= 0m)
         {
             DonQuixoteModEntry.DonQuixote_Logger?.Info(
-                "[DonQuixote] blood crystal: no bleed (strength=" + DonQuixote_totalStrength
-                + " layers=" + DonQuixote_totalLayers + ")", 0);
+                "[DonQuixote] blood crystal: no bleeding enemy", 0);
             return;
         }
-
-        // 总强度 × 总层数 × 0.01，结果向上取整（本模组统一规则）。
-        decimal DonQuixote_heal = Math.Ceiling(
-            DonQuixote_totalStrength * DonQuixote_totalLayers * DonQuixote_HealRate);
 
         DonQuixoteModEntry.DonQuixote_Logger?.Info(
-            "[DonQuixote] blood crystal: strength=" + DonQuixote_totalStrength
-            + " layers=" + DonQuixote_totalLayers
-            + " raw=" + (DonQuixote_totalStrength * DonQuixote_totalLayers * DonQuixote_HealRate)
-            + " heal=" + DonQuixote_heal
+            "[DonQuixote] blood crystal: enemies=" + DonQuixote_bleedingEnemies
+            + " heal=" + DonQuixote_heal + DonQuixote_detail
             + " hp=" + DonQuixote_me.CurrentHp + "/" + DonQuixote_me.MaxHp, 0);
-
-        if (DonQuixote_heal <= 0m)
-        {
-            return;
-        }
 
         await CreatureCmd.Heal(DonQuixote_me, DonQuixote_heal, true);
     }
