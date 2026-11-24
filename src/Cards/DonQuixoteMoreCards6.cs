@@ -114,6 +114,11 @@ public sealed class DonQuixoteBloodSpread : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodfiendMight : ModCardTemplate
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/bloodfiend_might.png";
+
     public DonQuixoteBloodfiendMight()
         : base(2, CardType.Power, CardRarity.Uncommon, TargetType.Self)
     {

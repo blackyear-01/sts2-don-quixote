@@ -146,6 +146,11 @@ public sealed class DonQuixoteClotIntoArmor : DonQuixoteBloodFeastCard
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteFreezeBloodAroundUs : DonQuixoteBloodFeastCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/freeze_blood_around_us.png";
+
     public DonQuixoteFreezeBloodAroundUs()
         : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.AllAllies)
     {

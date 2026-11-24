@@ -459,6 +459,11 @@ public sealed class DonQuixoteNoReflection : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteSanchoBloodImitation : ModCardTemplate, IDonQuixoteBloodForgeCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/sancho_blood_imitation.png";
+
     public DonQuixoteSanchoBloodImitation()
         : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.Self)
     {

@@ -240,7 +240,7 @@ public sealed class DonQuixotePowerWavering : ModPowerTemplate
 }
 
 /// <summary>
-/// 流血 X/Y：敌方每次行动（攻击的每段伤害、获得格挡、获得状态）时受到 X 点伤害。
+/// 流血 X/Y：敌方按头顶的意图行动时受到 X 点伤害——攻击意图每段触发一次，其它意图每次行动触发一次。
 /// </summary>
 public sealed class DonQuixotePowerBleed : ModPowerTemplate, IPowerExtraIconAmountLabelsProvider
 {
@@ -339,12 +339,21 @@ public sealed class DonQuixotePowerBleed : ModPowerTemplate, IPowerExtraIconAmou
         }
 
         // 多段攻击按「段」结算：每一段都触发一次流血，并且各扣 1 层（层数扣完就自然停下）。
+        // 同一次伤害结算打中多个玩家（多人联机）只算一段，不会因为人数变多而多触发。
         if (DonQuixote_LastBleedBatch == DonQuixote_DamageBatch)
         {
             return;
         }
 
+        // 意图上写了多少段就最多触发多少次：怪物把一次攻击拆成对每个玩家单独结算时也不会翻倍。
+        if (DonQuixote_CurrentMoveAttackHits > 0
+            && DonQuixote_MoveTriggerCount >= DonQuixote_CurrentMoveAttackHits)
+        {
+            return;
+        }
+
         DonQuixote_LastBleedBatch = DonQuixote_DamageBatch;
+        DonQuixote_MoveTriggerCount++;
 
         // 攻击段也算「这次行动结算过」，这样行动结束的兜底不会再补一次。
         DonQuixote_MarkActionSettled(Owner);
@@ -378,6 +387,26 @@ public sealed class DonQuixotePowerBleed : ModPowerTemplate, IPowerExtraIconAmou
     /// 当前这次敌方行动是不是「眩晕 / 睡眠」——这类行动不触发流血。
     /// </summary>
     private static bool DonQuixote_CurrentMoveInert;
+
+    /// <summary>
+    /// 当前这次敌方行动的意图里有没有攻击（有攻击时只按段数结算，不再额外按效果结算）。
+    /// </summary>
+    internal static bool DonQuixote_CurrentMoveHasAttack;
+
+    /// <summary>
+    /// 当前这次敌方行动的意图里一共有多少段攻击（多段攻击按段触发流血）。
+    /// </summary>
+    internal static int DonQuixote_CurrentMoveAttackHits;
+
+    /// <summary>
+    /// 当前这次敌方行动的 id（只用来打日志）。
+    /// </summary>
+    internal static string DonQuixote_CurrentMoveId;
+
+    /// <summary>
+    /// 这次行动里已经因为攻击触发过几次流血（用来卡「段数」上限）。
+    /// </summary>
+    private static int DonQuixote_MoveTriggerCount;
 
     /// <summary>
     /// 这次敌方行动到目前为止有没有结算过流血（有无都会阻止「行动结束兜底」再补一次）。
@@ -421,7 +450,26 @@ public sealed class DonQuixotePowerBleed : ModPowerTemplate, IPowerExtraIconAmou
     internal static void DonQuixote_BeginAction(MoveState DonQuixote_move)
     {
         DonQuixote_MoveSerial++;
+        DonQuixote_CurrentMoveId = DonQuixote_move?.Id;
         DonQuixote_CurrentMoveInert = DonQuixote_IsInertMove(DonQuixote_move);
+        DonQuixote_CurrentMoveHasAttack = false;
+        DonQuixote_CurrentMoveAttackHits = 0;
+        DonQuixote_MoveTriggerCount = 0;
+        if (!DonQuixote_CurrentMoveInert && DonQuixote_move?.Intents != null)
+        {
+            foreach (AbstractIntent DonQuixote_intent in DonQuixote_move.Intents)
+            {
+                if (DonQuixote_intent is AttackIntent DonQuixote_attack)
+                {
+                    DonQuixote_CurrentMoveHasAttack = true;
+                    if (DonQuixote_attack.Repeats > 0)
+                    {
+                        DonQuixote_CurrentMoveAttackHits += DonQuixote_attack.Repeats;
+                    }
+                }
+            }
+        }
+
         DonQuixote_Claims.Clear();
         DonQuixote_ClaimSerial = -1;
         DonQuixote_ClaimActor = null;
@@ -434,10 +482,43 @@ public sealed class DonQuixotePowerBleed : ModPowerTemplate, IPowerExtraIconAmou
     internal static void DonQuixote_EndAction()
     {
         DonQuixote_CurrentMoveInert = false;
+        DonQuixote_CurrentMoveHasAttack = false;
+        DonQuixote_CurrentMoveAttackHits = 0;
+        DonQuixote_MoveTriggerCount = 0;
+        DonQuixote_CurrentMoveId = null;
         DonQuixote_AnyClaimThisAction = false;
         DonQuixote_Claims.Clear();
         DonQuixote_ClaimSerial = -1;
         DonQuixote_ClaimActor = null;
+    }
+
+    /// <summary>
+    /// 「非攻击类效果」能不能触发流血：只有正在执行、且意图里没有攻击的行动才算一次行动。
+    /// 这样「获得格挡 / 上状态 / 塞牌」不会各自再触发一遍，多人时也不会因为目标多而多触发。
+    /// </summary>
+    internal static bool DonQuixote_CanTriggerFromMoveEffect(Creature DonQuixote_actor)
+    {
+        if (DonQuixote_actor == null || DonQuixote_actor.IsDead)
+        {
+            return false;
+        }
+
+        if (DonQuixote_CurrentMoveInert)
+        {
+            return false;
+        }
+
+        if (DonQuixote_CurrentMoveHasAttack)
+        {
+            return false;
+        }
+
+        if (DonQuixote_actor.Monster == null || !DonQuixote_actor.Monster.IsPerformingMove)
+        {
+            return false;
+        }
+
+        return DonQuixoteBloodMagic.DonQuixote_Find<DonQuixotePowerBleed>(DonQuixote_actor) != null;
     }
 
     private static bool DonQuixote_IsInertMove(MoveState DonQuixote_move)
@@ -487,6 +568,12 @@ public sealed class DonQuixotePowerBleed : ModPowerTemplate, IPowerExtraIconAmou
             DonQuixote_ClaimSerial = DonQuixote_MoveSerial;
             DonQuixote_ClaimActor = DonQuixote_actor;
             DonQuixote_Claims.Clear();
+        }
+
+        // 一次行动只结算一次：同一次行动里先后获得格挡 / 上状态 / 塞牌都算同一个意图。
+        if (DonQuixote_AnyClaimThisAction)
+        {
+            return false;
         }
 
         string DonQuixote_key = DonQuixote_category.ToString()
@@ -642,6 +729,12 @@ public sealed class DonQuixotePowerBleed : ModPowerTemplate, IPowerExtraIconAmou
             return;
         }
 
+        // 必须是这次意图本身给的格挡（被动涨甲、玩家给盾都不算），并且这次行动里没有攻击意图。
+        if (!DonQuixote_CanTriggerFromMoveEffect(Owner))
+        {
+            return;
+        }
+
         if (!DonQuixote_TryClaimAction(Owner, DonQuixote_BleedCategoryBlock, null))
         {
             return;
@@ -699,6 +792,12 @@ public sealed class DonQuixotePowerBleed : ModPowerTemplate, IPowerExtraIconAmou
             return;
         }
 
+        // 这次行动里带攻击的话，只按攻击的段数结算。
+        if (!DonQuixote_CanTriggerFromMoveEffect(Owner))
+        {
+            return;
+        }
+
         // 一次行动里连给多张状态牌只结算一次（否则「给 10 张」会瞬间打光 10 层）。
         if (!DonQuixote_TryClaimAction(Owner, DonQuixote_BleedCategoryCards, null))
         {
@@ -737,13 +836,13 @@ public sealed class DonQuixotePowerBleed : ModPowerTemplate, IPowerExtraIconAmou
             return;
         }
 
-        // 上增益和上负面是两类不同的行动：同一个意图里既给玩家上负面、又给自己上增益。
-        bool DonQuixote_onPlayer = power.Owner != null && power.Owner.Player != null;
-        int DonQuixote_category = DonQuixote_onPlayer
-            ? DonQuixote_BleedCategoryDebuff
-            : DonQuixote_BleedCategoryBuff;
+        // 上增益和上负面是同一类「行动」：一次行动只结算一次，多人时每个目标各触发一遍也不重复。
+        if (!DonQuixote_CanTriggerFromMoveEffect(Owner))
+        {
+            return;
+        }
 
-        if (!DonQuixote_TryClaimAction(Owner, DonQuixote_category, power.Id.Entry))
+        if (!DonQuixote_TryClaimAction(Owner, DonQuixote_BleedCategoryBuff, null))
         {
             return;
         }

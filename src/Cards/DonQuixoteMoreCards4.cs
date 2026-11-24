@@ -82,6 +82,11 @@ public sealed class DonQuixoteHardBloodWedge : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteShatteredHardBlood : ModCardTemplate
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/shattered_hard_blood.png";
+
     public DonQuixoteShatteredHardBlood()
         : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.Self)
     {
@@ -106,6 +111,11 @@ public sealed class DonQuixoteShatteredHardBlood : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteEmptyComfortDream : ModCardTemplate, IDonQuixoteCorruptible
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/empty_comfort_dream.png";
+
     public const int DonQuixote_CorruptionThreshold = 80;
 
     public int DonQuixote_CorruptAt => DonQuixote_CorruptionThreshold;
@@ -160,6 +170,11 @@ public sealed class DonQuixoteEmptyComfortDream : ModCardTemplate, IDonQuixoteCo
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteSelfishWishOfFamily : DonQuixoteHardBloodCard, IDonQuixoteCorruptedCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/selfish_wish_of_family.png";
+
     public DonQuixoteSelfishWishOfFamily()
         : base(3, CardType.Attack, CardRarity.Rare, TargetType.AllEnemies)
     {
@@ -727,6 +742,11 @@ public sealed class DonQuixoteBloodCheer : DonQuixoteBloodFeastCard
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteAllClottedBlood : ModCardTemplate
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/all_clotted_blood.png";
+
     public DonQuixoteAllClottedBlood()
         : base(1, CardType.Power, CardRarity.Uncommon, TargetType.Self)
     {

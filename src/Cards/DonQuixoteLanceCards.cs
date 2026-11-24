@@ -341,6 +341,11 @@ public sealed class DonQuixoteTacticalTechnique : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteKnightlyProtection : ModCardTemplate, IDonQuixoteCorruptible, IDonQuixoteBloodForgeCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/knightly_protection.png";
+
     public int DonQuixote_ForgeCost => DynamicVars["Forge"].IntValue;
 
     public DonQuixoteKnightlyProtection()
@@ -407,6 +412,11 @@ public sealed class DonQuixoteKnightlyProtection : ModCardTemplate, IDonQuixoteC
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodSweep : ModCardTemplate, IDonQuixoteCorruptedCard, IDonQuixoteBloodForgeCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_sweep.png";
+
     public int DonQuixote_ForgeCost => DynamicVars["Forge"].IntValue;
 
     public DonQuixoteBloodSweep()
@@ -580,17 +590,34 @@ public sealed class DonQuixoteHardBloodPierce : ModCardTemplate
         int DonQuixote_layers = DonQuixoteBloodMagic.DonQuixote_BleedLayers(DonQuixote_target);
         for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_layers && !DonQuixote_target.IsDead; DonQuixote_i++)
         {
-            await DonQuixoteBloodMagic.DonQuixote_TriggerBleed(DonQuixote_ctx, DonQuixote_target, true);
+            // 不扣层：次数要等于层数，扣层会在中途把流血打光（层数用完流血就被移除了）。
+            await DonQuixoteBloodMagic.DonQuixote_TriggerBleed(DonQuixote_ctx, DonQuixote_target, false);
         }
 
+        if (DonQuixote_target.IsDead)
+        {
+            return;
+        }
+
+        // 然后把层数压到 1 层（保留强度），和卡面的「把层数压到1层」对上。
         DonQuixotePowerBleedLayers DonQuixote_layersPower =
             DonQuixoteBloodMagic.DonQuixote_Find<DonQuixotePowerBleedLayers>(DonQuixote_target);
-        if (DonQuixote_layersPower != null && DonQuixote_layersPower.Amount > 1)
+        if (DonQuixote_layersPower != null && DonQuixote_layersPower.Amount > DonQuixote_KeepLayers)
         {
             await PowerCmd.ModifyAmount(
-                DonQuixote_ctx, DonQuixote_layersPower, -(DonQuixote_layersPower.Amount - 1), Owner.Creature, this, true);
+                DonQuixote_ctx,
+                DonQuixote_layersPower,
+                -(DonQuixote_layersPower.Amount - DonQuixote_KeepLayers),
+                Owner.Creature,
+                this,
+                true);
         }
     }
+
+    /// <summary>
+    /// 贯穿结算后留下的流血层数（卡面写的是 1 层）。
+    /// </summary>
+    private const int DonQuixote_KeepLayers = 1;
 }
 
 /// <summary>

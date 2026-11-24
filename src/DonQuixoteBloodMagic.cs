@@ -873,7 +873,10 @@ internal static class DonQuixoteBloodMagic
             + " layers_before=" + DonQuixote_layers
             + " layers_after=" + DonQuixote_BleedLayers(DonQuixote_bleeding)
             + " hits=" + DonQuixote_hits
-            + " consume_layers=" + DonQuixote_consumeLayers,
+            + " consume_layers=" + DonQuixote_consumeLayers
+            + " move=" + (DonQuixote_bleeding.Player == null
+                ? Powers.DonQuixotePowerBleed.DonQuixote_CurrentMoveId ?? "?"
+                : "-"),
             0);
     }
 

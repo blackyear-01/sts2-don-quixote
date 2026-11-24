@@ -337,6 +337,11 @@ public sealed class DonQuixoteAbandonAll : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodTeaching : ModCardTemplate, IDonQuixoteHardBloodCost
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_teaching.png";
+
     public int DonQuixote_HardBloodCost => DynamicVars["HardBlood"].IntValue;
 
     public DonQuixoteHardBloodTeaching()

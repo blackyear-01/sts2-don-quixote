@@ -17,6 +17,11 @@ namespace DonQuixote.Cards;
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteLatentBlood : ModCardTemplate
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/latent_blood.png";
+
     public DonQuixoteLatentBlood()
         : base(3, CardType.Power, CardRarity.Rare, TargetType.Self)
     {
