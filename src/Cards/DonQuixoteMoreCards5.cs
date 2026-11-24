@@ -718,11 +718,22 @@ public sealed class DonQuixoteLaSangre : DonQuixoteBloodFeastCard
         // 需要 100 点血宴；出牌已被 CanPlay 拦下，这里只是把血宴扣掉。
         await DonQuixote_TriggerBloodFeast(DonQuixote_ctx);
 
-        // 参考「无厌沙虫-沙坑」的处决写法：CreatureCmd.Kill(creature, force: true)，
-        // 直接走死亡结算，不产生伤害数字，也不受难以杀灭/滑板/无实体等减伤与免死影响。
+        // 参考控制台 "win" 的做法：先把目标身上的能力全部清掉，再走一次真正的 Kill。
+        //
+        // 很多 Boss 的「免死 / 限伤 / 阶段保护」都挂在自己的 Power 上（例如下界亚波伦的
+        // ApocalypticRadiancePower + ApollyonDirectDeathProtection 会 patch 掉
+        // KillWithoutCheckingWinCondition，把任何击杀转成一次小额扣血）。
+        // Power 被移除后，那些 Prefix 查不到 Power 就会直接放行，Kill 才是真击杀。
         if (!DonQuixote_target.IsDead)
         {
+            DonQuixote_target.RemoveAllPowersInternalExcept();
             await CreatureCmd.Kill(DonQuixote_target, true);
+        }
+
+        // Kill 内部走的是 KillWithoutCheckingWinCondition，胜利判定要自己补一次。
+        if (CombatManager.Instance.IsInProgress)
+        {
+            await CombatManager.Instance.CheckWinCondition();
         }
 
         await DonQuixote_RemoveFromDeck();
