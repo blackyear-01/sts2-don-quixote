@@ -7,10 +7,6 @@ namespace DonQuixote.Encounters;
 
 /// <summary>
 /// 白月骑士-巴里的 Boss 遭遇（只在「折射轨道线」章节出现）。
-///
-/// 背景不走原版 <c>BackgroundAssets</c> 的目录约定，而是由怪物自己
-/// （<see cref="Monsters.DonQuixoteWhiteMoonKnight.AfterAddedToRoom"/>）挂一层全屏贴图，
-/// 所以这里 <see cref="EncounterModel.HasCustomBackground"/> 保持 false，避免去读不存在的层目录。
 /// </summary>
 public sealed class DonQuixoteWhiteMoonKnightEncounter : EncounterModel
 {

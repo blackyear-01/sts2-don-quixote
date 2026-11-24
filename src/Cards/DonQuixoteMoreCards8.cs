@@ -19,15 +19,18 @@ namespace DonQuixote.Cards;
 
 /// <summary>
 /// 不被允许的期待：0 费技能，消耗手里 2 张牌，抽 1 张。
-/// 升级后：消耗 2 张牌，改成从抽牌堆挑 1 张加入手牌。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteUnallowedExpectation : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\不被允许的期待.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\不被允许的期待.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/unallowed_expectation.png";
 
-    /// <summary>要消耗的手牌数量。</summary>
+    /// <summary>
+    /// 要消耗的手牌数量。
+    /// </summary>
     private const int DonQuixote_ExhaustCount = 2;
 
     public DonQuixoteUnallowedExpectation()
@@ -103,7 +106,9 @@ public sealed class DonQuixoteUnallowedExpectation : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteAllInVain : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\所做皆为徒劳.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\所做皆为徒劳.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/all_in_vain.png";
 
     public DonQuixoteAllInVain()
@@ -140,13 +145,14 @@ public sealed class DonQuixoteAllInVain : ModCardTemplate
 }
 
 /// <summary>
-/// 陌生的晚宴：X 费技能，对全体敌人结算 X 次流血（每次各减 1 层），并失去自身 2X 点生命。
-/// 升级后：本次结算中流血获得的血宴翻倍。
+/// 陌生的晚宴：X 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteStrangeBanquet : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\陌生的晚宴.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\陌生的晚宴.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/strange_banquet.png";
 
     public DonQuixoteStrangeBanquet()
@@ -154,7 +160,9 @@ public sealed class DonQuixoteStrangeBanquet : ModCardTemplate
     {
     }
 
-    /// <summary>X 费：能量全部投入，X = 本回合消耗的能量。</summary>
+    /// <summary>
+    /// X 费：能量全部投入，X = 本回合消耗的能量。
+    /// </summary>
     protected override bool HasEnergyCostX => true;
 
     protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
@@ -184,7 +192,7 @@ public sealed class DonQuixoteStrangeBanquet : ModCardTemplate
                         break;
                     }
 
-                    // consumeLayers: true —— 每触发一次同时减 1 层流血。
+                    // consumeLayers: true.
                     await DonQuixoteBloodMagic.DonQuixote_TriggerBleed(DonQuixote_ctx, DonQuixote_enemy, true);
                 }
             }

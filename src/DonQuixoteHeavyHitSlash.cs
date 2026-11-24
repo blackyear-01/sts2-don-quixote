@@ -11,33 +11,38 @@ using DonQuixote.Cards;
 namespace DonQuixote;
 
 /// <summary>
-/// 重击演出：单段伤害 &gt; 20 时，角色换成「举手蓄力 → 挥手投出」的重击立绘
-/// （骨架里的 <c>HeavyHit</c>，两帧由 tools/make_heavy_art.py 从
-/// 资源\人物\战斗立绘-重击.gif 水平翻转、打进 don_quixote.png 图集），
-/// 同时把血马化成的长枪从身体后上方甩向被打的怪物。
-///
-/// 立绘走 track 1（0 留给状态机），播完清轨；
-/// 投掷物是一个独立的 Sprite2D，**绕图片中心自转**（offset 留空），
-/// 位置按「枪尖局部偏移 × 旋转角」反推，所以自旋时不偏、命中时枪尖仍精确落在怪物身上。
+/// 重击演出：单段伤害 &gt; 20 时。
 /// </summary>
 internal static class DonQuixoteHeavyHitSlash
 {
-    /// <summary>骨架里的动画名（make_spine.py 里同时导出了 HeavyHit / heavy_hit）。</summary>
+    /// <summary>
+    /// 骨架里的动画名（make_spine.py 里同时导出了 HeavyHit / heavy_hit）。
+    /// </summary>
     public const string DonQuixote_Anim = "HeavyHit";
 
-    /// <summary>专用轨道：0 留给角色状态机。</summary>
+    /// <summary>
+    /// 专用轨道：0 留给角色状态机。
+    /// </summary>
     private const int DonQuixote_Track = 1;
 
-    /// <summary>动画时长，与 make_spine.py 的 HEAVY_END 一致。</summary>
+    /// <summary>
+    /// 动画时长，与 make_spine.py 的 HEAVY_END 一致。
+    /// </summary>
     private const double DonQuixote_Length = 2.0;
 
-    /// <summary>清轨时刻：动画结束后多留一点余量。</summary>
+    /// <summary>
+    /// 清轨时刻：动画结束后多留一点余量。
+    /// </summary>
     private const double DonQuixote_ClearAt = DonQuixote_Length + 0.04;
 
-    /// <summary>触发门槛：单段未被格挡的伤害大于这个值才算重击。</summary>
+    /// <summary>
+    /// 触发门槛：单段未被格挡的伤害大于这个值才算重击。
+    /// </summary>
     private const int DonQuixote_Threshold = 20;
 
-    /// <summary>两次演出的最小间隔，避免多段伤害连着放满屏。</summary>
+    /// <summary>
+    /// 两次演出的最小间隔，避免多段伤害连着放满屏。
+    /// </summary>
     private const double DonQuixote_Cooldown = 1.3;
 
     private const string DonQuixote_MetaKey = "DonQuixoteHeavyHitSeq";
@@ -47,31 +52,43 @@ internal static class DonQuixoteHeavyHitSlash
     // ---- 投掷物时间轴（秒，从演出开始算）--------------------------------
     // 节奏：浮现 → 慢慢自旋瞄准 → 悬停停顿等挥手 → 猛地射出 → 命中后钉住一会儿再碎掉。
     // 角色动画：0-0.75 举手蓄力，0.75 之后保持挥手姿势到 2.0s（见 make_spine.py）。
-    /// <summary>长枪浮现的时刻：角色刚举手，武器先在高处聚形。</summary>
+    /// <summary>
+    /// 长枪浮现的时刻：角色刚举手，武器先在高处聚形。
+    /// </summary>
     private const double DonQuixote_WeaponIn = 0.08;
 
-    /// <summary>旋转瞄准完成的时刻：此时枪尖已指向怪物。</summary>
+    /// <summary>
+    /// 旋转瞄准完成的时刻：此时枪尖已指向怪物。
+    /// </summary>
     private const double DonQuixote_AimBy = 0.68;
 
-    /// <summary>停顿结束、脱手发射的时刻：留给角色把挥手动作做出来。</summary>
+    /// <summary>
+    /// 停顿结束、脱手发射的时刻：留给角色把挥手动作做出来。
+    /// </summary>
     private const double DonQuixote_ReleaseAt = 0.92;
 
-    /// <summary>命中时刻：快速发射，飞行时间压得很短。</summary>
+    /// <summary>
+    /// 命中时刻：快速发射，飞行时间压得很短。
+    /// </summary>
     private const double DonQuixote_HitAt = 1.09;
 
-    /// <summary>命中后钉在目标身上的停留时长，之后才碎裂消失。</summary>
+    /// <summary>
+    /// 命中后钉在目标身上的停留时长，之后才碎裂消失。
+    /// </summary>
     private const double DonQuixote_Stick = 0.5;
 
-    /// <summary>枪尖在贴图上的横向比例（贴图顶部正中，由 make_heavy_art.py 生成）。</summary>
+    /// <summary>
+    /// 枪尖在贴图上的横向比例（贴图顶部正中，由 make_heavy_art.py 生成）。
+    /// </summary>
     private const float DonQuixote_TipRatioX = 0.4578f;
 
-    /// <summary>起飞前自转的圈数（乘 π 得弧度，所以这里是「半圈」数）。</summary>
+    /// <summary>
+    /// 起飞前自转的圈数（乘 π 得弧度，所以这里是「半圈」数）。
+    /// </summary>
     private const float DonQuixote_AimSpin = 3.2f;
 
     /// <summary>
-    /// 长枪的最终显示缩放。贴图本身 296x668，比角色（约 300px 高）还长一倍多，
-    /// 1.0 时绕中心自转会把枪身甩出画面左边；0.6 大约 400px，整把枪都能留在画面里。
-    /// 注意枪尖偏移要一起缩放，否则命中点会偏移。
+    /// 长枪的最终显示缩放。
     /// </summary>
     private const float DonQuixote_WeaponScale = 0.6f;
 
@@ -92,8 +109,7 @@ internal static class DonQuixoteHeavyHitSlash
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// 伤害结算后判定：玩家是堂吉诃德、单段未格挡伤害 &gt; 20、不是长枪卡
-    /// （长枪卡自己有 LancePose 演出，两段撞一起会互相清轨）。
+    /// 伤害结算后判定：玩家是堂吉诃德、单段未格挡伤害 &gt; 20、不是长枪卡 （长枪卡自己有 LancePose 演出。
     /// </summary>
     public static void DonQuixote_OnDamageGiven(Creature? DonQuixote_Dealer, DamageResult? DonQuixote_Result, CardModel? DonQuixote_Card)
     {
@@ -228,10 +244,6 @@ internal static class DonQuixoteHeavyHitSlash
 
     /// <summary>
     /// 生成血马长枪并从身体后上方甩向目标。
-    ///
-    /// 贴图的枪尖在顶部正中，这里用 Sprite2D.Offset 把枪尖挪到节点原点 ——
-    /// 于是 rotation 是「绕枪尖转」、global_position 是「枪尖所在处」，
-    /// 瞄准时枪尖指着怪物转，命中时枪尖正好落在怪物身上。
     /// </summary>
     private static void DonQuixote_ThrowWeapon(NCreature DonQuixote_Owner, Creature DonQuixote_TargetCreature)
     {
@@ -266,7 +278,6 @@ internal static class DonQuixoteHeavyHitSlash
             Vector2 DonQuixote_Foot = DonQuixote_Owner.GlobalPosition;
 
             // 枪尖相对「贴图中心」的偏移：贴图顶部正中就是枪尖。
-            // 缩放会作用在局部偏移上，所以这里先乘上最终缩放，反推中心时才对得上。
             Vector2 DonQuixote_TipLocal = new Vector2(
                 DonQuixote_Texture.GetWidth() * (DonQuixote_TipRatioX - 0.5f),
                 -DonQuixote_Texture.GetHeight() * 0.5f) * DonQuixote_WeaponScale;
@@ -283,8 +294,7 @@ internal static class DonQuixoteHeavyHitSlash
             Vector2 DonQuixote_Dir = (DonQuixote_End - DonQuixote_TipAt).Normalized();
             float DonQuixote_Aim = Mathf.Atan2(DonQuixote_Dir.X, -DonQuixote_Dir.Y);
 
-            // 旋转轴改成图像中心之后，位置要反推：中心 = 枪尖 - R(aim)·枪尖局部偏移，
-            // 这样转到位时枪尖正好落在待发点。飞行终点同理反推，命中时枪尖才在目标身上。
+            // 旋转轴改成图像中心之后。
             Vector2 DonQuixote_TipOffset = DonQuixote_Rotate(DonQuixote_TipLocal, DonQuixote_Aim);
             Vector2 DonQuixote_Center = DonQuixote_TipAt - DonQuixote_TipOffset;
             Vector2 DonQuixote_CenterEnd = DonQuixote_End - DonQuixote_TipOffset;
@@ -323,7 +333,6 @@ internal static class DonQuixoteHeavyHitSlash
             DonQuixote_Tween.SetParallel(true);
 
             // 1) 自旋瞄准：绕图片中心转到位，本体同时放大显形。
-            //    Sine/InOut 让转速分布均匀，整段都看得清在转，而不是开头一下就转完。
             DonQuixote_Tween.TweenProperty(DonQuixote_Bullet, "rotation", DonQuixote_Aim, DonQuixote_SpinTime)
                 .SetTrans(Tween.TransitionType.Sine)
                 .SetEase(Tween.EaseType.InOut);
@@ -343,8 +352,7 @@ internal static class DonQuixoteHeavyHitSlash
                 .SetEase(Tween.EaseType.In);
             DonQuixote_Tween.TweenProperty(DonQuixote_Bullet, "scale", DonQuixote_FullScale * 0.92f, DonQuixote_FlyTime);
 
-            // 4) 命中：先让怪物抖一下（走游戏自己的 hurt 触发器），
-            //    长枪钉在原地停一会儿，然后再碎掉 —— 不然刚碰到就没了，看不清打击感。
+            // 4) 命中：先让怪物抖一下（走游戏自己的 hurt 触发器）。
             DonQuixote_Tween.Chain().TweenCallback(Callable.From(
                 () => DonQuixote_FlinchTarget(DonQuixote_TargetCreature, DonQuixote_TargetNode)));
             DonQuixote_Tween.Chain().TweenInterval(DonQuixote_Stick);
@@ -368,9 +376,7 @@ internal static class DonQuixoteHeavyHitSlash
     }
 
     /// <summary>
-    /// 命中瞬间让怪物抖一下：直接走游戏自己的受击触发器
-    /// （<c>SetAnimationTrigger("Hit")</c>，和 DoomPower 里用的是同一个）。
-    /// 已经死掉或正在播死亡动画的目标跳过，免得把死亡演出打断。
+    /// 命中瞬间让怪物抖一下：直接走游戏自己的受击触发器 （SetAnimationTrigger("Hit")。
     /// </summary>
     private static void DonQuixote_FlinchTarget(Creature? DonQuixote_Target, NCreature DonQuixote_TargetNode)
     {
@@ -412,7 +418,9 @@ internal static class DonQuixoteHeavyHitSlash
         }
     }
 
-    /// <summary>二维旋转，角度正方向与 Godot 一致（y 轴向下，视觉上顺时针）。</summary>
+    /// <summary>
+    /// 二维旋转，角度正方向与 Godot 一致（y 轴向下，视觉上顺时针）。
+    /// </summary>
     private static Vector2 DonQuixote_Rotate(Vector2 DonQuixote_V, float DonQuixote_Angle)
     {
         float DonQuixote_Cos = Mathf.Cos(DonQuixote_Angle);
@@ -422,7 +430,9 @@ internal static class DonQuixoteHeavyHitSlash
             DonQuixote_V.X * DonQuixote_Sin + DonQuixote_V.Y * DonQuixote_Cos);
     }
 
-    /// <summary>角色显示高度：取身体矩形的 y 边长，拿不到就用兜底值。</summary>
+    /// <summary>
+    /// 角色显示高度：取身体矩形的 y 边长，拿不到就用兜底值。
+    /// </summary>
     private static float DonQuixote_BodyHeight(NCreature DonQuixote_Node, float DonQuixote_Fallback)
     {
         try
@@ -437,7 +447,7 @@ internal static class DonQuixoteHeavyHitSlash
         }
         catch
         {
-            // 忽略：退回到兜底值
+            // 忽略：退回到兜底值。
         }
 
         return DonQuixote_Fallback;

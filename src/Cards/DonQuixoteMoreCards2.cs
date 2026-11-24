@@ -19,7 +19,6 @@ namespace DonQuixote.Cards;
 
 /// <summary>
 /// 骑士的无畏冲锋：1 费，造成 8 点伤害（升级 12），给予 2 层流血（升级 3）。
-/// 堕落 80：当目标拥有「决斗对象」时伤害 +50%。堕落值达到 80 时会被替换成「血之欲望」。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteKnightCharge : ModCardTemplate, IDonQuixoteCorruptible
@@ -35,7 +34,9 @@ public sealed class DonQuixoteKnightCharge : ModCardTemplate, IDonQuixoteCorrupt
 
     public CardModel DonQuixote_CorruptedCanonical => ModelDb.Card<DonQuixoteBloodDesire>();
 
-    /// <summary>「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。</summary>
+    /// <summary>
+    /// 「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。
+    /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixoteKeywords.DonQuixote_Knight };
 
     public DonQuixoteKnightCharge()
@@ -60,8 +61,7 @@ public sealed class DonQuixoteKnightCharge : ModCardTemplate, IDonQuixoteCorrupt
     {
         ArgumentNullException.ThrowIfNull(DonQuixote_cardPlay.Target, "cardPlay.Target");
 
-        // 「决斗对象」的 +50% 增伤已收进「骑士」词条（DonQuixoteKnightDuelBonus），
-        // 这里只负责把卡面基础伤害打出去。
+        // 「决斗对象」的 +50% 增伤已收进「骑士」词条（DonQuixoteKnightDuelBonus）。
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this, DonQuixote_cardPlay)
             .Targeting(DonQuixote_cardPlay.Target)
@@ -79,13 +79,14 @@ public sealed class DonQuixoteKnightCharge : ModCardTemplate, IDonQuixoteCorrupt
 }
 
 /// <summary>
-/// 腐败版：血之欲望：2 费，血宴 10，获得 1 层复还的血之冲动，造成 13 点伤害（升级 20），
-/// 给予 1 层流血 4 次（升级 5 次）。只能由「骑士的无畏冲锋」腐化而来，不进卡池。
+/// 腐败版：血之欲望：2 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodDesire : DonQuixoteBloodFeastCard, IDonQuixoteCorruptedCard
 {
-    /// <summary>卡面插画（资源\卡牌\血之欲望.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\血之欲望.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_desire.png";
 
     public DonQuixoteBloodDesire()
@@ -103,8 +104,7 @@ public sealed class DonQuixoteBloodDesire : DonQuixoteBloodFeastCard, IDonQuixot
 
     public override int DonQuixote_BloodFeastCost => DonQuixote_Var("BloodFeast");
 
-    // 堕落牌的费用折扣由 Hook.ModifyEnergyCostInCombat 补丁统一处理
-    // （CanonicalEnergyCost 只在卡牌创建时被读一次，运行时改它不会生效）。
+    // 堕落牌的费用折扣由 Hook.ModifyEnergyCostInCombat 补丁统一处理 （CanonicalEnergyCost 只在卡牌创建时被读一次。
 
     protected override void OnUpgrade()
     {
@@ -142,13 +142,14 @@ public sealed class DonQuixoteBloodDesire : DonQuixoteBloodFeastCard, IDonQuixot
 }
 
 /// <summary>
-/// 堂吉诃德派硬血 4 式-剜除：2 费，造成 13 点伤害，获得 1 层复还的血之冲动（升级 2 层），
-/// 施加 8 级流血（升级再 +2 层流血）。
+/// 堂吉诃德派硬血 4 式-剜除：2 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodGouge : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\堂吉诃德派硬血4式-剜除.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\堂吉诃德派硬血4式-剜除.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_gouge.png";
 
     public DonQuixoteHardBloodGouge()
@@ -194,13 +195,14 @@ public sealed class DonQuixoteHardBloodGouge : ModCardTemplate
 }
 
 /// <summary>
-/// 血宴时刻：1 费，血宴 10，恢复 10 点生命，获得 1 层复还的血之冲动、2 层硬血
-/// （升级：15 点生命，2 层冲动，5 层硬血）。
+/// 血宴时刻：1 费，血宴 10，恢复 10 点生命，获得 1 层复还的血之冲动、2 层硬血 （升级：15 点生命，2 层冲动，5 层硬血）。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteFeastMoment : DonQuixoteBloodFeastCard
 {
-    /// <summary>卡面插画（资源\卡牌\血宴时刻.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\血宴时刻.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/feast_moment.png";
 
     public DonQuixoteFeastMoment()
@@ -251,14 +253,14 @@ public sealed class DonQuixoteFeastMoment : DonQuixoteBloodFeastCard
 }
 
 /// <summary>
-/// 堂吉诃德派硬血奥义-球：5 费，硬血 10，对全体敌人造成 50 点伤害（升级 55），施加 2 层易损；
-/// 每 1 层复还的血之冲动使基础伤害 +1（升级 +2）；「消耗血宴总数」的增伤翻倍；
-/// 另对每个敌人造成「流血强度 × 层数」的伤害并获得等量血宴，最后移除敌方所有流血。
+/// 堂吉诃德派硬血奥义-球：5 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodOrb : DonQuixoteHardBloodCard
 {
-    /// <summary>卡面插画（资源\卡牌\堂吉诃德派硬血奥义-球.png，先古卡 250x351）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\堂吉诃德派硬血奥义-球.png，先古卡 250x351）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_orb.png";
 
     public DonQuixoteHardBloodOrb()
@@ -302,10 +304,9 @@ public sealed class DonQuixoteHardBloodOrb : DonQuixoteHardBloodCard
             + DonQuixoteBloodMagic.DonQuixote_HardBloodDamageBonus(DonQuixote_consumed)
             + (DonQuixote_impulse * DynamicVars["ImpulseBonus"].IntValue);
 
-        // 堕落值那部分增伤交给全局钩子（DonQuixotePowerCorruption.ModifyDamageMultiplicative），
-        // 这里只额外乘「消耗血宴总数」的翻倍份。
+        // 堕落值那部分增伤交给全局钩子（DonQuixotePowerCorruption.ModifyDamageMultiplicative）。
 
-        // 「消耗血宴总数」：每 1 点 +1%（无上限），本卡的这一份增伤翻 FeastMultiplier 倍（基础 2 倍，升级 3 倍）。
+        // 「消耗血宴总数」：每 1 点 +1%（无上限）。
         int DonQuixote_total = DonQuixoteBloodMagic.DonQuixote_FeastTotal(Owner.Creature);
 
         int DonQuixote_multiplier = Math.Max(1, DynamicVars["FeastMultiplier"].IntValue);
@@ -338,8 +339,7 @@ public sealed class DonQuixoteHardBloodOrb : DonQuixoteHardBloodCard
 
             int DonQuixote_layers = DonQuixoteBloodMagic.DonQuixote_BleedLayers(DonQuixote_target);
 
-            // 新描述：「触发全体敌方单位身上全部流血层数的效果」→ 每个敌人按其流血层数
-            // 逐次触发流血（每次触发造成强度点伤害并给堂吉诃德等量血宴，随后层数 -1）。
+            // 新描述：「触发全体敌方单位身上全部流血层数的效果」→ 每个敌人按其流血层数 逐次触发流血（每次触发造成强度点伤害并给堂吉诃德等量血宴。
             for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_layers; DonQuixote_i++)
             {
                 if (DonQuixote_target.IsDead
@@ -369,12 +369,14 @@ public sealed class DonQuixoteHardBloodOrb : DonQuixoteHardBloodCard
 }
 
 /// <summary>
-/// 血腥旋转木马：1 费，虚无，给予 1 层流血 2 次与 2 级流血 2 次，消耗（升级后不再消耗）。
+/// 血腥旋转木马：1 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodCarousel : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\血腥旋转木马.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\血腥旋转木马.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_carousel.png";
 
     public DonQuixoteBloodCarousel()
@@ -388,8 +390,6 @@ public sealed class DonQuixoteBloodCarousel : ModCardTemplate
     protected override void OnUpgrade()
     {
         // 升级后去掉「消耗」，只保留虚无。
-        // CardModel 的关键词集合是实例上首次取用时缓存下来的，升级不会重算，
-        // 所以原来写成 `IsUpgraded ? {Ethereal} : {Ethereal, Exhaust}` 是不生效的。
         RemoveKeyword(CardKeyword.Exhaust);
     }
 
@@ -412,8 +412,7 @@ public sealed class DonQuixoteBloodCarousel : ModCardTemplate
 }
 
 /// <summary>
-/// 向着那巨人冲锋！：1 费技能，获得 5 点活力（升级 10 点），失去 5 点生命，消耗。
-/// 堕落 40：堕落值达到 40 时会被替换成「那只是个风车而已」。
+/// 向着那巨人冲锋！
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteGiantCharge : ModCardTemplate, IDonQuixoteCorruptible
@@ -459,7 +458,7 @@ public sealed class DonQuixoteGiantCharge : ModCardTemplate, IDonQuixoteCorrupti
             this,
             false);
 
-        // 失去生命：无视格挡与任何伤害修正，直接扣血
+        // 失去生命：无视格挡与任何伤害修正，直接扣血。
         await CreatureCmd.Damage(
             DonQuixote_choiceContext,
             Owner.Creature,
@@ -472,8 +471,7 @@ public sealed class DonQuixoteGiantCharge : ModCardTemplate, IDonQuixoteCorrupti
 }
 
 /// <summary>
-/// 腐败版：那只是个风车而已：1 费，血宴 5，施加 2 层易损，造成 6 点伤害并获得 5 层硬血；
-/// 升级后 9 点伤害、10 层硬血。只能由「向着那巨人冲锋！」腐化而来，不进卡池。
+/// 腐败版：那只是个风车而已：1 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteJustAWindmill : DonQuixoteBloodFeastCard, IDonQuixoteCorruptedCard
@@ -493,8 +491,7 @@ public sealed class DonQuixoteJustAWindmill : DonQuixoteBloodFeastCard, IDonQuix
 
     public override int DonQuixote_BloodFeastCost => DonQuixote_Var("BloodFeast");
 
-    // 堕落牌的费用折扣由 Hook.ModifyEnergyCostInCombat 补丁统一处理
-    // （CanonicalEnergyCost 只在卡牌创建时被读一次，运行时改它不会生效）。
+    // 堕落牌的费用折扣由 Hook.ModifyEnergyCostInCombat 补丁统一处理 （CanonicalEnergyCost 只在卡牌创建时被读一次。
 
     protected override void OnUpgrade()
     {
@@ -536,13 +533,14 @@ public sealed class DonQuixoteJustAWindmill : DonQuixoteBloodFeastCard, IDonQuix
 }
 
 /// <summary>
-/// 堂吉诃德派硬血 2 式-硬血：1 费技能，血宴 2，获得 5 层硬血（升级 15 层），
-/// 并对自身施加 2 层流血与 3 级流血（升级 6 级）。
+/// 堂吉诃德派硬血 2 式-硬血：1 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodForm2 : DonQuixoteBloodFeastCard
 {
-    /// <summary>卡面插画（资源\卡牌\堂吉诃德派硬血2式-硬血.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\堂吉诃德派硬血2式-硬血.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_form2.png";
 
     public DonQuixoteHardBloodForm2()
@@ -592,13 +590,14 @@ public sealed class DonQuixoteHardBloodForm2 : DonQuixoteBloodFeastCard
 }
 
 /// <summary>
-/// 堂吉诃德派硬血 10 式-鞭：1 费攻击，硬血 2，对所有敌人造成 5 点伤害 2 次并施加 5 级流血。
-/// 升级：硬血 5，伤害次数变成 3 次。
+/// 堂吉诃德派硬血 10 式-鞭：1 费攻击。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodWhip10 : DonQuixoteHardBloodCard
 {
-    /// <summary>卡面插画（资源\卡牌\堂吉诃德派硬血10式-鞭.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\堂吉诃德派硬血10式-鞭.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_whip10.png";
 
     public DonQuixoteHardBloodWhip10()

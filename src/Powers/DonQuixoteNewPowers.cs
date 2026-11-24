@@ -17,8 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace DonQuixote.Powers;
 
 /// <summary>
-/// 心-勇敢的骑士：受到的伤害 -25%，拥有「骑士」词条的卡造成的基础伤害 +5%、
-/// 费用 -1（费用在 DonQuixoteCorruptedCostPatch 里统一减）。不可叠加。
+/// 心-勇敢的骑士：受到的伤害 -25%。
 /// </summary>
 public sealed class DonQuixotePowerBraveHeart : ModPowerTemplate
 {
@@ -64,18 +63,15 @@ public sealed class DonQuixotePowerBraveHeart : ModPowerTemplate
 }
 
 /// <summary>
-/// 望：下一张**自己**打出的攻击牌造成的伤害 +25%（每层 +25%，可叠加），那张牌打完就消失。
-///
-/// 绑定方式和原版「活力」（VigorPower）一致：BeforeAttack 时记录这一次攻击，
-/// 伤害结算只认这条被记录的攻击，AfterAttack 再消耗掉。
-/// 不能用 AfterCardPlayed —— 多人模式里队友出牌也会广播给所有玩家的能力，
-/// 那样堂吉诃德的「望」会被队友的攻击牌白白吃掉。
+/// 望：下一张自己打出的攻击牌造成的伤害 +25%（每层 +25%，可叠加），那张牌打完就消失。
 /// </summary>
 public sealed class DonQuixotePowerHope : ModPowerTemplate
 {
     public const decimal DonQuixote_DamagePerStack = 0.25m;
 
-    /// <summary>这一次「望」认领的攻击（和 VigorPower 的 internal data 同一套做法）。</summary>
+    /// <summary>
+    /// 这一次「望」认领的攻击（和 VigorPower 的 internal data 同一套做法）。
+    /// </summary>
     private sealed class DonQuixoteHopeBinding
     {
         public AttackCommand DonQuixote_command;
@@ -93,7 +89,9 @@ public sealed class DonQuixotePowerHope : ModPowerTemplate
 
     private DonQuixoteHopeBinding DonQuixote_Binding => GetInternalData<DonQuixoteHopeBinding>();
 
-    /// <summary>自检用：确认「望」已经改成绑定自己的攻击，而不是 AfterCardPlayed。</summary>
+    /// <summary>
+    /// 自检用：确认「望」已经改成绑定自己的攻击，而不是 AfterCardPlayed。
+    /// </summary>
     public static string DonQuixote_Probe()
     {
         System.Type DonQuixote_type = typeof(DonQuixotePowerHope);
@@ -111,7 +109,9 @@ public sealed class DonQuixotePowerHope : ModPowerTemplate
         return new DonQuixoteHopeBinding();
     }
 
-    /// <summary>认领自己打出的下一张攻击牌（队友的攻击不算）。</summary>
+    /// <summary>
+    /// 认领自己打出的下一张攻击牌（队友的攻击不算）。
+    /// </summary>
     public override Task BeforeAttack(AttackCommand DonQuixote_command)
     {
         if (DonQuixote_command == null
@@ -164,8 +164,7 @@ public sealed class DonQuixotePowerHope : ModPowerTemplate
             return 1m;
         }
 
-        // 只加在「被认领的那一次攻击」上：同一次攻击的每一段都吃得到，
-        // 没被认领的其它伤害（遗物、能力、队友）一律不加。
+        // 只加在「被认领的那一次攻击」上：同一次攻击的每一段都吃得到。
         AttackCommand DonQuixote_claimed = DonQuixote_Binding.DonQuixote_command;
         if (DonQuixote_claimed == null
             || !ReferenceEquals(DonQuixote_claimed.ModelSource, DonQuixote_cardSource))
@@ -176,7 +175,9 @@ public sealed class DonQuixotePowerHope : ModPowerTemplate
         return 1m + (DonQuixote_DamagePerStack * Amount);
     }
 
-    /// <summary>认领的那次攻击结算完，层数清空（打出后消失）。</summary>
+    /// <summary>
+    /// 认领的那次攻击结算完，层数清空（打出后消失）。
+    /// </summary>
     public override async Task AfterAttack(
         PlayerChoiceContext DonQuixote_choiceContext,
         AttackCommand DonQuixote_command)
@@ -199,26 +200,31 @@ public sealed class DonQuixotePowerHope : ModPowerTemplate
 }
 
 /// <summary>
-/// 援护防御：最大 1 层。敌方攻击意图会给友方造成失去生命的伤害时，
-/// 若「援护反击」的伤害高于对方这一段伤害，就打断这次攻击
-/// （把整次攻击的段数清零，动画与后续命中一并跳过），
-/// 并按对方原攻击段数重复打出「援护反击」。触发后 -1 层，回合开始也 -1 层。
+/// 援护防御：最大 1 层。
 /// </summary>
 public sealed class DonQuixotePowerGuardAssist : ModPowerTemplate
 {
-    /// <summary>AttackCommand._hitCount：这一击的段数。</summary>
+    /// <summary>
+    /// AttackCommand._hitCount：这一击的段数。
+    /// </summary>
     private static readonly System.Reflection.FieldInfo DonQuixote_HitCountField =
         typeof(AttackCommand).GetField("_hitCount", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
-    /// <summary>AttackCommand._damagePerHit：固定伤害类的每段伤害。</summary>
+    /// <summary>
+    /// AttackCommand._damagePerHit：固定伤害类的每段伤害。
+    /// </summary>
     private static readonly System.Reflection.FieldInfo DonQuixote_DamagePerHitField =
         typeof(AttackCommand).GetField("_damagePerHit", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
-    /// <summary>AttackCommand._calculatedDamageVar：按目标计算的每段伤害（优先于 _damagePerHit）。</summary>
+    /// <summary>
+    /// AttackCommand._calculatedDamageVar：按目标计算的每段伤害（优先于 _damagePerHit）。
+    /// </summary>
     private static readonly System.Reflection.FieldInfo DonQuixote_CalculatedDamageField =
         typeof(AttackCommand).GetField("_calculatedDamageVar", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
-    /// <summary>AttackCommand._singleTarget：单体攻击的目标（全体攻击为 null）。</summary>
+    /// <summary>
+    /// AttackCommand._singleTarget：单体攻击的目标（全体攻击为 null）。
+    /// </summary>
     private static readonly System.Reflection.FieldInfo DonQuixote_SingleTargetField =
         typeof(AttackCommand).GetField("_singleTarget", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
@@ -231,9 +237,7 @@ public sealed class DonQuixotePowerGuardAssist : ModPowerTemplate
     public override string CustomBigIconPath => "res://DonQuixote/images/powers/guard_assist_big.png";
 
     /// <summary>
-    /// 打断实现：AttackCommand.Execute 的顺序是
-    /// BeforeAttack → attackCount = Hook.ModifyAttackHitCount(_hitCount) → for(i &lt; attackCount)。
-    /// 所以在 BeforeAttack 里把 hitCount 改成 0，整次攻击就会被完整跳过（不出手、不结算）。
+    /// 打断实现：AttackCommand.Execute 的顺序是 BeforeAttack → attackCount = Hook.ModifyAttackHitCount(_hitCount) → for(i &lt; attackCount)。
     /// </summary>
     public override async Task BeforeAttack(AttackCommand DonQuixote_command)
     {
@@ -265,10 +269,7 @@ public sealed class DonQuixotePowerGuardAssist : ModPowerTemplate
             int DonQuixote_hits = DonQuixote_HitCountOf(DonQuixote_command);
             decimal DonQuixote_perHit = DonQuixote_PerHitDamageOf(DonQuixote_command, DonQuixote_target);
 
-            // 判定用的是「援护反击这张卡此刻真能打出多少」：卡面基础伤害再走一遍
-            // Hook.ModifyDamage（力量、增伤之类的增减益全算上），不是卡面上的裸值。
-            // 真正结算时 CreatureCmd.Damage 内部会跑同一条管线，所以那边仍然传裸值，
-            // 否则力量会被算两次。
+            // 判定用的是「援护反击这张卡此刻真能打出多少」：卡面基础伤害再走一遍 Hook.ModifyDamage（力量、增伤之类的增减益全算上）。
             decimal DonQuixote_riposteBase = DonQuixote_RiposteBaseDamage();
             decimal DonQuixote_riposte = DonQuixote_RiposteFinalDamage(DonQuixote_target, DonQuixote_riposteBase);
 
@@ -331,7 +332,9 @@ public sealed class DonQuixotePowerGuardAssist : ModPowerTemplate
         }
     }
 
-    /// <summary>「援护反击」卡面上的基础伤害（从规范卡取，改了卡面数值这里自动跟着变）。</summary>
+    /// <summary>
+    /// 「援护反击」卡面上的基础伤害（从规范卡取，改了卡面数值这里自动跟着变）。
+    /// </summary>
     private static decimal DonQuixote_RiposteBaseDamage()
     {
         try
@@ -351,9 +354,7 @@ public sealed class DonQuixotePowerGuardAssist : ModPowerTemplate
     }
 
     /// <summary>
-    /// 「援护反击」此刻实际能打出的每段伤害：基础伤害过一遍 <c>Hook.ModifyDamage</c>，
-    /// 力量、增伤、减伤、上限等修正全部计入 —— 判定要和真正结算出来的数字一致。
-    /// 结算侧仍传基础伤害（<see cref="CreatureCmd.Damage"/> 内部会再跑同一条管线）。
+    /// 「援护反击」此刻实际能打出的每段伤害：基础伤害过一遍 Hook.ModifyDamage。
     /// </summary>
     private decimal DonQuixote_RiposteFinalDamage(Creature DonQuixote_target, decimal DonQuixote_baseDamage)
     {
@@ -385,7 +386,9 @@ public sealed class DonQuixotePowerGuardAssist : ModPowerTemplate
         }
     }
 
-    /// <summary>读 AttackCommand 的原始段数（拿不到就按 1 段算）。</summary>
+    /// <summary>
+    /// 读 AttackCommand 的原始段数（拿不到就按 1 段算）。
+    /// </summary>
     private static int DonQuixote_HitCountOf(AttackCommand DonQuixote_command)
     {
         try
@@ -403,7 +406,9 @@ public sealed class DonQuixotePowerGuardAssist : ModPowerTemplate
         return 1;
     }
 
-    /// <summary>自检用：确认反射字段都找到了，且 BeforeAttack 确实被本类重写。</summary>
+    /// <summary>
+    /// 自检用：确认反射字段都找到了，且 BeforeAttack 确实被本类重写。
+    /// </summary>
     public static string DonQuixote_Probe()
     {
         System.Reflection.MethodInfo DonQuixote_method =
@@ -418,7 +423,9 @@ public sealed class DonQuixotePowerGuardAssist : ModPowerTemplate
             + " override=" + DonQuixote_overridden;
     }
 
-    /// <summary>读单体攻击的目标；全体攻击（_singleTarget 为空）时取第一个活着的玩家单位来估值。</summary>
+    /// <summary>
+    /// 读单体攻击的目标；全体攻击（_singleTarget 为空）时取第一个活着的玩家单位来估值。
+    /// </summary>
     private static Creature DonQuixote_SingleTargetOf(AttackCommand DonQuixote_command)
     {
         try
@@ -454,7 +461,9 @@ public sealed class DonQuixotePowerGuardAssist : ModPowerTemplate
         return null;
     }
 
-    /// <summary>读这一击的每段伤害（和 AttackCommand.Execute 内部取值顺序一致）。</summary>
+    /// <summary>
+    /// 读这一击的每段伤害（和 AttackCommand.Execute 内部取值顺序一致）。
+    /// </summary>
     private static decimal DonQuixote_PerHitDamageOf(AttackCommand DonQuixote_command, Creature DonQuixote_target)
     {
         try
@@ -505,7 +514,6 @@ public sealed class DonQuixotePowerGuardAssist : ModPowerTemplate
 
 /// <summary>
 /// 加强防御：摇曳【血魔】持续多 1 回合后减半（隔回合才减半）。
-/// 层数为 2（升级版）时，血铠回合结束不再减少。
 /// </summary>
 public sealed class DonQuixotePowerReinforcedDefense : ModPowerTemplate
 {
@@ -530,8 +538,6 @@ public sealed class DonQuixotePowerReinforcedDefense : ModPowerTemplate
 
 /// <summary>
 /// 过人的毅力（未升级）：本回合受到的伤害按层数百分比降低。
-/// 「本回合」指到**敌方回合结束**为止 —— 敌人在它自己的回合里攻击，
-/// 所以不能在玩家回合结束时移除，否则减伤完全吃不到。
 /// </summary>
 public sealed class DonQuixotePowerGrit : ModPowerTemplate
 {
@@ -588,8 +594,6 @@ public sealed class DonQuixotePowerGrit : ModPowerTemplate
 
 /// <summary>
 /// 过人的毅力（升级版）：本回合每次受到的伤害固定最高 X 点（卡面是 2）。
-/// 和 <see cref="DonQuixotePowerGrit"/> 一样，持续到敌方回合结束。
-/// 用无实体的那套「伤害上限」钩子（ModifyDamageCap 管格挡/预览，ModifyHpLostAfterOsty 管实际掉血）。
 /// </summary>
 public sealed class DonQuixotePowerGritCap : ModPowerTemplate
 {

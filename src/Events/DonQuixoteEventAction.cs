@@ -16,13 +16,6 @@ namespace DonQuixote.Events;
 
 /// <summary>
 /// 事件选项的联网结算。
-///
-/// 原版事件在联机下由「主机替所有玩家执行选项、客户端只执行自己的选项」，
-/// 而发遗物、改计数器这些都是纯本地状态修改（RelicCmd.Obtain 里没有任何网络动作），
-/// 于是主机选的选项效果永远到不了客户端，退出事件房算 checksum 时就会 StateDivergence。
-///
-/// 这里把选项效果包成一个托管网络动作：谁选都只由主机请求一次，
-/// 各端在行动队列里执行同一份确定性逻辑，所以两端状态必然一致。
 /// </summary>
 internal static class DonQuixoteEventAction
 {
@@ -79,8 +72,7 @@ internal static class DonQuixoteEventAction
     }
 
     /// <summary>
-    /// 请求结算一次事件选项。只在单机或主机上真正请求（主机替所有玩家执行选项，
-    /// 客户端再请求一次会双发），客户端什么都不做，等主机的动作广播过来。
+    /// 请求结算一次事件选项。
     /// </summary>
     public static bool DonQuixote_Request(Player DonQuixote_player, string DonQuixote_optionKey)
     {
@@ -89,8 +81,7 @@ internal static class DonQuixoteEventAction
             return false;
         }
 
-        // RitsuLib 的 Request 只允许「行动主人本人」入队（owner 必须等于本地 NetId），
-        // 所以别人的选项不在这里请求，交给他自己那一端请求后再广播回来。
+        // RitsuLib 的 Request 只允许「行动主人本人」入队（owner 必须等于本地 NetId）。
         if (!DonQuixote_IsLocalActionOwner(DonQuixote_player))
         {
             DonQuixoteModEntry.DonQuixote_Logger?.Info(
@@ -134,7 +125,9 @@ internal static class DonQuixoteEventAction
         return true;
     }
 
-    /// <summary>单机恒为 true；联机时只有「这个选项的主人」才是本机时为 true。</summary>
+    /// <summary>
+    /// 单机恒为 true；联机时只有「这个选项的主人」才是本机时为 true。
+    /// </summary>
     private static bool DonQuixote_IsLocalActionOwner(Player DonQuixote_player)
     {
         try
@@ -179,7 +172,9 @@ internal static class DonQuixoteEventAction
         await DonQuixote_Apply(DonQuixote_context.PlayerChoiceContext, DonQuixote_player, DonQuixote_payload);
     }
 
-    /// <summary>两端共用同一份结算逻辑，任何端执行结果都相同。</summary>
+    /// <summary>
+    /// 两端共用同一份结算逻辑，任何端执行结果都相同。
+    /// </summary>
     private static async Task DonQuixote_Apply(
         PlayerChoiceContext DonQuixote_ctx,
         Player DonQuixote_player,

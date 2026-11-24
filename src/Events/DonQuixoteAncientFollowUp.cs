@@ -14,13 +14,6 @@ namespace DonQuixote.Events;
 
 /// <summary>
 /// 先古事件结束后，把本模组对应层的事件作为「独立事件房」接在后面。
-///
-/// 这里刻意不再往先古事件里塞选项：先古事件用的是 <c>NAncientEventLayout</c>，
-/// 它的画面被对话气泡和先古立绘占满，既不会显示普通事件的描述文本，也无法替换背景，
-/// 而直接改写选项回调还容易在 canonical 模型上崩溃、把事件卡死。
-/// 现在的做法是：先古事件照常结束 → 玩家点「继续」时拦截
-/// <see cref="NEventRoom.Proceed"/>，用 <see cref="EventSynchronizer.BeginEvent"/>
-/// 启动本模组事件并替换整个事件房节点，于是描述、立绘、选项全部走普通事件布局。
 /// </summary>
 internal static class DonQuixoteAncientFollowUp
 {
@@ -30,7 +23,9 @@ internal static class DonQuixoteAncientFollowUp
     public const string DonQuixote_DreamEntry = "DON_QUIXOTE_EVENT_DON_QUIXOTE_EVENT_DREAM";
     public const string DonQuixote_DuelEntry = "DON_QUIXOTE_EVENT_DON_QUIXOTE_EVENT_DUEL";
 
-    /// <summary>本模组自带的事件条目，永远只能由先古后续触发，不进随机事件池。</summary>
+    /// <summary>
+    /// 本模组自带的事件条目，永远只能由先古后续触发，不进随机事件池。
+    /// </summary>
     public static readonly string[] DonQuixote_Entries =
     {
         DonQuixote_AshEntry,
@@ -40,14 +35,18 @@ internal static class DonQuixoteAncientFollowUp
 
     private static readonly HashSet<string> DonQuixote_Triggered = new HashSet<string>();
 
-    /// <summary>上一次触发所属的 run 实例，用来在新一局开始时清空去重表。</summary>
+    /// <summary>
+    /// 上一次触发所属的 run 实例，用来在新一局开始时清空去重表。
+    /// </summary>
     private static IRunState DonQuixote_TriggeredRun;
 
     private static Player DonQuixote_PendingOwner;
 
     private static string DonQuixote_PendingEntry;
 
-    /// <summary>按层数取本模组事件条目（无对应事件时返回 null）。</summary>
+    /// <summary>
+    /// 按层数取本模组事件条目（无对应事件时返回 null）。
+    /// </summary>
     public static string DonQuixote_EntryForAct(int DonQuixote_actIndex)
     {
         if (DonQuixote_actIndex == 0)
@@ -68,7 +67,9 @@ internal static class DonQuixoteAncientFollowUp
         return null;
     }
 
-    /// <summary>先古事件结束时登记待播放的事件，等玩家点「继续」再切场景。</summary>
+    /// <summary>
+    /// 先古事件结束时登记待播放的事件，等玩家点「继续」再切场景。
+    /// </summary>
     public static void DonQuixote_Queue(AncientEventModel DonQuixote_host, int DonQuixote_actIndex)
     {
         DonQuixote_PendingOwner = DonQuixote_host?.Owner;
@@ -78,7 +79,9 @@ internal static class DonQuixoteAncientFollowUp
             "[DonQuixote] ancient follow-up queued: " + DonQuixote_PendingEntry, 0);
     }
 
-    /// <summary>是否有待播放的后续事件（不清空）。</summary>
+    /// <summary>
+    /// 是否有待播放的后续事件（不清空）。
+    /// </summary>
     public static bool DonQuixote_HasPending()
     {
         return !string.IsNullOrEmpty(DonQuixote_PendingEntry) && DonQuixote_PendingOwner != null;
@@ -86,12 +89,6 @@ internal static class DonQuixoteAncientFollowUp
 
     /// <summary>
     /// 等所有玩家的先古事件都结束再切场景。
-    ///
-    /// 联机时 <see cref="NEventRoom.Proceed"/> 只对本地玩家生效：一端点了「继续」时，
-    /// 另一端可能还在先古事件里翻选项。若此时就本端 BeginEvent 后续事件，
-    /// 先点的一端发出的选项消息会落到另一端「对不上」的事件实例上（把后续事件的选项
-    /// 当成先古事件的选项执行），轻则奖励错乱，重则事件卡死。
-    /// 所以这里先等所有事件结束（最多等 10 秒，避免有人掉线时一直挂着）。
     /// </summary>
     public static async Task DonQuixote_LaunchPendingWhenReady()
     {
@@ -109,11 +106,7 @@ internal static class DonQuixoteAncientFollowUp
                 await Task.Delay(100);
             }
 
-            // 还有别人的事件没结束就绝对不能开新事件：引擎会把「上一个事件」
-            // 悬空（日志会打印 "... but event EVENT.OROBAS ... is not yet finished!"），
-            // 那个玩家后来的选项效果（选牌附魔、遗物）就只在他自己那端生效，
-            // 两端 relic / choice id 不一致 → checksum 不同步。宁可不触发，
-            // 也不要制造不同步。
+            // 还有别人的事件没结束就绝对不能开新事件：引擎会把「上一个事件」 悬空（日志会打印 "... but event EVENT.OROBAS ... is not yet finished!"）。
             if (DonQuixote_sync != null && !DonQuixote_OthersEventsFinished(DonQuixote_sync))
             {
                 DonQuixoteModEntry.DonQuixote_Logger?.Warn(
@@ -125,9 +118,7 @@ internal static class DonQuixoteAncientFollowUp
 
             if (DonQuixote_sync != null)
             {
-                // 光等 IsFinished 不够：对端可能还在跑先古的「选项奖励」任务
-                // （例如捏奥发遗物）。这时就 BeginEvent，那笔奖励会落到新事件上，
-                // 表现为两端 relic 列表不一致。AwaitPendingOptionTasks 会把它们全部等完。
+                // 光等 IsFinished 不够：对端可能还在跑先古的「选项奖励」任务 （例如捏奥发遗物）。
                 await DonQuixote_sync.AwaitPendingOptionTasks();
                 await Task.Delay(150);
             }
@@ -138,10 +129,7 @@ internal static class DonQuixoteAncientFollowUp
                 "[DonQuixote] follow-up wait failed: " + DonQuixote_Exception.Message, 0);
         }
 
-        // 联机时只能有一个客户端去 BeginEvent：两端各自开一次会各自造出
-        // 一套事件实例，选项消息落到「对端还没有的实例」上就被丢弃，
-        // 表现为一端拿了遗物、另一端没拿到（relic 列表不一致）。
-        // 这里用「NetId 最小的玩家为发起端」这条两端一致的规则来定谁开。
+        // 联机时只能有一个客户端去 BeginEvent：两端各自开一次会各自造出 一套事件实例。
         if (DonQuixote_sync != null && !DonQuixote_IsInitiator(DonQuixote_sync))
         {
             bool DonQuixote_shown = false;
@@ -175,9 +163,7 @@ internal static class DonQuixoteAncientFollowUp
     }
 
     /// <summary>
-    /// 本端是不是「发起端」。规则：本地玩家 NetId 是全场最小。
-    /// 两端算出来必然一致，所以只会有一端去 BeginEvent。
-    /// 取不到本地玩家（单人、反射失败）时按发起端处理，保持单机行为不变。
+    /// 本端是不是「发起端」。
     /// </summary>
     private static bool DonQuixote_IsInitiator(EventSynchronizer DonQuixote_sync)
     {
@@ -216,7 +202,9 @@ internal static class DonQuixoteAncientFollowUp
         }
     }
 
-    /// <summary>反射读 internal 的 <c>EventSynchronizer.LocalPlayer</c>。</summary>
+    /// <summary>
+    /// 反射读 internal 的 EventSynchronizer.LocalPlayer。
+    /// </summary>
     private static Player DonQuixote_TryGetLocalPlayer(EventSynchronizer DonQuixote_sync)
     {
         try
@@ -235,9 +223,7 @@ internal static class DonQuixoteAncientFollowUp
     }
 
     /// <summary>
-    /// 逐玩家检查「他的事件是否已经结束」。联机时这是唯一可靠的口径：
-    /// <c>EventSynchronizer.Events</c> 只看得到本端的实例，而真正会把状态写歪
-    /// 的是「对端事件还没收尾就开新事件」。
+    /// 逐玩家检查「他的事件是否已经结束」。
     /// </summary>
     private static bool DonQuixote_AllEventsFinished(EventSynchronizer DonQuixote_sync)
     {
@@ -278,8 +264,7 @@ internal static class DonQuixoteAncientFollowUp
             }
         }
 
-        // 本端实例再兜一层：EventSynchronizer.Events 里的实例即使已结束也还在列表里，
-        // 只要有一个没结束就不能开新事件。
+        // 本端实例再兜一层：EventSynchronizer.Events 里的实例即使已结束也还在列表里。
         IReadOnlyList<EventModel> DonQuixote_events = DonQuixote_sync.Events;
         if (DonQuixote_events == null || DonQuixote_events.Count == 0)
         {
@@ -298,8 +283,7 @@ internal static class DonQuixoteAncientFollowUp
     }
 
     /// <summary>
-    /// 只检查「别的玩家」的事件是否都结束了。自己那几个事件在 Proceed 回调里
-    /// 本来就已经收尾，盯着自己只会白等。
+    /// 只检查「别的玩家」的事件是否都结束了。
     /// </summary>
     private static bool DonQuixote_OthersEventsFinished(EventSynchronizer DonQuixote_sync)
     {
@@ -343,7 +327,9 @@ internal static class DonQuixoteAncientFollowUp
         }
     }
 
-    /// <summary>用本模组事件替换当前事件房。返回 true 表示已接管，调用方不要再走原版流程。</summary>
+    /// <summary>
+    /// 用本模组事件替换当前事件房。
+    /// </summary>
     public static bool DonQuixote_LaunchPending()
     {
         string DonQuixote_entry = DonQuixote_PendingEntry;
@@ -360,7 +346,7 @@ internal static class DonQuixoteAncientFollowUp
             .FirstOrDefault(DonQuixote_event => DonQuixote_event != null
                 && DonQuixote_event.Id.Entry == DonQuixote_entry);
 
-        // 用类型做兜底匹配：注册器给的 Id 前缀若与本地化 key 不一致，仍能取到模板
+        // 用类型做兜底匹配：注册器给的 Id 前缀若与本地化 key 不一致，仍能取到模板。
         if (DonQuixote_canonical == null)
         {
             DonQuixote_canonical = ModelDb.AllEvents.FirstOrDefault(DonQuixote_event =>
@@ -404,12 +390,13 @@ internal static class DonQuixoteAncientFollowUp
         }
     }
 
-    /// <summary>已经显示过的事件实例，避免同一份实例被重复建房间（Proceed 会被点多次）。</summary>
+    /// <summary>
+    /// 已经显示过的事件实例，避免同一份实例被重复建房间（Proceed 会被点多次）。
+    /// </summary>
     private static EventModel DonQuixote_ShownEvent;
 
     /// <summary>
     /// 把本地玩家手里那份本模组事件实例显示成事件房。
-    /// 联机时每个玩家各有一份实例，所以两端都要各自调一次。
     /// </summary>
     public static bool DonQuixote_ShowRoom(
         EventSynchronizer DonQuixote_sync,
@@ -457,10 +444,7 @@ internal static class DonQuixoteAncientFollowUp
     }
 
     /// <summary>
-    /// 联机对端的兜底路径：本端没有 pending（事件不是本端点出来的），
-    /// 但本地玩家手上已经有一份未结束的本模组事件实例——说明对端已经
-    /// BeginEvent 了。这时把房间建出来，否则玩家会直接回地图，
-    /// 而这份事件实例永远没人处理，两端从此不一致。
+    /// 联机对端的兜底路径：本端没有 pending（事件不是本端点出来的）。
     /// </summary>
     public static bool DonQuixote_TryShowLocalOwnEvent()
     {
@@ -514,8 +498,7 @@ internal static class DonQuixoteAncientFollowUp
             return false;
         }
 
-        // 换了一局（放弃存档重开房间、读档进新 run）就清空去重表，
-        // 否则同一批玩家在第二局的第 N 层永远不会再触发后续事件。
+        // 换了一局（放弃存档重开房间、读档进新 run）就清空去重表。
         if (!ReferenceEquals(DonQuixote_TriggeredRun, DonQuixote_owner.RunState))
         {
             DonQuixote_TriggeredRun = DonQuixote_owner.RunState;
@@ -536,7 +519,9 @@ internal static class DonQuixoteAncientFollowUp
     }
 }
 
-/// <summary>先古事件收尾时登记后续事件，先古事件本身照常结束。</summary>
+/// <summary>
+/// 先古事件收尾时登记后续事件，先古事件本身照常结束。
+/// </summary>
 [HarmonyPatch(typeof(AncientEventModel), "Done")]
 internal static class DonQuixoteAncientDonePatch
 {
@@ -578,8 +563,6 @@ internal static class DonQuixoteEventProceedPatch
             }
 
             // 联机对端：事件已经由对端在网络上开始，本端还停在先古房间。
-            // 这里必须先把自己的事件显示出来，不能直接回地图，
-            // 否则本端的事件实例永远没人处理（选项奖励丢失 → 两端数据不一致）。
             if (DonQuixoteAncientFollowUp.DonQuixote_TryShowLocalOwnEvent())
             {
                 __result = Task.CompletedTask;
@@ -598,13 +581,7 @@ internal static class DonQuixoteEventProceedPatch
 }
 
 /// <summary>
-/// 联机兜底：
-/// 1) 选项消息重复/迟到时会落到已经结束的事件实例上，原版直接抛
-///    <see cref="InvalidOperationException"/>，异常会中断整包消息处理，表现为事件卡住。
-///    已经结束的事件再收到选项消息就忽略掉，不再抛出。
-/// 2) 共享事件的投票按「选项索引」广播，原版假设各端选项完全一致。混搭角色时
-///    堂吉诃德的「梦幻的拉曼却领」有 4 个选项、其他角色只有 1 个（冒险），
-///    索引会越界并抛异常。这里只对这个事件兜底：越界时退回最后一个合法选项（冒险）。
+/// 联机兜底：1) 选项消息重复/迟到时会落到已经结束的事件实例上。
 /// </summary>
 [HarmonyPatch(typeof(EventSynchronizer), "ChooseOptionForEvent")]
 internal static class DonQuixoteDuplicateEventOptionPatch

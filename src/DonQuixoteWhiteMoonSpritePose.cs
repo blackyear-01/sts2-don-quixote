@@ -10,21 +10,6 @@ namespace DonQuixote;
 
 /// <summary>
 /// 白月骑士-巴里的「逐帧贴图」兜底实现（只在骨架加载失败时生效）。
-///
-/// 正式路径是 <see cref="DonQuixoteWhiteMoonPose"/>：视觉场景已经是 spine
-/// （<c>white_moon_knight_spine.tscn</c>），所有姿势都是骨架里的动画。
-/// 万一某次打包把骨架弄丢了、<c>HasSpineAnimation</c> 为 false，
-/// 就退回这里按帧换 <see cref="Sprite2D.Texture"/>，至少人还看得见。
-///
-/// 贴图版视觉没有 SpineSprite，原版 <c>NCreature</c> 不会创建 <c>CreatureAnimator</c>，
-/// 所以所有动作都得自己按帧换 <see cref="Sprite2D.Texture"/>：
-/// ・闲置 / 防御（打铁）/ 受伤（掉血）—— 单帧；
-/// ・意图1、意图4 —— 4 帧挥砍；
-/// ・意图3 —— 16 帧拉弓，前 10 帧是「起手→举弓→拉满瞄准」，后 6 帧是「松弦→收势」，
-///   中间由 <see cref="Monsters.DonQuixoteWhiteMoonKnight"/> 插伤害结算。
-///
-/// 所有帧都由 <c>tools/barry_frames.py</c> 归一化到同一张画布（422x546，地平线 y=470），
-/// 所以这里只换贴图、不动 position / scale，角色不会跳。
 /// </summary>
 internal static class DonQuixoteWhiteMoonSpritePose
 {
@@ -38,12 +23,13 @@ internal static class DonQuixoteWhiteMoonSpritePose
 
     private const string DonQuixote_OathFormat = "res://DonQuixote/images/creatures/barry_oath_f{0}.png";
 
-    /// <summary>意图 1 / 4 的挥砍帧（4 帧）。</summary>
+    /// <summary>
+    /// 意图 1 / 4 的挥砍帧（4 帧）。
+    /// </summary>
     private static readonly int[] DonQuixote_AtkMs = { 200, 160, 160, 520 };
 
     /// <summary>
     /// 意图 3 的帧时长，直接照抄 GIF：200,160x5,200,160x3 | 160,160,200,160,160,560。
-    /// 前半段（0..9）停在「拉弓瞄准」，后半段（10..15）是松弦与收势。
     /// </summary>
     private static readonly int[] DonQuixote_OathMs =
     {
@@ -51,35 +37,51 @@ internal static class DonQuixoteWhiteMoonSpritePose
         160, 160, 200, 160, 160, 560,
     };
 
-    /// <summary>拉弓瞄准是第 10 帧之前的最后一帧（0..9 播放完停在这里）。</summary>
+    /// <summary>
+    /// 拉弓瞄准是第 10 帧之前的最后一帧（0..9 播放完停在这里）。
+    /// </summary>
     public const int DonQuixote_OathWindupFrames = 10;
 
-    /// <summary>停住不动的那一帧：拉满弓、瞄准。「意图出现」到「伤害结算完」之间一直保持这张。</summary>
+    /// <summary>
+    /// 停住不动的那一帧：拉满弓、瞄准。
+    /// </summary>
     private static readonly string DonQuixote_AimPath = string.Format(DonQuixote_OathFormat, 9);
 
-    /// <summary>受伤 / 防御是单帧，短暂停留后回闲置。</summary>
+    /// <summary>
+    /// 受伤 / 防御是单帧，短暂停留后回闲置。
+    /// </summary>
     private const double DonQuixote_HurtHold = 0.45;
 
     private const double DonQuixote_GuardHold = 0.5;
 
-    /// <summary>诊断日志开关：排查「姿态没换上去」时临时打开。</summary>
+    /// <summary>
+    /// 诊断日志开关：排查「姿态没换上去」时临时打开。
+    /// </summary>
     private static readonly bool DonQuixote_Debug = true;
 
     private static readonly Dictionary<ulong, int> DonQuixote_Token = new Dictionary<ulong, int>();
 
-    /// <summary>每个贴图节点当前显示的是哪张图（用来判断「现在是不是端着弓」）。</summary>
+    /// <summary>
+    /// 每个贴图节点当前显示的是哪张图（用来判断「现在是不是端着弓」）。
+    /// </summary>
     private static readonly Dictionary<ulong, string> DonQuixote_CurrentPath = new Dictionary<ulong, string>();
 
-    /// <summary>已经为这次 OATH 意图起过手了，避免意图刷新时重复播起手。</summary>
+    /// <summary>
+    /// 已经为这次 OATH 意图起过手了，避免意图刷新时重复播起手。
+    /// </summary>
     private static readonly HashSet<ulong> DonQuixote_AimArmed = new HashSet<ulong>();
 
-    /// <summary>本轮「意图3」是否已经完整起手过（离开 OATH 时清掉）。</summary>
+    /// <summary>
+    /// 本轮「意图3」是否已经完整起手过（离开 OATH 时清掉）。
+    /// </summary>
     private static readonly HashSet<ulong> DonQuixote_OathCycle = new HashSet<ulong>();
     private static readonly Dictionary<string, Texture2D> DonQuixote_Cache = new Dictionary<string, Texture2D>();
 
     private static int DonQuixote_Serial;
 
-    /// <summary>换回闲置贴图（不打断正在播放的序列）。</summary>
+    /// <summary>
+    /// 换回闲置贴图（不打断正在播放的序列）。
+    /// </summary>
     public static void DonQuixote_PlayIdle(Creature DonQuixote_Creature)
     {
         Sprite2D? DonQuixote_Sprite = DonQuixote_FindSprite(DonQuixote_Creature);
@@ -95,11 +97,7 @@ internal static class DonQuixoteWhiteMoonSpritePose
     }
 
     /// <summary>
-    /// 意图出现时起手：把 0..9 帧放一遍，停在「拉弓瞄准」那张不动，
-    /// 一直保持到攻击结算完，再交给 <see cref="DonQuixote_PlayBowRelease"/>。
-    ///
-    /// 同一个意图周期里只会完整起手一次：中途挨打会打断姿态，
-    /// 之后只把瞄准帧「端回去」，不重播 1.7 秒的起手。
+    /// 意图出现时起手：把 0..9 帧放一遍。
     /// </summary>
     public static void DonQuixote_HoldBowAim(Creature DonQuixote_Creature)
     {
@@ -128,7 +126,9 @@ internal static class DonQuixoteWhiteMoonSpritePose
             DonQuixote_OathWindupFrames, DonQuixote_OathMs, false);
     }
 
-    /// <summary>离开「意图3」这个循环：下一个 OATH 会重新完整起手一次。</summary>
+    /// <summary>
+    /// 离开「意图3」这个循环：下一个 OATH 会重新完整起手一次。
+    /// </summary>
     public static void DonQuixote_ResetOathCycle(Creature DonQuixote_Creature)
     {
         Sprite2D? DonQuixote_Sprite = DonQuixote_FindSprite(DonQuixote_Creature);
@@ -140,7 +140,6 @@ internal static class DonQuixoteWhiteMoonSpritePose
 
     /// <summary>
     /// 兜底：直接跳到「拉弓瞄准」那一帧并端起弓（不重播 1.7 秒的起手）。
-    /// 用在起手被打断、或者意图刷新没赶上（刚进场）的时候。
     /// </summary>
     public static void DonQuixote_SnapBowAim(Creature DonQuixote_Creature)
     {
@@ -155,7 +154,9 @@ internal static class DonQuixoteWhiteMoonSpritePose
         DonQuixote_SetTexture(DonQuixote_Sprite, DonQuixote_AimPath);
     }
 
-    /// <summary>现在是不是「端着弓」的状态（起手途中或已停在瞄准帧）。</summary>
+    /// <summary>
+    /// 现在是不是「端着弓」的状态（起手途中或已停在瞄准帧）。
+    /// </summary>
     public static bool DonQuixote_IsAiming(Creature DonQuixote_Creature)
     {
         Sprite2D? DonQuixote_Sprite = DonQuixote_FindSprite(DonQuixote_Creature);
@@ -174,26 +175,34 @@ internal static class DonQuixoteWhiteMoonSpritePose
             && DonQuixote_Path == DonQuixote_AimPath;
     }
 
-    /// <summary>受到伤害且真的掉了血：换成「受伤」贴图。</summary>
+    /// <summary>
+    /// 受到伤害且真的掉了血：换成「受伤」贴图。
+    /// </summary>
     public static void DonQuixote_PlayHurt(Creature DonQuixote_Creature)
     {
         DonQuixote_PlayStill(DonQuixote_Creature, DonQuixote_HurtPath, DonQuixote_HurtHold);
     }
 
-    /// <summary>受到伤害但被格挡吃干净：换成「防御」贴图。</summary>
+    /// <summary>
+    /// 受到伤害但被格挡吃干净：换成「防御」贴图。
+    /// </summary>
     public static void DonQuixote_PlayGuard(Creature DonQuixote_Creature)
     {
         DonQuixote_PlayStill(DonQuixote_Creature, DonQuixote_GuardPath, DonQuixote_GuardHold);
     }
 
-    /// <summary>意图 1 / 4：整套挥砍帧，播完回闲置。调用方不必等待。</summary>
+    /// <summary>
+    /// 意图 1 / 4：整套挥砍帧，播完回闲置。
+    /// </summary>
     public static void DonQuixote_PlayAttack(Creature DonQuixote_Creature)
     {
         _ = DonQuixote_RunAsync(DonQuixote_Creature, DonQuixote_AtkFormat, 0, DonQuixote_AtkMs.Length,
             DonQuixote_AtkMs, true);
     }
 
-    /// <summary>意图 3 后半段：松弦→收势，播完回闲置。</summary>
+    /// <summary>
+    /// 意图 3 后半段：松弦→收势，播完回闲置。
+    /// </summary>
     public static Task DonQuixote_PlayBowRelease(Creature DonQuixote_Creature)
     {
         Sprite2D? DonQuixote_Sprite = DonQuixote_FindSprite(DonQuixote_Creature);
@@ -208,7 +217,9 @@ internal static class DonQuixoteWhiteMoonSpritePose
             DonQuixote_OathMs.Length - DonQuixote_OathWindupFrames, DonQuixote_OathMs, true);
     }
 
-    /// <summary>死亡时清掉残留的帧序列（死亡淡出由原版负责）。</summary>
+    /// <summary>
+    /// 死亡时清掉残留的帧序列（死亡淡出由原版负责）。
+    /// </summary>
     public static void DonQuixote_Stop(Creature DonQuixote_Creature)
     {
         Sprite2D? DonQuixote_Sprite = DonQuixote_FindSprite(DonQuixote_Creature);
@@ -245,8 +256,6 @@ internal static class DonQuixoteWhiteMoonSpritePose
 
     /// <summary>
     /// 单帧姿态停留结束：回闲置。
-    /// 如果这一下挨打把「意图3」的拉弓打断了、而这一轮 OATH 还没打完，
-    /// 就重新把弓端回去（不重播起手），否则整轮就一直是站着的了。
     /// </summary>
     private static async Task DonQuixote_RestoreIdleLater(
         Creature DonQuixote_Creature, Sprite2D DonQuixote_Sprite, int DonQuixote_Mine, double DonQuixote_Delay)
@@ -281,7 +290,9 @@ internal static class DonQuixoteWhiteMoonSpritePose
         }
     }
 
-    /// <summary>这一手是不是「意图3」，且还没结算完。</summary>
+    /// <summary>
+    /// 这一手是不是「意图3」，且还没结算完。
+    /// </summary>
     private static bool DonQuixote_IsOathPending(Creature DonQuixote_Creature)
     {
         return DonQuixote_Creature?.Monster is Monsters.DonQuixoteWhiteMoonKnight DonQuixote_Knight
@@ -289,8 +300,7 @@ internal static class DonQuixoteWhiteMoonSpritePose
     }
 
     /// <summary>
-    /// 逐帧播放。返回的 Task 在整段播完（或被打断）时完成，
-    /// 意图 3 需要「播到瞄准 → 结算伤害 → 播后半段」时 await 它。
+    /// 逐帧播放。返回的 Task 在整段播完（或被打断）时完成。
     /// </summary>
     private static async Task DonQuixote_RunAsync(
         Creature DonQuixote_Creature,
@@ -464,7 +474,7 @@ internal static class DonQuixoteWhiteMoonSpritePose
             return DonQuixote_Sprite;
         }
 
-        // 兜底：%Visuals 万一不是 Sprite2D（手改场景出错时），直接找第一个带贴图的 Sprite2D。
+        // 兜底：%Visuals 万一不是 Sprite2D（手改场景出错时）。
         Sprite2D? DonQuixote_Found = DonQuixote_FindSpriteDeep(DonQuixote_Node);
         DonQuixote_Note(DonQuixote_Found == null
             ? "sprite lookup failed: body=" + (DonQuixote_Body?.GetType().Name ?? "null")

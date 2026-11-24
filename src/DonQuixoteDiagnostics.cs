@@ -13,9 +13,7 @@ using DonQuixote_Logger = MegaCrit.Sts2.Core.Logging.Logger;
 namespace DonQuixote;
 
 /// <summary>
-/// One-shot diagnostic that dumps what the game believes about ancients, so we
-/// can tell whether the missing ancient relics are a content registration
-/// problem or purely a UI/localization problem.
+/// One-shot diagnostic that dumps what the game believes about ancients, so we can tell whether the missing ancient relics are a content registration problem or purely a UI/localization problem.
 /// </summary>
 internal static class DonQuixoteDiagnostics
 {
@@ -73,9 +71,7 @@ internal static class DonQuixoteDiagnostics
 
     private static bool DonQuixote_LoggedRelics;
     /// <summary>
-    /// 打印本模组遗物池的内容与稀有度，用来确认「罕见 / 稀有遗物到底进没进
-    /// 宝箱房和商店的随机池」。游戏只在 RelicRarity 为 Common / Uncommon / Rare / Shop
-    /// 的遗物里抽（RelicGrabBag._rarities），其它稀有度永远不会进宝箱/商店。
+    /// 打印本模组遗物池的内容与稀有度。
     /// </summary>
     public static void DonQuixote_LogRelicPoolReport(DonQuixote_Logger DonQuixote_Logger)
     {
@@ -106,9 +102,7 @@ internal static class DonQuixoteDiagnostics
         }
     }
     /// <summary>
-    /// 内容自检：确认这一轮改动的几个关键点真的落到了运行时模型上
-    /// （新 power 有没有注册、卡牌接口/关键词对不对、选牌提示键在不在），
-    /// 免得又出现「改了代码但游戏里没生效」这种只能靠实战才发现的问题。
+    /// 内容自检：确认这一轮改动的几个关键点真的落到了运行时模型上 （新 power 有没有注册、卡牌接口/关键词对不对、选牌提示键在不在）。
     /// </summary>
     public static void DonQuixote_LogContentReport(DonQuixote_Logger DonQuixote_Logger)
     {
@@ -204,8 +198,7 @@ internal static class DonQuixoteMainMenuReadyPatch
     {
         DonQuixoteModEntry.DonQuixote_Logger?.Info("[DonQuixote] main menu ready", 0);
 
-        // BaseLib 的 CleanUp 空引用兜底：必须等到 BaseLib 程序集加载之后才能挂，
-        // 主菜单就绪是第一个「所有 mod 都已加载、玩家还没点继续」的安全点。
+        // BaseLib 的 CleanUp 空引用兜底：必须等到 BaseLib 程序集加载之后才能挂。
         DonQuixoteBaseLibCleanupGuard.DonQuixote_Apply();
 
         if (DonQuixoteModEntry.DonQuixote_Logger != null)
@@ -213,7 +206,7 @@ internal static class DonQuixoteMainMenuReadyPatch
             DonQuixoteDiagnostics.DonQuixote_LogAncientReport(DonQuixoteModEntry.DonQuixote_Logger);
             DonQuixoteDiagnostics.DonQuixote_LogRelicPoolReport(DonQuixoteModEntry.DonQuixote_Logger);
 
-            // 先古对话自检：mine=我们那组对话条数，valid=实际会被选中的条数，picked=是否选中我们。
+            // 先古对话自检：mine=我们那组对话条数。
             DonQuixoteAncientDialoguePatch.DonQuixote_SelfTest();
 
             DonQuixoteDiagnostics.DonQuixote_LogContentReport(DonQuixoteModEntry.DonQuixote_Logger);

@@ -12,19 +12,7 @@ using MegaCrit.Sts2.Core.Nodes.Combat;
 namespace DonQuixote;
 
 /// <summary>
-/// 决斗对象 / 决斗的荣耀的头顶大图标记。实现方式与「正在凝固的血」的血刺完全一致：
-/// 往生物的 NCreatureVisuals 上挂自定义 Sprite2D，由三个补丁 + 轮询定时器驱动显隐，
-/// 区别只是位置——血刺贯穿身体中心，这里把图放在**拥有效果的单位头顶正上方**。
-///
-/// 位置算法：以 NCreatureVisuals.Bounds（身体矩形）为基准，取顶边中点，
-/// 向上留一点缝隙后居中放置图标；图标高度按身体高度等比缩放并做上下限钳制。
-/// 同一单位同时拥有两个状态时左右并排，避免叠在一起看不清。
-///
-/// 时机（与血刺同一套）：
-/// - PowerCmd.Apply 后缀：状态落到单位身上的那一刻立刻点亮；
-/// - Creature.RemovePowerInternal 后缀：状态移除的那一刻立刻熄灭；
-/// - NCreature._Ready 后缀：单位进场时先挂好隐藏的图标；
-/// - 控制器内 Timer：兜底处理死亡、身体尺寸变化、层数归零等边界情况。
+/// 决斗对象 / 决斗的荣耀的头顶大图标记。
 /// </summary>
 internal static class DonQuixoteDuelMarkers
 {
@@ -36,18 +24,26 @@ internal static class DonQuixoteDuelMarkers
 
     private const string DonQuixote_GloryTexturePath = "res://DonQuixote/images/powers/duel_glory_big.png";
 
-    /// <summary>图标边长 / 身体高度。太大的怪会撞到上方意图图标，所以下面还有上限钳制。</summary>
+    /// <summary>
+    /// 图标边长 / 身体高度。
+    /// </summary>
     private const float DonQuixote_SizeRatio = 0.46f;
 
-    /// <summary>图标底边与头顶之间的空隙 / 身体高度。</summary>
+    /// <summary>
+    /// 图标底边与头顶之间的空隙 / 身体高度。
+    /// </summary>
     private const float DonQuixote_GapRatio = 0.02f;
 
-    /// <summary>图标边长的下限 / 上限（像素，未含父级缩放）。</summary>
+    /// <summary>
+    /// 图标边长的下限 / 上限（像素，未含父级缩放）。
+    /// </summary>
     private const float DonQuixote_MinSize = 36f;
 
     private const float DonQuixote_MaxSize = 128f;
 
-    /// <summary>两个状态同时存在时的左右分开距离 / 图标边长。</summary>
+    /// <summary>
+    /// 两个状态同时存在时的左右分开距离 / 图标边长。
+    /// </summary>
     private const float DonQuixote_SplitRatio = 0.55f;
 
     private const double DonQuixote_RefreshInterval = 0.1;
@@ -59,8 +55,7 @@ internal static class DonQuixoteDuelMarkers
     private static bool DonQuixote_TexturesResolved;
 
     /// <summary>
-    /// buff 施加路径的入口：PowerCmd.Apply 后缀在检测到决斗对象 / 决斗的荣耀
-    /// 落到某个生物身上时调用，立刻点亮头顶图标。
+    /// buff 施加路径的入口：PowerCmd.Apply 后缀在检测到决斗对象 / 决斗的荣耀 落到某个生物身上时调用。
     /// </summary>
     public static void DonQuixote_OnPowerApplied(Creature DonQuixote_Target, PowerModel DonQuixote_Power)
     {
@@ -82,9 +77,7 @@ internal static class DonQuixoteDuelMarkers
                 return;
             }
 
-            // Apply 是 async，此后缀运行时 power 尚未进列表，不能靠 Refresh 的
-            // HasPower 判定；直接按目标状态的类型置可见 + 同步几何，
-            // 若最终施加被免疫/取消，0.1s 的轮询会把它修正回去。
+            // Apply 是 async.
             DonQuixote_SetMarkVisible(DonQuixote_Node, DonQuixote_Power, true);
             DonQuixote_RefreshGeometry(DonQuixote_Node);
 
@@ -99,7 +92,7 @@ internal static class DonQuixoteDuelMarkers
     }
 
     /// <summary>
-    /// buff 移除路径的入口：Creature.RemovePowerInternal 后缀调用，立刻熄灭头顶图标。
+    /// buff 移除路径的入口：Creature.RemovePowerInternal 后缀调用。
     /// </summary>
     public static void DonQuixote_OnPowerRemoved(Creature DonQuixote_Target, PowerModel DonQuixote_Power)
     {
@@ -128,8 +121,7 @@ internal static class DonQuixoteDuelMarkers
     }
 
     /// <summary>
-    /// 给生物挂上（或复用已有的）头顶图标节点。图标是 NCreatureVisuals 的直接子节点，
-    /// z_index = 2 保证画在身体与血刺之上。返回是否已就绪可用。
+    /// 给生物挂上（或复用已有的）头顶图标节点。
     /// </summary>
     public static bool DonQuixote_Attach(NCreature DonQuixote_Node)
     {
@@ -146,7 +138,7 @@ internal static class DonQuixoteDuelMarkers
                 return false;
             }
 
-            // 已挂过就直接复用
+            // 已挂过就直接复用。
             if (DonQuixote_Visuals.GetNodeOrNull<Sprite2D>(DonQuixote_TargetMarkName) != null)
             {
                 return true;
@@ -175,7 +167,7 @@ internal static class DonQuixoteDuelMarkers
             };
             DonQuixote_Visuals.AddChild(DonQuixote_GloryMark);
 
-            // 定时器兜底：状态是否还在、身体尺寸是否变了（怪物长大/缩小/死亡）
+            // 定时器兜底：状态是否还在、身体尺寸是否变了（怪物长大/缩小/死亡）。
             Timer DonQuixote_Timer = new Timer
             {
                 Name = "DonQuixoteDuelMarkerTick",
@@ -185,7 +177,7 @@ internal static class DonQuixoteDuelMarkers
             DonQuixote_Timer.Timeout += () => DonQuixote_Refresh(DonQuixote_Node);
             DonQuixote_Visuals.AddChild(DonQuixote_Timer);
 
-            // 进场时可能已经带着状态（读档 / 召唤），同步一次
+            // 进场时可能已经带着状态（读档 / 召唤），同步一次。
             DonQuixote_Refresh(DonQuixote_Node);
             return true;
         }
@@ -198,7 +190,7 @@ internal static class DonQuixoteDuelMarkers
     }
 
     /// <summary>
-    /// 同步显隐与几何。只有单位活着且身上还有对应状态时才显示。
+    /// 同步显隐与几何。
     /// </summary>
     private static void DonQuixote_Refresh(NCreature DonQuixote_Node)
     {
@@ -238,7 +230,6 @@ internal static class DonQuixoteDuelMarkers
 
     /// <summary>
     /// 只同步位置与缩放：以 Bounds 顶边中点为头顶，向上让出缝隙后居中放置。
-    /// 两个状态同时存在时左右并排。
     /// </summary>
     private static void DonQuixote_RefreshGeometry(NCreature DonQuixote_Node)
     {
@@ -283,8 +274,7 @@ internal static class DonQuixoteDuelMarkers
             DonQuixote_BodySize.Y * DonQuixote_SizeRatio, DonQuixote_MinSize, DonQuixote_MaxSize);
         float DonQuixote_Gap = Mathf.Max(3f, DonQuixote_BodySize.Y * DonQuixote_GapRatio);
 
-        // 头顶基准线：默认取身体矩形顶边；若这一列已经有意图图标（敌人回合预告），
-        // 就把标记抬到意图上方——意图本身就占着头顶正中，不抬会被完全盖住。
+        // 头顶基准线：默认取身体矩形顶边。
         float DonQuixote_TopY = DonQuixote_Bounds.GlobalPosition.Y;
         Control DonQuixote_Intents = null;
         try
@@ -309,20 +299,20 @@ internal static class DonQuixoteDuelMarkers
             }
         }
 
-        // 图标中心：头顶（或意图）上方 gap + 半径
+        // 图标中心：头顶（或意图）上方 gap + 半径。
         float DonQuixote_CenterX = DonQuixote_Bounds.GlobalPosition.X + (DonQuixote_BodySize.X * 0.5f);
         float DonQuixote_CenterY = DonQuixote_TopY
             - DonQuixote_Gap
             - (DonQuixote_DisplaySize * 0.5f);
 
-        // 两个状态同时存在时左右并用，避免互相遮住
+        // 两个状态同时存在时左右并用，避免互相遮住。
         float DonQuixote_Split = 0f;
         if (DonQuixote_TargetOn && DonQuixote_GloryOn)
         {
             DonQuixote_Split = DonQuixote_DisplaySize * DonQuixote_SplitRatio * 0.5f;
         }
 
-        // 父级可能有非 1 缩放（大怪/小怪），图标尺寸要按父级全局缩放反算
+        // 父级可能有非 1 缩放（大怪/小怪），图标尺寸要按父级全局缩放反算。
         float DonQuixote_ParentScale = 1f;
         try
         {
@@ -394,7 +384,7 @@ internal static class DonQuixoteDuelMarkers
             : DonQuixote_GloryMarkName;
         DonQuixote_SetVisible(DonQuixote_Visuals, DonQuixote_Name, DonQuixote_Visible);
 
-        // 另一个标记的显隐也跟着刷新一次，保证并排布局立刻正确
+        // 另一个标记的显隐也跟着刷新一次，保证并排布局立刻正确。
         string DonQuixote_Other = DonQuixote_Name == DonQuixote_TargetMarkName
             ? DonQuixote_GloryMarkName
             : DonQuixote_TargetMarkName;
@@ -434,7 +424,9 @@ internal static class DonQuixoteDuelMarkers
             || DonQuixote_Power is DonQuixotePowerWhiteMoonDuel;
     }
 
-    /// <summary>走「决斗的荣耀」那套头顶图标的类型：玩家侧 / 白月骑士侧。</summary>
+    /// <summary>
+    /// 走「决斗的荣耀」那套头顶图标的类型：玩家侧 / 白月骑士侧。
+    /// </summary>
     private static bool DonQuixote_IsGloryPower(PowerModel DonQuixote_Power)
     {
         return DonQuixote_Power is DonQuixotePowerDuelGlory

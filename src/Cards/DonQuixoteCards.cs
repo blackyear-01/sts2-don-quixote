@@ -16,12 +16,14 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace DonQuixote.Cards;
 
 /// <summary>
-/// 堂吉诃德派硬血14式斗篷：1 费，血宴5，获得 8 层摇曳【血魔】（升级15）
+/// 堂吉诃德派硬血14式斗篷：1 费，血宴5，获得 8 层摇曳【血魔】（升级15）。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodCape14 : DonQuixoteBloodFeastCard
 {
-    /// <summary>卡面插画（资源\卡牌\堂吉诃德派硬血14式-斗篷.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\堂吉诃德派硬血14式-斗篷.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_cape14.png";
 
     public DonQuixoteHardBloodCape14()
@@ -62,13 +64,14 @@ public sealed class DonQuixoteHardBloodCape14 : DonQuixoteBloodFeastCard
 }
 
 /// <summary>
-/// 桑丘啊！我有一个点子：0 费，恢复 1 点能量并抽 1 张卡（升级抽 2 张）
-/// 堕落值达到 40 时会被腐化替换成「化脓腐烂的怠惰之梦」
+/// 桑丘啊！我有一个点子：0 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteSanchoIdea : ModCardTemplate, IDonQuixoteCorruptible
 {
-    /// <summary>卡面插画（资源\卡牌\桑丘啊！我有个好点子.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\桑丘啊！
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/sancho_idea.png";
 
     public const int DonQuixote_CorruptionThreshold = 40;
@@ -110,21 +113,21 @@ public sealed class DonQuixoteSanchoIdea : ModCardTemplate, IDonQuixoteCorruptib
 }
 
 /// <summary>
-/// 腐败版：化脓腐烂的怠惰之梦：0 费，恢复 1 点能量并抽 1 张卡（升级恢复 2 点能量）
-/// 只能由「桑丘啊！我有一个点子」在堕落值达到阈值时转化而来，不进卡池。
+/// 腐败版：化脓腐烂的怠惰之梦：0 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteRottenLazyDream : ModCardTemplate, IDonQuixoteCorruptedCard
 {
-    /// <summary>卡面插画（资源\卡牌\化脓腐烂的怠惰之梦.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\化脓腐烂的怠惰之梦.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/rotten_lazy_dream.png";
 
     public DonQuixoteRottenLazyDream()
         : base(0, CardType.Skill, CardRarity.Token, TargetType.Self)
     {
     }
-    // 堕落牌的费用折扣由 Hook.ModifyEnergyCostInCombat 补丁统一处理
-    // （CanonicalEnergyCost 只在卡牌创建时被读一次，运行时改它不会生效）。
+    // 堕落牌的费用折扣由 Hook.ModifyEnergyCostInCombat 补丁统一处理 （CanonicalEnergyCost 只在卡牌创建时被读一次。
 
 
     protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
@@ -146,7 +149,6 @@ public sealed class DonQuixoteRottenLazyDream : ModCardTemplate, IDonQuixoteCorr
 
 /// <summary>
 /// 决斗宣告：2 费，堕落 80，给予目标 1 层决斗对象，本回合获得 2 层临时强壮，消耗（升级 5 层）。
-/// 堕落值达到 80 时会被替换成「令伤口撕裂，令鲜血绽放」。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteDuelDeclaration : ModCardTemplate, IDonQuixoteCorruptible
@@ -198,13 +200,14 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
 }
 
 /// <summary>
-/// 骑士的梦：2 费能力，每使用 1 张技能卡获得 1 点格挡（升级后固有）
-/// 堕落值达到 80 时会被腐化替换成「不负责任的梦」
+/// 骑士的梦：2 费能力。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteKnightDream : ModCardTemplate, IDonQuixoteCorruptible
 {
-    /// <summary>卡面插画（资源\卡牌\骑士的梦.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\骑士的梦.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/knight_dream.png";
 
     public const int DonQuixote_CorruptionThreshold = 80;
@@ -218,7 +221,9 @@ public sealed class DonQuixoteKnightDream : ModCardTemplate, IDonQuixoteCorrupti
 
     public CardModel DonQuixote_CorruptedCanonical => ModelDb.Card<DonQuixoteIrresponsibleDream>();
 
-    /// <summary>「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。</summary>
+    /// <summary>
+    /// 「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。
+    /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixoteKeywords.DonQuixote_Knight };
 
     public DonQuixoteKnightDream()
@@ -236,8 +241,7 @@ public sealed class DonQuixoteKnightDream : ModCardTemplate, IDonQuixoteCorrupti
     {
         DynamicVars["Defense"].UpgradeValueBy(4m);
 
-        // 升级后固有。CardModel 的关键词只在第一次取用时按 CanonicalKeywords 缓存一次
-        // （见 CardModel.LocalKeywords），升级不会重算，所以这里必须显式加。
+        // 升级后固有。CardModel 的关键词只在第一次取用时按 CanonicalKeywords 缓存一次 （见 CardModel.LocalKeywords）。
         AddKeyword(CardKeyword.Innate);
     }
 
@@ -249,21 +253,21 @@ public sealed class DonQuixoteKnightDream : ModCardTemplate, IDonQuixoteCorrupti
 }
 
 /// <summary>
-/// 腐败版：不负责任的梦：2 费能力，腐化卡有 10% 概率重放 1 次（升级后固有）
-/// 只能由「骑士的梦」在堕落值达到阈值时转化而来，不进卡池。
+/// 腐败版：不负责任的梦：2 费能力。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteIrresponsibleDream : ModCardTemplate, IDonQuixoteCorruptedCard
 {
-    /// <summary>卡面插画（资源\卡牌\不负责任的梦.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\不负责任的梦.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/irresponsible_dream.png";
 
     public DonQuixoteIrresponsibleDream()
         : base(2, CardType.Power, CardRarity.Uncommon, TargetType.Self)
     {
     }
-    // 堕落牌的费用折扣由 Hook.ModifyEnergyCostInCombat 补丁统一处理
-    // （CanonicalEnergyCost 只在卡牌创建时被读一次，运行时改它不会生效）。
+    // 堕落牌的费用折扣由 Hook.ModifyEnergyCostInCombat 补丁统一处理 （CanonicalEnergyCost 只在卡牌创建时被读一次。
 
 
     protected override void OnUpgrade()
@@ -279,14 +283,14 @@ public sealed class DonQuixoteIrresponsibleDream : ModCardTemplate, IDonQuixoteC
 }
 
 /// <summary>
-/// 灼烧的饥渴：古老牙齿转化后的先古卡。血宴3 只对「获得复还的血之冲动」生效
-/// （血宴不够时不给冲动，伤害与流血照常结算），造成 24 点伤害并施加 7 级流血 2 次
-/// （升级：6 层冲动、34 点伤害，10 级流血 + 5 层流血 4 次）
+/// 灼烧的饥渴：古老牙齿转化后的先古卡。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBurningHunger : DonQuixoteBloodFeastCard
 {
-    /// <summary>卡面插画（资源\卡牌\灼烧的饥渴.png，先古卡 250x351）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\灼烧的饥渴.png，先古卡 250x351）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/burning_hunger.png";
 
     public DonQuixoteBurningHunger()
@@ -310,8 +314,7 @@ public sealed class DonQuixoteBurningHunger : DonQuixoteBloodFeastCard
     {
         ArgumentNullException.ThrowIfNull(DonQuixote_cardPlay.Target, "cardPlay.Target");
 
-        // 「血宴 3：」只覆盖「获得复还的血之冲动」这一段 —— 血宴不够时不拿冲动，
-        // 伤害和流血照常结算（卡面把这两句拆成独立的两行）。
+        // 「血宴 3：」只覆盖「获得复还的血之冲动」这一段。
         if (await DonQuixote_TriggerBloodFeast(DonQuixote_choiceContext))
         {
             await PowerCmd.Apply<DonQuixotePowerBloodImpulse>(
@@ -324,8 +327,7 @@ public sealed class DonQuixoteBurningHunger : DonQuixoteBloodFeastCard
             .WithHitFx("vfx/vfx_attack_slash", null, null)
             .Execute(DonQuixote_choiceContext);
 
-        // 先施加两次流血强度，再把升级附加的层数单独加一次
-        // （若两次调用都带层数，层数会被算成两倍）。
+        // 先施加两次流血强度，再把升级附加的层数单独加一次 （若两次调用都带层数，层数会被算成两倍）。
         int DonQuixote_times = Math.Max(1, DynamicVars["Times"].IntValue);
         for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_times; DonQuixote_i++)
         {

@@ -7,11 +7,7 @@ using MegaCrit.Sts2.Core.Models;
 namespace DonQuixote;
 
 /// <summary>
-/// 腐化版本的卡（化脓腐烂的怠惰之梦 / 不负责任的梦）只能由堕落值阈值转化而来，
-/// 不能出现在战斗奖励、商店等随机卡池里。
-///
-/// RitsuLib 的 [RegisterCard] 会把卡挂进卡池的 AllCards，而 ModelDb.Card&lt;T&gt;() 依赖
-/// AllCards 才能取到模板，所以不能直接过滤 AllCards；这里只在“可获取卡牌”这一层过滤。
+/// 腐化版本的卡（化脓腐烂的怠惰之梦 / 不负责任的梦）只能由堕落值阈值转化而来。
 /// </summary>
 [HarmonyPatch(typeof(CardPoolModel), nameof(CardPoolModel.GetUnlockedCards))]
 internal static class DonQuixoteCorruptedCardPoolPatch
@@ -30,8 +26,7 @@ internal static class DonQuixoteCorruptedCardPoolPatch
 
         foreach (CardModel DonQuixote_card in __result)
         {
-            // 堕落版本 / 衍生卡 / 「不可通过选卡获得」的卡都不进随机卡池
-            // （最后一种仍然留在卡牌图鉴里，只是拿不到）。
+            // 堕落版本 / 衍生卡 / 「不可通过选卡获得」的卡都不进随机卡池 （最后一种仍然留在卡牌图鉴里。
             if (DonQuixote_card is IDonQuixoteCorruptedCard or IDonQuixoteTokenCard or IDonQuixoteUnselectableCard)
             {
                 DonQuixote_dropped = true;
@@ -56,7 +51,9 @@ internal static class DonQuixoteCorruptedCardPoolPatch
     }
 }
 
-/// <summary>堕落版本的卡不进入卡牌图鉴（视为衍生卡）。</summary>
+/// <summary>
+/// 堕落版本的卡不进入卡牌图鉴（视为衍生卡）。
+/// </summary>
 [HarmonyPatch(typeof(CardModel), nameof(CardModel.ShouldShowInCardLibrary), MethodType.Getter)]
 internal static class DonQuixoteCorruptedCardLibraryPatch
 {

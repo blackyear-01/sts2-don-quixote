@@ -22,12 +22,13 @@ namespace DonQuixote.Cards;
 
 /// <summary>
 /// 楔形硬血：1 费技能，保留，施加 2 级流血与 2 层流血。
-/// 升级后额外获得 2 层复还的血之冲动。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodWedge : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\楔形硬血.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\楔形硬血.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_wedge.png";
 
     public DonQuixoteHardBloodWedge()
@@ -77,7 +78,6 @@ public sealed class DonQuixoteHardBloodWedge : ModCardTemplate
 
 /// <summary>
 /// 破碎四散的硬血：1 费技能，本回合每抽一张牌对全体敌人施加 1 级流血。
-/// 升级后获得保留。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteShatteredHardBlood : ModCardTemplate
@@ -101,8 +101,7 @@ public sealed class DonQuixoteShatteredHardBlood : ModCardTemplate
 }
 
 /// <summary>
-/// 空虚而安逸之梦：2 费技能，堕落 80，获得 30 点血宴，
-/// 自身每有 5 点血宴获得 1 层摇曳【血魔】（升级后每 3 点）。
+/// 空虚而安逸之梦：2 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteEmptyComfortDream : ModCardTemplate, IDonQuixoteCorruptible
@@ -156,9 +155,7 @@ public sealed class DonQuixoteEmptyComfortDream : ModCardTemplate, IDonQuixoteCo
 }
 
 /// <summary>
-/// 堕落版：牺牲了家族的自私愿望：3 费攻击，硬血 3，获得 5 层复还的血之冲动，
-/// 对所有敌人造成 10 点伤害 3 次并施加 8 层流血（升级后 4 次，且保留）。
-/// 只能由「空虚而安逸之梦」腐化而来，不进卡池。
+/// 堕落版：牺牲了家族的自私愿望：3 费攻击。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteSelfishWishOfFamily : DonQuixoteHardBloodCard, IDonQuixoteCorruptedCard
@@ -233,7 +230,9 @@ public sealed class DonQuixoteSelfishWishOfFamily : DonQuixoteHardBloodCard, IDo
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteCrush : DonQuixoteBloodFeastCard
 {
-    /// <summary>卡面插画（资源\卡牌 对应 png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/crush.png";
 
     public DonQuixoteCrush()
@@ -252,8 +251,7 @@ public sealed class DonQuixoteCrush : DonQuixoteBloodFeastCard
 
     protected override async Task OnPlay(PlayerChoiceContext DonQuixote_choiceContext, CardPlay DonQuixote_cardPlay)
     {
-        // 目标类型是「随机敌人」时 cardPlay.Target 是空的，必须用 TargetingRandomOpponents
-        // （与结算顺序、随机源都由引擎按同步 RNG 处理，联机两端一致）。
+        // 目标类型是「随机敌人」时 cardPlay.Target 是空的。
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this, DonQuixote_cardPlay)
             .TargetingRandomOpponents(CombatState)
@@ -287,7 +285,9 @@ public sealed class DonQuixoteCrush : DonQuixoteBloodFeastCard
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteWound : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌 对应 png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/wound.png";
 
     public DonQuixoteWound()
@@ -327,13 +327,14 @@ public sealed class DonQuixoteWound : ModCardTemplate
 }
 
 /// <summary>
-/// 能量灌注（联机）：1 费技能，血宴 10，对全体友方施加 3 点力量与 5 层血铠
-/// （升级：5 点力量与 10 层血铠）。
+/// 能量灌注（联机）：1 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteEnergyInfusion : DonQuixoteBloodFeastCard
 {
-    /// <summary>卡面插画（资源\卡牌\能量灌注.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\能量灌注.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/energy_infusion.png";
 
     public DonQuixoteEnergyInfusion()
@@ -391,13 +392,14 @@ public sealed class DonQuixoteEnergyInfusion : DonQuixoteBloodFeastCard
 }
 
 /// <summary>
-/// 由此踏上冒险之途：2 费技能，堕落 40，获得 10 层摇曳【血魔】、5 层硬血（升级 9 层），
-/// 并对自身施加 5 级流血（升级：15 层摇曳，3 级流血）。
+/// 由此踏上冒险之途：2 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteSetOutOnAdventure : ModCardTemplate, IDonQuixoteCorruptible
 {
-    /// <summary>卡面插画（资源\卡牌\由此踏上冒险之途.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\由此踏上冒险之途.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/set_out_on_adventure.png";
 
     public const int DonQuixote_CorruptionThreshold = 40;
@@ -411,7 +413,9 @@ public sealed class DonQuixoteSetOutOnAdventure : ModCardTemplate, IDonQuixoteCo
 
     public CardModel DonQuixote_CorruptedCanonical => ModelDb.Card<DonQuixoteBetrayalOfKin>();
 
-    /// <summary>「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。</summary>
+    /// <summary>
+    /// 「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。
+    /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixoteKeywords.DonQuixote_Knight };
 
     public DonQuixoteSetOutOnAdventure()
@@ -459,8 +463,7 @@ public sealed class DonQuixoteSetOutOnAdventure : ModCardTemplate, IDonQuixoteCo
 }
 
 /// <summary>
-/// 堕落版：来自亲族的背叛：2 费技能，血宴 2，获得 5 层复还的血之冲动与 5 层硬血，
-/// 对自身施加 10 级流血（升级 6 级）。只能由「由此踏上冒险之途」腐化而来，不进卡池。
+/// 堕落版：来自亲族的背叛：2 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBetrayalOfKin : DonQuixoteBloodFeastCard, IDonQuixoteCorruptedCard
@@ -520,13 +523,14 @@ public sealed class DonQuixoteBetrayalOfKin : DonQuixoteBloodFeastCard, IDonQuix
 }
 
 /// <summary>
-/// 血之欢喜：2 费技能，对全体敌人施加 10 级流血，然后触发对方 2 次流血效果
-/// （触发是「额外结算」，不扣层数）。升级后保留。
+/// 血之欢喜：2 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodJoy : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌 对应 png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_joy.png";
 
     public DonQuixoteBloodJoy()
@@ -584,13 +588,14 @@ public sealed class DonQuixoteBloodJoy : ModCardTemplate
 }
 
 /// <summary>
-/// 无止尽的饥饿：3 费攻击，消耗全部血宴，每 5 点让攻击次数 +1，
-/// 对所有敌人造成 10 点伤害（基础 0 次，升级 1 次）并施加 3 层流血。
+/// 无止尽的饥饿：3 费攻击。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteEndlessHunger : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\无止尽的饥饿.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\无止尽的饥饿.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/endless_hunger.png";
 
     public DonQuixoteEndlessHunger()
@@ -619,8 +624,7 @@ public sealed class DonQuixoteEndlessHunger : ModCardTemplate
         decimal DonQuixote_hitDamage =
             DynamicVars.Damage.BaseValue + DonQuixoteBloodMagic.DonQuixote_HardBloodDamageBonus(DonQuixote_hardBlood);
 
-        // 消耗至多 MaxFeast 点血宴：按实际消耗的点数决定追加攻击次数，
-        // 同时由 PayBloodFeastUpTo 把「实际消耗」累计进消耗血宴总数。
+        // 消耗至多 MaxFeast 点血宴：按实际消耗的点数决定追加攻击次数。
         int DonQuixote_spend = await DonQuixoteBloodMagic.DonQuixote_PayBloodFeastUpTo(
             DonQuixote_choiceContext, Owner.Creature, DynamicVars["MaxFeast"].IntValue, this);
         int DonQuixote_per = Math.Max(1, DynamicVars["FeastPerHit"].IntValue);
@@ -660,13 +664,14 @@ public sealed class DonQuixoteEndlessHunger : ModCardTemplate
 
 
 /// <summary>
-/// 血喜：1 费攻击，血宴 10，获得 3 层硬血（升级 8 层），
-/// 造成 10 点伤害，目标每有 1 级流血便 +1 点伤害。
+/// 血喜：1 费攻击，血宴 10，获得 3 层硬血（升级 8 层），造成 10 点伤害，目标每有 1 级流血便 +1 点伤害。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodCheer : DonQuixoteBloodFeastCard
 {
-    /// <summary>卡面插画（资源\卡牌 对应 png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_cheer.png";
 
     public DonQuixoteBloodCheer()
@@ -735,8 +740,6 @@ public sealed class DonQuixoteAllClottedBlood : ModCardTemplate
     protected override async Task OnPlay(PlayerChoiceContext DonQuixote_choiceContext, CardPlay DonQuixote_cardPlay)
     {
         // 能力是 Single（层数固定 1、数值就存在 Amount 上）。
-        // 直接 Apply 会让已有实例「+50」叠成 100（等于免疫流血），
-        // 所以先移除旧的再按当前等级重新挂。
         DonQuixotePowerAllClottedBlood DonQuixote_existing =
             DonQuixoteBloodMagic.DonQuixote_Find<DonQuixotePowerAllClottedBlood>(Owner.Creature);
         if (DonQuixote_existing != null)
@@ -762,7 +765,6 @@ public sealed class DonQuixoteAllClottedBlood : ModCardTemplate
 
 /// <summary>
 /// 披上鲜血，听从血液的驱使：2 费技能，获得 10 层血铠并抽 3 张牌。
-/// 升级后额外获得 1 点能量。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteCladInBlood : ModCardTemplate
@@ -806,12 +808,14 @@ public sealed class DonQuixoteCladInBlood : ModCardTemplate
 }
 
 /// <summary>
-/// 猩红之爪：2 费攻击，造成 3 点伤害 3 次（升级 4 次），并回复「造成伤害总量」的生命。
+/// 猩红之爪：2 费攻击。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteCrimsonClaw : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\猩红之爪.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\猩红之爪.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/crimson_claw.png";
 
     public DonQuixoteCrimsonClaw()
@@ -860,13 +864,14 @@ public sealed class DonQuixoteCrimsonClaw : ModCardTemplate
 }
 
 /// <summary>
-/// 鲜血吸收：2 费技能，消除自身随机 1 个负面状态并回复 6 点生命
-/// （升级：2 个负面状态，回复 10 点）。
+/// 鲜血吸收：2 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodAbsorb : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\鲜血吸收.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\鲜血吸收.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_absorb.png";
 
     public DonQuixoteBloodAbsorb()
@@ -887,9 +892,7 @@ public sealed class DonQuixoteBloodAbsorb : ModCardTemplate
         // 「随机」必须用同步随机源：Random.Shared 每端都不一样，一用就会数据不同步。
         Rng DonQuixote_rng = Owner.RunState?.Rng?.CombatCardSelection;
 
-        // 注意用 Amount != 0 而不是 > 0：像「缩小」(ShrinkPower) 这种没有回合数、
-        // 用负数（Amount < 0）表示「永久持续」的负面状态，> 0 会把它们全过滤掉，
-        // 导致卡牌描述说「消除负面状态」却清不掉缩小。
+        // 注意用 Amount != 0 而不是 > 0：像「缩小」(ShrinkPower) 这种没有回合数、用负数（Amount < 0）表示「永久持续」的负面状态。
         List<PowerModel> DonQuixote_debuffs = Owner.Creature.Powers
             .Where(DonQuixote_power => DonQuixote_power != null
                 && DonQuixote_power.Type == PowerType.Debuff
@@ -923,14 +926,14 @@ public sealed class DonQuixoteBloodAbsorb : ModCardTemplate
 }
 
 /// <summary>
-/// 公平的决斗：2 费技能（升级 1 费），目标为任意敌人。复制随机 1 个敌人的随机
-/// 1 个正面增益（优先坚不可摧 / 仪式 / 滑溜 / 人工制品 / 难以杀灭 / 激怒 / 天罚 /
-/// 污染），再把选中的那个敌人标记为「决斗对象」1 层。
+/// 公平的决斗：2 费技能（升级 1 费），目标为任意敌人。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteFairDuel : ModCardTemplate, IDonQuixoteCorruptible
 {
-    /// <summary>优先复制的增益（按卡面顺序）。</summary>
+    /// <summary>
+    /// 优先复制的增益（按卡面顺序）。
+    /// </summary>
     private static readonly Type[] DonQuixote_PriorityBuffs =
     {
         typeof(BarricadePower),
@@ -943,7 +946,9 @@ public sealed class DonQuixoteFairDuel : ModCardTemplate, IDonQuixoteCorruptible
         typeof(TaintedPower),
     };
 
-    /// <summary>「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。</summary>
+    /// <summary>
+    /// 「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。
+    /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixoteKeywords.DonQuixote_Knight };
 
     public DonQuixoteFairDuel()
@@ -976,8 +981,7 @@ public sealed class DonQuixoteFairDuel : ModCardTemplate, IDonQuixoteCorruptible
 
         Rng DonQuixote_rng = Owner.RunState?.Rng?.CombatCardSelection;
 
-        // 优先从选中的目标身上复制；目标是个白板时退回「场上随便一个带正面增益的敌人」，
-        // 免得卡面写的「复制 1 个正面增益」因为选了只没 buff 的怪而落空。
+        // 优先从选中的目标身上复制。
         List<PowerModel> DonQuixote_buffs = DonQuixote_BuffsOf(DonQuixote_target);
         if (DonQuixote_buffs.Count == 0)
         {
@@ -1034,8 +1038,7 @@ public sealed class DonQuixoteFairDuel : ModCardTemplate, IDonQuixoteCorruptible
     }
 
     /// <summary>
-    /// 复制黑名单统一放在 <see cref="DonQuixotePowerBlacklist"/>，
-    /// 和「伤口破坏」共用一份（含沙坑 SandpitPower）。
+    /// 复制黑名单统一放在 <see cref="DonQuixotePowerBlacklist"/>。
     /// </summary>
     private static bool DonQuixote_IsCopyBlacklisted(PowerModel DonQuixote_power)
     {
@@ -1054,8 +1057,7 @@ public sealed class DonQuixoteFairDuel : ModCardTemplate, IDonQuixoteCorruptible
     }
 
     /// <summary>
-    /// 复制一份能力给自己：从模型库里取规范实例再克隆，不要直接复用敌人身上那一个
-    /// （那会把对方的能力实例搬走）。
+    /// 复制一份能力给自己：从模型库里取规范实例再克隆。
     /// </summary>
     private async Task DonQuixote_CopyPower(PlayerChoiceContext DonQuixote_ctx, PowerModel DonQuixote_source)
     {
@@ -1082,10 +1084,7 @@ public sealed class DonQuixoteFairDuel : ModCardTemplate, IDonQuixoteCorruptible
 
         int DonQuixote_amount = DonQuixote_source.Amount;
 
-        // ToMutable(initialAmount) 内部会调用 SetAmount，而 SetAmount 末尾会去碰 Owner
-        // （Creature.InvokePowerModified），此时克隆体还没有 Owner，会抛 NullReferenceException。
-        // 所以克隆时给 0（amount - _amount == 0 会提前 return，不会碰 Owner），
-        // 真正的层数交给 PowerCmd.Apply -> ApplyInternal 去设置（它会先 set_Owner）。
+        // ToMutable(initialAmount) 内部会调用 SetAmount。
         PowerModel DonQuixote_copy = DonQuixote_canonical.ToMutable(0);
 
         await PowerCmd.Apply(

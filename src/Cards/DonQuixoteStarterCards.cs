@@ -24,17 +24,19 @@ public abstract class DonQuixoteBloodFeastCard : ModCardTemplate
     {
     }
 
-    /// <summary>需要消耗的血宴数量（由 DynamicVars 提供，升级时同步变化）。</summary>
+    /// <summary>
+    /// 需要消耗的血宴数量（由 DynamicVars 提供，升级时同步变化）。
+    /// </summary>
     public abstract int DonQuixote_BloodFeastCost { get; }
 
     /// <summary>
     /// 是否必须凑够血宴才能打出。
-    /// 默认 false：新规则下「血宴 X」是条件触发 —— 血宴不足时照样能打出，只是不触发后续效果。
-    /// 只有卡面明写「需消耗 X 点血宴才能打出」的卡（La Sangre）才返回 true。
     /// </summary>
     public virtual bool DonQuixote_BloodFeastMustPay => false;
 
-    /// <summary>取一个动态数值；缺失时返回 0，避免升级/预览路径抛异常。</summary>
+    /// <summary>
+    /// 取一个动态数值；缺失时返回 0，避免升级/预览路径抛异常。
+    /// </summary>
     protected int DonQuixote_Var(string DonQuixote_name)
     {
         DynamicVar DonQuixote_var;
@@ -43,8 +45,7 @@ public abstract class DonQuixoteBloodFeastCard : ModCardTemplate
 
     protected decimal DonQuixote_ScaledDamage(decimal DonQuixote_baseValue)
     {
-        // 堕落值的增伤已经改成全局伤害钩子（DonQuixotePowerCorruption.ModifyDamageMultiplicative），
-        // 这里不能再乘一次，否则血宴卡会吃到两份加成。
+        // 堕落值的增伤已经改成全局伤害钩子（DonQuixotePowerCorruption.ModifyDamageMultiplicative）。
         return DonQuixote_baseValue;
     }
 
@@ -55,9 +56,7 @@ public abstract class DonQuixoteBloodFeastCard : ModCardTemplate
     }
 
     /// <summary>
-    /// 「血宴 X：」条件触发 —— 血宴够 X 点时扣掉并返回 true，不够则什么都不做、返回 false。
-    /// 与 <see cref="DonQuixote_PayBloodFeast"/> 的区别：这里不做血袋抵扣，
-    /// 因为卡面写的是「满足条件时」，条件是「手上有 X 点血宴」。
+    /// 「血宴 X：」条件触发。
     /// </summary>
     protected Task<bool> DonQuixote_TriggerBloodFeast(PlayerChoiceContext DonQuixote_ctx)
     {
@@ -68,14 +67,14 @@ public abstract class DonQuixoteBloodFeastCard : ModCardTemplate
 
 /// <summary>
 /// 硬血斩击：1 费，造成 5 点伤害并施加 1 级流血（升级 6 点伤害、3 级流血）。
-/// 视为初始「打击」：带 Strike 标签，供树叶药膏 / 纽奥的护符 / 大胶囊 /
-/// 营养汤 / 潘多拉之盒等按「基础打击/防御」检定的遗物识别。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 [RegisterCharacterStarterCard(typeof(DonQuixoteCharacter), 4, Order = 10)]
 public sealed class DonQuixoteHardBloodSlash : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\硬血打击.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\硬血打击.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_slash.png";
 
     public DonQuixoteHardBloodSlash()
@@ -83,8 +82,7 @@ public sealed class DonQuixoteHardBloodSlash : ModCardTemplate
     {
     }
 
-    // CardModel.IsBasicStrikeOrDefend 就是靠「Basic + Strike/Defend 标签」判定的，
-    // 遗物（LeafyPoultice、NeowsTalisman、LargeCapsule、NutritiousSoup）直接查 Tags。
+    // CardModel.IsBasicStrikeOrDefend 就是靠「Basic + Strike/Defend 标签」判定的，遗物（LeafyPoultice、NeowsTalisman、LargeCapsule、NutritiousSoup）直接查 Tags。
     protected override HashSet<CardTag> CanonicalTags => new HashSet<CardTag>
     {
         CardTag.Strike,
@@ -123,13 +121,14 @@ public sealed class DonQuixoteHardBloodSlash : ModCardTemplate
 
 /// <summary>
 /// 硬血防御：1 费，获得 5 层摇曳[血魔]（升级 7）。
-/// 视为初始「防御」：带 Defend 标签，同上参与按初始打防检定的遗物。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 [RegisterCharacterStarterCard(typeof(DonQuixoteCharacter), 5, Order = 20)]
 public sealed class DonQuixoteHardBloodGuard : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\硬血防御.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\硬血防御.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_guard.png";
 
     public DonQuixoteHardBloodGuard()
@@ -162,13 +161,15 @@ public sealed class DonQuixoteHardBloodGuard : ModCardTemplate
 }
 
 /// <summary>
-/// 抑制的血之渴望：2 费，造成 11 点伤害并施加 5 级流血（升级 15 点伤害、14 级流血）。
+/// 抑制的血之渴望：2 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 [RegisterCharacterStarterCard(typeof(DonQuixoteCharacter), 1, Order = 30)]
 public sealed class DonQuixoteBloodHunger : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\抑制的血之渴望.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\抑制的血之渴望.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_hunger.png";
 
     public DonQuixoteBloodHunger()
@@ -214,7 +215,9 @@ public sealed class DonQuixoteBloodHunger : ModCardTemplate
 [RegisterCharacterStarterCard(typeof(DonQuixoteCharacter), 1, Order = 40)]
 public sealed class DonQuixoteFragileFragility : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\脆弱，脆弱不堪.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\脆弱，脆弱不堪.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/fragile_fragility.png";
 
     public DonQuixoteFragileFragility()

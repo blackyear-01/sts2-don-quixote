@@ -11,8 +11,6 @@ namespace DonQuixote;
 
 /// <summary>
 /// 卡面写「需消耗 X 点硬血才能打出」的卡。
-/// 和「血铸」不同：血铸是打出去后按实际消耗加长枪伤害，硬血不足也能打；
-/// 这个接口是**出牌门槛**，硬血不足时整张牌不能打出。
 /// </summary>
 public interface IDonQuixoteHardBloodCost
 {
@@ -21,14 +19,6 @@ public interface IDonQuixoteHardBloodCost
 
 /// <summary>
 /// 血宴相关的「能不能打出」判定。
-///
-/// 现在的规则（卡牌.docx / 效果.docx 更新后）：
-/// 1. 「血宴 X」是**条件触发**——血宴不足时卡牌照样能打出，只是不触发那一段效果，
-///    所以默认不再拦截。
-/// 2. 「血铸 X」同理：硬血不足也能打出，按实际消耗的硬血算增伤。
-/// 3. 仍然会拦截的只剩两种：
-///    - 「为了共存必须舍弃」挂的「血宴封锁」；
-///    - 卡面明写「需消耗 X 点血宴才能打出」的卡（<see cref="DonQuixoteBloodFeastCard.DonQuixote_BloodFeastMustPay"/>）。
 /// </summary>
 internal static class DonQuixoteBloodFeastGate
 {
@@ -142,7 +132,9 @@ internal static class DonQuixoteBloodFeastGate
         }
     }
 
-    /// <summary>血宴封锁只对「会消耗血宴」的卡生效：血宴卡本身，以及写有「消耗至多 X 点血宴」的卡。</summary>
+    /// <summary>
+    /// 血宴封锁只对「会消耗血宴」的卡生效：血宴卡本身，以及写有「消耗至多 X 点血宴」的卡。
+    /// </summary>
     private static bool DonQuixote_IsBloodFeastConsumer(CardModel DonQuixote_card)
     {
         if (DonQuixote_card is DonQuixoteBloodFeastCard)

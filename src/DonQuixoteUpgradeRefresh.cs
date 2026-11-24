@@ -6,9 +6,6 @@ namespace DonQuixote;
 
 /// <summary>
 /// 升级后刷新本模组卡牌所有 DynamicVar 的 PreviewValue。
-/// 原版的描述高亮（{X:diff()}）读的是 PreviewValue 而不是 BaseValue，
-/// 而基类 DynamicVar.UpdateCardPreview 是空实现，所以自定义数值升级后
-/// 描述会一直显示旧的数字，看起来像「升级没生效」。
 /// </summary>
 [HarmonyPatch(typeof(CardModel), nameof(CardModel.UpgradeInternal))]
 internal static class DonQuixoteUpgradeVarRefreshPatch

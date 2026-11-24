@@ -16,11 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace DonQuixote.Powers;
 
 /// <summary>
-/// 硬血 X：资源型状态，打出需要消耗硬血的卡时扣除。硬血不足时仍可打出，按实际消耗结算。
-///
-/// 中立状态（<see cref="PowerType.None"/>）：它只是「资源条」，不是强度增益。
-/// 标成 Buff 的话会被「翻倍增益」把硬血翻倍、被「清除增益」直接清零，
-/// 整套硬血经济当场崩掉 —— 所以一律不参与增减益判定。
+/// 硬血 X：资源型状态，打出需要消耗硬血的卡时扣除。
 /// </summary>
 public sealed class DonQuixotePowerHardBlood : ModPowerTemplate
 {
@@ -46,7 +42,9 @@ public sealed class DonQuixotePowerBloodArmor : ModPowerTemplate
 
     public override string CustomBigIconPath => "res://DonQuixote/images/powers/blood_armor_big.png";
 
-    /// <summary>有血铠时护甲不随回合开始清空。</summary>
+    /// <summary>
+    /// 有血铠时护甲不随回合开始清空。
+    /// </summary>
     public override bool ShouldClearBlock(Creature DonQuixote_creature)
     {
         return !ReferenceEquals(DonQuixote_creature, Owner) || Amount <= 0;
@@ -157,7 +155,9 @@ public sealed class DonQuixotePowerClottingBlood : ModPowerTemplate
 
     public override string CustomBigIconPath => "res://DonQuixote/images/powers/clotting_blood_big.png";
 
-    /// <summary>原版「戏剧性刺穿」特效，用作血刺贯穿的视觉表现。</summary>
+    /// <summary>
+    /// 原版「戏剧性刺穿」特效，用作血刺贯穿的视觉表现。
+    /// </summary>
     private const string DonQuixote_ClotVfx = "vfx/vfx_dramatic_stab";
 
     public override async Task BeforeSideTurnStart(
@@ -252,7 +252,7 @@ public sealed class DonQuixotePowerResponsibility : ModPowerTemplate
 }
 
 /// <summary>
-/// 眷属：每使用 1 张卡自身失去 5 点生命、堂吉诃德获得 5 点血宴；造成伤害时回复伤害量 10% 的生命。
+/// 眷属：每使用 1 张卡自身失去 5 点生命、堂吉诃德获得 5 点血宴。
 /// </summary>
 public sealed class DonQuixotePowerFollower : ModPowerTemplate
 {
@@ -349,8 +349,6 @@ public sealed class DonQuixotePowerBloodBag : ModPowerTemplate
 
 /// <summary>
 /// 消耗血宴总数：记录本场战斗里「血宴 X」与「消耗至多 X 点血宴」累计支付的数值。
-/// 每 1 点让施加流血效果的卡最终伤害 +1%（无上限）。
-/// 中立状态（<see cref="PowerType.None"/>）：不是增益也不是减益，人工制品抵消不掉。
 /// </summary>
 public sealed class DonQuixotePowerFeastTotal : ModPowerTemplate
 {
@@ -364,7 +362,9 @@ public sealed class DonQuixotePowerFeastTotal : ModPowerTemplate
 
     public override string CustomBigIconPath => "res://DonQuixote/images/powers/feast_total_big.png";
 
-    /// <summary>每 1 点让「施加流血」的卡最终伤害 +1%（无上限）。</summary>
+    /// <summary>
+    /// 每 1 点让「施加流血」的卡最终伤害 +1%（无上限）。
+    /// </summary>
     public override decimal ModifyDamageMultiplicative(
         Creature DonQuixote_target,
         decimal DonQuixote_amount,

@@ -6,19 +6,13 @@ using MegaCrit.Sts2.Core.Models.Powers;
 namespace DonQuixote;
 
 /// <summary>
-/// 「不能动」的敌方增益黑名单：被这些效果挡下的状态，既不能被
-/// 「公平的决斗」复制，也不能被「伤口破坏」解除。
-///
-/// 三类会被挡下：
-/// 1) 本模组自己的资源类状态（血宴 / 堕落值 / 摇曳等，拿走或复制都没有意义还容易出 bug）；
-/// 2) InstanceType 不是 None 的状态（多实例状态 / 与施加者绑定的状态，动它就会破坏绑定）；
-/// 3) 与原版怪物强绑定、动一下就出问题的状态（下面显式列出）。
-///    其中最典型的是沙坑（<see cref="SandpitPower"/>）：它是无厌沙虫吞人的计数器，
-///    复制给玩家或从沙虫身上解掉都会让战斗流程错乱。
+/// 「不能动」的敌方增益黑名单：被这些效果挡下的状态。
 /// </summary>
 internal static class DonQuixotePowerBlacklist
 {
-    /// <summary>按类型拉黑。</summary>
+    /// <summary>
+    /// 按类型拉黑。
+    /// </summary>
     internal static readonly Type[] DonQuixote_BlockedTypes =
     {
         typeof(SandpitPower),
@@ -36,7 +30,9 @@ internal static class DonQuixotePowerBlacklist
         typeof(GalvanicPower),
     };
 
-    /// <summary>按条目 id 拉黑：连怪物 / 其他模组的状态也能覆盖。</summary>
+    /// <summary>
+    /// 按条目 id 拉黑：连怪物 / 其他模组的状态也能覆盖。
+    /// </summary>
     internal static readonly string[] DonQuixote_BlockedIds =
     {
         "SANDPIT_POWER",
@@ -51,7 +47,9 @@ internal static class DonQuixotePowerBlacklist
         "LIVING_SHIELD_POWER",
     };
 
-    /// <summary>标题兜底黑名单：id 与类型都猜不到时（例如只存在于其他模组的状态），按显示名挡。</summary>
+    /// <summary>
+    /// 标题兜底黑名单：id 与类型都猜不到时（例如只存在于其他模组的状态），按显示名挡。
+    /// </summary>
     internal static readonly string[] DonQuixote_BlockedTitles =
     {
         "沙坑",

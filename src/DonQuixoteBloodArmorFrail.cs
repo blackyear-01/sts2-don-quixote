@@ -13,8 +13,6 @@ namespace DonQuixote;
 
 /// <summary>
 /// 血铠：生效期间，护甲的结算不受「脆弱」削减。
-/// 原版脆弱在 Hook.ModifyBlock 里乘 0.75，这里在血铠生效时把这一刀还原回去，
-/// 敏捷等其它加成照常保留。
 /// </summary>
 [HarmonyPatch(typeof(Hook), nameof(Hook.ModifyBlock))]
 internal static class DonQuixoteBloodArmorFrailPatch

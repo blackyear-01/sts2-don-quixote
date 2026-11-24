@@ -46,8 +46,7 @@ public sealed class DonQuixoteLatentBlood : ModCardTemplate
 }
 
 /// <summary>
-/// 好点子形态：3 费能力，每消耗 20 点血宴获得 1 点能量；
-/// 升级后固有，并且阈值降为 15 点。
+/// 好点子形态：3 费能力，每消耗 20 点血宴获得 1 点能量。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteGoodIdeaForm : ModCardTemplate
@@ -62,7 +61,9 @@ public sealed class DonQuixoteGoodIdeaForm : ModCardTemplate
         new DynamicVar("FeastCost", 20m),
     };
 
-    /// <summary>卡面插画（资源\卡牌\好点子形态.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\好点子形态.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/good_idea_form.png";
 
     private int DonQuixote_Threshold => DynamicVars["FeastCost"].IntValue;
@@ -84,7 +85,7 @@ public sealed class DonQuixoteGoodIdeaForm : ModCardTemplate
         // 20 -> 15：消耗更少的血宴就能攒出 1 点能量。
         DynamicVars["FeastCost"].UpgradeValueBy(-5m);
 
-        // 升级后固有。关键词是实例上缓存的，升级不会重算 CanonicalKeywords，必须显式加。
+        // 升级后固有。关键词是实例上缓存的。
         AddKeyword(CardKeyword.Innate);
     }
 }

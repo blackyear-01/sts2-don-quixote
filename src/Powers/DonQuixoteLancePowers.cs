@@ -15,8 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace DonQuixote.Powers;
 
 /// <summary>
-/// 血铸累计：每场战斗累计的「血铸X」总量，只影响「骑士长枪」的伤害，
-/// 本身不在状态栏显示（真正的关键词显示在卡面的描述文本里）。
+/// 血铸累计：每场战斗累计的「血铸X」总量。
 /// </summary>
 public sealed class DonQuixotePowerLanceForge : ModPowerTemplate
 {
@@ -27,7 +26,9 @@ public sealed class DonQuixotePowerLanceForge : ModPowerTemplate
     protected override bool IsVisibleInternal => false;
 }
 
-/// <summary>技巧累计：为「骑士长枪」与「饱食鲜血的长枪」增加攻击段数。</summary>
+/// <summary>
+/// 技巧累计：为「骑士长枪」与「饱食鲜血的长枪」增加攻击段数。
+/// </summary>
 public sealed class DonQuixotePowerLanceTechnique : ModPowerTemplate
 {
     public override PowerType Type => PowerType.Buff;
@@ -37,7 +38,9 @@ public sealed class DonQuixotePowerLanceTechnique : ModPowerTemplate
     protected override bool IsVisibleInternal => false;
 }
 
-/// <summary>增幅累计：为「骑士长枪」加血铠与摇曳，为「饱食鲜血的长枪」加流血触发次数。</summary>
+/// <summary>
+/// 增幅累计：为「骑士长枪」加血铠与摇曳，为「饱食鲜血的长枪」加流血触发次数。
+/// </summary>
 public sealed class DonQuixotePowerLanceAmplify : ModPowerTemplate
 {
     public override PowerType Type => PowerType.Buff;
@@ -47,7 +50,9 @@ public sealed class DonQuixotePowerLanceAmplify : ModPowerTemplate
     protected override bool IsVisibleInternal => false;
 }
 
-/// <summary>「如骑士般提供保护」提供的状态：让「骑士长枪」获得重放。</summary>
+/// <summary>
+/// 「如骑士般提供保护」提供的状态：让「骑士长枪」获得重放。
+/// </summary>
 public sealed class DonQuixotePowerKnightProtection : ModPowerTemplate
 {
     public override PowerType Type => PowerType.Buff;
@@ -56,7 +61,9 @@ public sealed class DonQuixotePowerKnightProtection : ModPowerTemplate
 
     protected override bool IsVisibleInternal => false;
 
-    /// <summary>状态被清掉（战斗结束 / 被驱散）时把长枪上的重放同步回去。</summary>
+    /// <summary>
+    /// 状态被清掉（战斗结束 / 被驱散）时把长枪上的重放同步回去。
+    /// </summary>
     public override Task AfterRemoved(Creature DonQuixote_oldOwner)
     {
         Player DonQuixote_player = DonQuixote_oldOwner?.Player;
@@ -69,7 +76,9 @@ public sealed class DonQuixotePowerKnightProtection : ModPowerTemplate
     }
 }
 
-/// <summary>「用鲜血荡涤前路」提供的状态：让「饱食鲜血的长枪」打到全体敌人。</summary>
+/// <summary>
+/// 「用鲜血荡涤前路」提供的状态：让「饱食鲜血的长枪」打到全体敌人。
+/// </summary>
 public sealed class DonQuixotePowerBloodSweep : ModPowerTemplate
 {
     public override PowerType Type => PowerType.Buff;
@@ -81,7 +90,6 @@ public sealed class DonQuixotePowerBloodSweep : ModPowerTemplate
 
 /// <summary>
 /// 伤口破坏 X：持续 X 回合，对方回合结束时减一层。
-/// 拥有该状态的单位受到的流血伤害 ×1.5（不增加血宴获取量）。
 /// </summary>
 public sealed class DonQuixotePowerWoundDestruction : ModPowerTemplate
 {
@@ -115,9 +123,6 @@ public sealed class DonQuixotePowerWoundDestruction : ModPowerTemplate
 
 /// <summary>
 /// 鲜血重铸：每消耗 30 点血宴获得 3 点硬血（升级后固有）。
-///
-/// 中立状态（<see cref="PowerType.None"/>）：层数恒为 1，只是「机制开关」，
-/// 翻倍没有意义，被「清除增益」清掉则会永久丢掉这条转换通道。
 /// </summary>
 public sealed class DonQuixotePowerBloodRecast : ModPowerTemplate
 {

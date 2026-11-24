@@ -93,8 +93,6 @@ internal static class DonQuixoteEventHelper
 
     /// <summary>
     /// 调试用：报告这个遗物当前会被序列化多少个自定义字段。
-    /// 为 0 说明模型没进 ModelIdSerializationCache（[SavedProperty] 不生效，
-    /// 联机开战同步会把计数清零）。
     /// </summary>
     private static string DonQuixote_SavedPropCount(RelicModel DonQuixote_relic)
     {
@@ -120,8 +118,7 @@ internal static class DonQuixoteEventHelper
             return;
         }
 
-        // ModelDb.AllRelics 里是 canonical 模板，RelicCmd.Obtain 要求可变的副本，
-        // 直接传模板会抛 CanonicalModelException 并让事件回调中断（表现为事件卡住）。
+        // ModelDb.AllRelics 里是 canonical 模板。
         await RelicCmd.Obtain(DonQuixote_relic.ToMutable(), DonQuixote_player, 0);
         DonQuixoteModEntry.DonQuixote_Logger?.Info("[DonQuixote] event granted relic " + typeof(T).Name, 0);
     }
@@ -153,8 +150,7 @@ internal static class DonQuixoteEventHelper
             return DonQuixote_result;
         }
 
-        // 卡库里拿到的是 canonical 模板（没有 owner，RunState / CardScope 都是 null），
-        // 直接用 CardScope.CreateCard 会空引用；必须用玩家所在 run 的作用域来建卡。
+        // 卡库里拿到的是 canonical 模板（没有 owner。
         if (DonQuixote_player.RunState is not ICardScope DonQuixote_scope)
         {
             DonQuixoteModEntry.DonQuixote_Logger?.Warn(
@@ -249,7 +245,7 @@ internal static class DonQuixoteEventHelper
     }
 
     /// <summary>
-    /// 联网版本：必须传入行动队列给的 PlayerChoiceContext，联机时选择界面才会路由到选项主人。
+    /// 联网版本：必须传入行动队列给的 PlayerChoiceContext。
     /// </summary>
     public static async Task DonQuixote_ChooseUpgradedUncommon(
         PlayerChoiceContext DonQuixote_choiceContext,
@@ -286,8 +282,7 @@ internal static class DonQuixoteEventHelper
     {
         try
         {
-            // v0.112 起 LoseMaxHp 的第 4 个参数从 bool 换成了 CardModel?（卡牌来源），
-            // 事件里没有来源卡，传 null。
+            // v0.112 起 LoseMaxHp 的第 4 个参数从 bool 换成了 CardModel?（卡牌来源）。
             await CreatureCmd.LoseMaxHp(
                 DonQuixote_choiceContext ?? new ThrowingPlayerChoiceContext(),
                 DonQuixote_player.Creature,
@@ -323,7 +318,7 @@ internal static class DonQuixoteEventHelper
 }
 
 /// <summary>
-/// 第一层事件：灰烬中的某处。堂吉诃德获得二代眷属-桑丘（堕落值 +30），其他角色只能领取一张升级过的罕见卡。
+/// 第一层事件：灰烬中的某处。
 /// </summary>
 [RegisterSharedEvent]
 public sealed class DonQuixoteEventAsh : ModEventTemplate
@@ -368,8 +363,7 @@ public sealed class DonQuixoteEventAsh : ModEventTemplate
 }
 
 /// <summary>
-/// 第二层事件：梦幻的拉曼却领。堂吉诃德四选一（三条眷属线各给一件眷属遗物并 +30 堕落值，
-/// 或走「冒险」拿 10 点生命上限 + 三选一罕见卡）；其他角色只有「冒险」这一个选项。
+/// 第二层事件：梦幻的拉曼却领。
 /// </summary>
 [RegisterSharedEvent]
 public sealed class DonQuixoteEventDream : ModEventTemplate
@@ -434,7 +428,7 @@ public sealed class DonQuixoteEventDream : ModEventTemplate
 }
 
 /// <summary>
-/// 第三层事件：最终的对决。堂吉诃德二选一（留下桑丘 / 放任桑丘离开），其他角色只能围观。
+/// 第三层事件：最终的对决。
 /// </summary>
 [RegisterSharedEvent]
 public sealed class DonQuixoteEventDuel : ModEventTemplate

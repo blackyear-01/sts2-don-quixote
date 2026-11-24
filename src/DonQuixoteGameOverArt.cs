@@ -8,8 +8,6 @@ namespace DonQuixote;
 
 /// <summary>
 /// Paints Don Quixote's own full screen artwork behind the game over screen.
-/// The texture is only added when the finished run belongs to Don Quixote, so
-/// every other character keeps the vanilla game over screen untouched.
 /// </summary>
 internal static class DonQuixoteGameOverArt
 {

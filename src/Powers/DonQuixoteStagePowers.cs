@@ -14,21 +14,21 @@ namespace DonQuixote.Powers;
 
 /// <summary>
 /// 两张舞台能力共用的规则与工具。
-///
-/// 能力层数 = 剩余回合数：每个回合开始时先把效果结算一遍，再减 1 层，减到 0 就移除
-/// （移除时 <see cref="DonQuixoteStageDirector"/> 会把场景和音乐一起复原）。
 /// </summary>
 internal static class DonQuixoteStageRules
 {
-    /// <summary>每回合给全体友方单位的血编的荆棘层数。</summary>
+    /// <summary>
+    /// 每回合给全体友方单位的血编的荆棘层数。
+    /// </summary>
     public const int DonQuixote_ThornsPerTurn = 3;
 
-    /// <summary>每回合给全体友方单位的摇曳【血魔】层数。</summary>
+    /// <summary>
+    /// 每回合给全体友方单位的摇曳【血魔】层数。
+    /// </summary>
     public const int DonQuixote_WaveringPerTurn = 20;
 
     /// <summary>
-    /// 「效果持续期间摇曳【血魔】不会在回合开始时消失」：
-    /// 由 <see cref="DonQuixotePowerWavering"/> 在减半前查一次。
+    /// 「效果持续期间摇曳【血魔】不会在回合开始时消失」：由 <see cref="DonQuixotePowerWavering"/> 在减半前查一次。
     /// </summary>
     public static bool DonQuixote_KeepsWavering(Creature DonQuixote_owner)
     {
@@ -66,16 +66,7 @@ internal static class DonQuixoteStageRules
     }
 
     /// <summary>
-    /// 「持续清除负面效果」的真实含义：效果持续期间**无法被施加**负面状态。
-    ///
-    /// 挂在 <see cref="AbstractModel.TryModifyPowerAmountReceived"/> 上（和原版人工制品同一个口子），
-    /// 把收到的层数直接改成 0 —— 不是等回合开始再一条条删。
-    /// 回合开始那次 <see cref="DonQuixote_ClearDebuffs"/> 保留下来做兜底：
-    /// 清掉「卡刚打出、这个能力还没挂上」时身上就已经存在的负面状态。
-    ///
-    /// 两个细节：
-    ///  ・只护自己这一侧（描述是「全体友方单位」），不影响敌方互相施加；
-    ///  ・沙坑这类「动了就出错」的状态按黑名单放行，避免把原版机制卡死。
+    /// 「持续清除负面效果」的真实含义：效果持续期间无法被施加负面状态。
     /// </summary>
     public static bool DonQuixote_BlocksDebuff(
         PowerModel DonQuixote_stage,
@@ -118,7 +109,6 @@ internal static class DonQuixoteStageRules
 
     /// <summary>
     /// 清除一个单位身上的所有负面状态。
-    /// 流派自己的流血是「强度 + 层数」两条状态，必须成对清掉，否则会留下只有强度没有层数的鬼状态。
     /// </summary>
     public static async Task DonQuixote_ClearDebuffs(PlayerChoiceContext DonQuixote_ctx, Creature DonQuixote_target)
     {
@@ -179,7 +169,6 @@ internal static class DonQuixoteStageRules
 
     /// <summary>
     /// 把身上所有同类型状态的层数翻倍（增益 / 负面各用一次）。
-    /// 会改层数的效果都走 <see cref="PowerCmd.ModifyAmount"/>，两端算出来的结果一致。
     /// </summary>
     public static async Task DonQuixote_DoubleAmounts(
         PlayerChoiceContext DonQuixote_ctx,
@@ -193,10 +182,7 @@ internal static class DonQuixoteStageRules
 
         foreach (PowerModel DonQuixote_power in DonQuixote_target.Powers.ToList())
         {
-            // 只处理「层数就是强度」的增益 / 减益：
-            //  ・PowerType.None 是中立（资源、计数器、标记），既不增益也不减益；
-            //  ・StackType 不是 Counter 的状态没有层数（Single），翻倍没有意义。
-            // 两者都不参与增减益判定，避免把硬血、荣耀这类东西翻倍。
+            // 只处理「层数就是强度」的增益 / 减益：- PowerType.None 是中立（资源、计数器、标记）。
             if (DonQuixote_power == null
                 || DonQuixote_power.Type != DonQuixote_type
                 || DonQuixote_power.StackType != PowerStackType.Counter
@@ -207,9 +193,7 @@ internal static class DonQuixoteStageRules
                 continue;
             }
 
-            // 这几条不能翻倍：舞台能力自己（翻倍会把剩余回合越滚越多）、
-            // 堕落值（上限 100）、决斗对象（上限 1）；
-            // 血宴 / 消耗血宴总数是资源与计数器，翻倍会让整套血宴经济失真，也不该被「增益翻倍」碰。
+            // 这几条不能翻倍：舞台能力自己（翻倍会把剩余回合越滚越多）、堕落值（上限 100）、决斗对象（上限 1）。
             if (DonQuixote_power is DonQuixotePowerHappySmileLand
                 or DonQuixotePowerNightmareLand
                 or DonQuixotePowerCorruption
@@ -235,8 +219,7 @@ internal static class DonQuixoteStageRules
 
     private static bool DonQuixote_IsClearable(PowerModel DonQuixote_power, PowerType DonQuixote_type)
     {
-        // Type 不等于目标类型就直接跳过 —— PowerType.None（中立）既不是增益也不是减益，
-        // 永远不会被「清除增益 / 清除负面」碰到（硬血、血宴、荣耀这类资源与标记）。
+        // Type 不等于目标类型就直接跳过。
         if (DonQuixote_power == null
             || DonQuixote_power.Type != DonQuixote_type
             || !DonQuixote_power.IsVisible
@@ -256,11 +239,6 @@ internal static class DonQuixoteStageRules
 
     /// <summary>
     /// 回合开始的收尾：层数（剩余回合）大于 1 就减 1，只剩 1 层时标记「本回合结束后移除」。
-    ///
-    /// 为什么最后一层不立刻移除：摇曳的减半也挂在回合开始，两个能力的时点顺序不确定。
-    /// 如果最后这一回合在结算完效果后立刻摘掉舞台能力，
-    /// 「摇曳不会在回合开始时消失」就失效了，刚发的 20 层会当场被砍一半。
-    /// 挪到回合结束时移除，整个持续期间的每次回合开始都还处于「冻结」状态。
     /// </summary>
     public static async Task DonQuixote_TickTurns(PowerModel DonQuixote_power)
     {
@@ -278,10 +256,6 @@ internal static class DonQuixoteStageRules
 
 /// <summary>
 /// 幸福笑容如鲜花般绽放之地：把战场换成拉曼却乐园的游乐园夜景，并奏响嘉年华的曲子。
-///
-/// 层数 = 剩余回合数。每个我方回合开始时，全体友方单位获得 3 层血编的荆棘、
-/// 20 层摇曳【血魔】并清除负面效果；持续期间摇曳【血魔】不会在回合开始时消失。
-/// 移除（回合用完 / 被驱散 / 战斗结束）时场景与音乐一起复原。
 /// </summary>
 public sealed class DonQuixotePowerHappySmileLand : ModPowerTemplate
 {
@@ -293,10 +267,14 @@ public sealed class DonQuixotePowerHappySmileLand : ModPowerTemplate
 
     public override string CustomBigIconPath => "res://DonQuixote/images/powers/happy_smile_land_big.png";
 
-    /// <summary>本回合结束后就要移除（最后一层时置位），见 <see cref="DonQuixoteStageRules.DonQuixote_TickTurns"/>。</summary>
+    /// <summary>
+    /// 本回合结束后就要移除（最后一层时置位）。
+    /// </summary>
     private bool DonQuixote_Expiring;
 
-    /// <summary>持续期间无法被施加负面状态。</summary>
+    /// <summary>
+    /// 持续期间无法被施加负面状态。
+    /// </summary>
     public override bool TryModifyPowerAmountReceived(
         PowerModel canonicalPower, Creature target, decimal amount, Creature? applier, out decimal modifiedAmount)
     {
@@ -386,11 +364,6 @@ public sealed class DonQuixotePowerHappySmileLand : ModPowerTemplate
 
 /// <summary>
 /// 噩梦的拉曼却领：把战场换成噩梦中的拉曼却领，并奏响英雄的主题曲。
-///
-/// 层数 = 剩余回合数。每个我方回合开始时：
-/// ・全体友方单位翻倍身上的增益并清除所有负面效果；
-/// ・所有敌方单位的负面效果翻倍并清除所有增益（沙坑除外）；
-/// ・持续期间摇曳【血魔】不会在回合开始时消失。
 /// </summary>
 public sealed class DonQuixotePowerNightmareLand : ModPowerTemplate
 {
@@ -402,10 +375,14 @@ public sealed class DonQuixotePowerNightmareLand : ModPowerTemplate
 
     public override string CustomBigIconPath => "res://DonQuixote/images/powers/nightmare_land_big.png";
 
-    /// <summary>本回合结束后就要移除（最后一层时置位）。</summary>
+    /// <summary>
+    /// 本回合结束后就要移除（最后一层时置位）。
+    /// </summary>
     private bool DonQuixote_Expiring;
 
-    /// <summary>持续期间无法被施加负面状态。</summary>
+    /// <summary>
+    /// 持续期间无法被施加负面状态。
+    /// </summary>
     public override bool TryModifyPowerAmountReceived(
         PowerModel canonicalPower, Creature target, decimal amount, Creature? applier, out decimal modifiedAmount)
     {
@@ -443,8 +420,7 @@ public sealed class DonQuixotePowerNightmareLand : ModPowerTemplate
 
         PlayerChoiceContext DonQuixote_ctx = new ThrowingPlayerChoiceContext();
 
-        // 友方：先翻倍增益，再清负面（顺序反过来的话，本回合刚翻倍的增益不受影响，
-        // 但清负面会把「决斗对象」这类不能动的状态排除在外）。
+        // 友方：先翻倍增益，再清负面（顺序反过来的话，本回合刚翻倍的增益不受影响，但清负面会把「决斗对象」这类不能动的状态排除在外）。
         foreach (Creature DonQuixote_ally in DonQuixoteStageRules.DonQuixote_LivingAllies(Owner))
         {
             await DonQuixoteStageRules.DonQuixote_DoubleAmounts(DonQuixote_ctx, DonQuixote_ally, PowerType.Buff);

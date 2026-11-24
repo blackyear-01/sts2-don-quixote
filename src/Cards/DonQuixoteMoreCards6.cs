@@ -19,13 +19,14 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace DonQuixote.Cards;
 
 /// <summary>
-/// 血液扩散：3 费攻击，对全体敌人造成 21 点伤害并恢复等量生命，
-/// 施加 5 级流血与 5 层流血。升级后改为「1 级流血 6 次 + 1 层流血 6 次」。
+/// 血液扩散：3 费攻击。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodSpread : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\血液扩散.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\血液扩散.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_spread.png";
 
     public DonQuixoteBloodSpread()
@@ -108,7 +109,7 @@ public sealed class DonQuixoteBloodSpread : ModCardTemplate
 }
 
 /// <summary>
-/// 血魔之力：2 费能力，每次攻击恢复 2 点生命，每回合开始时获得 2 点临时强壮（升级后固有）。
+/// 血魔之力：2 费能力。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodfiendMight : ModCardTemplate
@@ -142,13 +143,14 @@ public sealed class DonQuixoteBloodfiendMight : ModCardTemplate
 }
 
 /// <summary>
-/// 永恒饥渴：2 费能力，每回合开始时消耗至多 30 点血宴，每 15 点（升级 10 点）恢复 1 点生命，
-/// 并触发全体敌方单位 1 次流血（减少 1 层）。升级后固有。
+/// 永恒饥渴：2 费能力。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteEternalThirst : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\永恒饥渴.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\永恒饥渴.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/eternal_thirst.png";
 
     public DonQuixoteEternalThirst()
@@ -189,7 +191,9 @@ public sealed class DonQuixoteEternalThirst : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteWeaponMaintenance : ModCardTemplate, IDonQuixoteBloodForgeCard
 {
-    /// <summary>卡面插画（资源\卡牌\武器维护.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\武器维护.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/weapon_maintenance.png";
 
     public int DonQuixote_ForgeCost => DynamicVars["Forge"].IntValue;
@@ -238,13 +242,14 @@ public sealed class DonQuixoteWeaponMaintenance : ModCardTemplate, IDonQuixoteBl
 }
 
 /// <summary>
-/// 请帮助我们吧！堂吉诃德大人：1 费技能，堕落 40，抽 1 张、丢弃 2 张，下回合开始时额外抽 1 张。
-/// 升级后抽 2 张、下回合额外抽 2 张。
+/// 请帮助我们吧！
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixotePleaseHelp : ModCardTemplate, IDonQuixoteCorruptible
 {
-    /// <summary>卡面插画（资源\卡牌\请帮助我们吧！堂吉诃德大人.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\请帮助我们吧！
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/please_help.png";
 
     public const int DonQuixote_CorruptionThreshold = 40;
@@ -258,7 +263,9 @@ public sealed class DonQuixotePleaseHelp : ModCardTemplate, IDonQuixoteCorruptib
         return CardScope.CreateCard(ModelDb.Card<DonQuixoteLookBackFather>(), DonQuixote_owner);
     }
 
-    /// <summary>「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。</summary>
+    /// <summary>
+    /// 「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。
+    /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixoteKeywords.DonQuixote_Knight };
 
     public DonQuixotePleaseHelp()
@@ -286,8 +293,7 @@ public sealed class DonQuixotePleaseHelp : ModCardTemplate, IDonQuixoteCorruptib
         int DonQuixote_discard = DynamicVars["Discard"].IntValue;
         if (DonQuixote_discard > 0)
         {
-            // 走原版的「丢弃」选择：提示语用 CardSelectorPrefs.DiscardSelectionPrompt（公共文案），
-            // 之前自己拼的 cards 表键没对上，选牌时会显示成缺键的错误文本。
+            // 走原版的「丢弃」选择：提示语用 CardSelectorPrefs.DiscardSelectionPrompt（公共文案）。
             IEnumerable<CardModel> DonQuixote_picked = await CardSelectCmd.FromHandForDiscard(
                 DonQuixote_choiceContext,
                 Owner,
@@ -315,14 +321,14 @@ public sealed class DonQuixotePleaseHelp : ModCardTemplate, IDonQuixoteCorruptib
 }
 
 /// <summary>
-/// 请将视线移回我们吧！父亲大人（请帮助我们吧的堕落版）：1 费技能，
-/// 抽 2 张、丢弃 1 张，在抽牌堆和弃牌堆各加入 1 张「手足们在呼唤我」，下回合开始时恢复 1 点能量。
-/// 升级后只在抽牌堆加入 1 张，下回合恢复 2 点能量。
+/// 请将视线移回我们吧！
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteLookBackFather : ModCardTemplate, IDonQuixoteCorruptedCard
 {
-    /// <summary>卡面插画（资源\卡牌\请将视线移回我们吧！父亲大人.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\请将视线移回我们吧！
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/look_back_father.png";
 
     public DonQuixoteLookBackFather()
@@ -399,7 +405,6 @@ public sealed class DonQuixoteLookBackFather : ModCardTemplate, IDonQuixoteCorru
 
 /// <summary>
 /// 为了共存必须舍弃：1 费技能，本回合不能再打出消耗血宴的牌，获得 4 点能量。
-/// 升级后下回合额外获得 2 点能量。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteMustAbandon : ModCardTemplate
@@ -442,8 +447,7 @@ public sealed class DonQuixoteMustAbandon : ModCardTemplate
 }
 
 /// <summary>
-/// 持续了三天的决斗：2 费技能，堕落 80，施加 1 层决斗对象，并在之后两回合继续盯住同一目标，消耗。
-/// 升级后减 1 点耗能。
+/// 持续了三天的决斗：2 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteThreeDayDuel : ModCardTemplate, IDonQuixoteCorruptible
@@ -503,8 +507,7 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
 }
 
 /// <summary>
-/// 结束这场愚蠢的战斗（持续了三天的决斗的堕落版）：2 费技能，
-/// 对全体敌人施加 2 层易损，技巧 2、增幅 1，消耗。升级后下回合开始时获得 1 点能量。
+/// 结束这场愚蠢的战斗（持续了三天的决斗的堕落版）：2 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteEndFoolishFight : ModCardTemplate, IDonQuixoteCorruptedCard
@@ -573,7 +576,6 @@ public sealed class DonQuixoteEndFoolishFight : ModCardTemplate, IDonQuixoteCorr
 
 /// <summary>
 /// 为了不再动摇：1 费技能，获得 7 层摇曳【血魔】，血铸 5。
-/// 升级后摇曳 7 → 15，血铸 5 → 7。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteNoLongerWaver : ModCardTemplate, IDonQuixoteBloodForgeCard

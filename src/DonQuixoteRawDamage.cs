@@ -12,8 +12,6 @@ namespace DonQuixote;
 
 /// <summary>
 /// 流血是「生命伤害」：无视防御、难以杀灭、无实体、滑溜等一切伤害修正。
-/// 伤害仍然走 CreatureCmd.Damage（保证死亡动画/特效正常），
-/// 但结算期间由这里把 Hook.ModifyDamage 的结果还原成原始数值。
 /// </summary>
 [HarmonyPatch(typeof(Hook), nameof(Hook.ModifyDamage))]
 internal static class DonQuixoteRawDamagePatch
@@ -40,8 +38,7 @@ internal static class DonQuixoteRawDamagePatch
             return;
         }
 
-        // 「白月骑士-决斗对象」把这一下完全归零时，这里也不要记原始值 ——
-        // 记了就会在 Postfix 里把 0 又还原成原伤害，免疫直接失效。
+        // 「白月骑士-决斗对象」把这一下完全归零时，这里也不要记原始值。
         if (DonQuixoteWhiteMoonDuelRules.DonQuixote_Zeroed(__2, __3))
         {
             DonQuixote_tracking = false;
@@ -63,9 +60,7 @@ internal static class DonQuixoteRawDamagePatch
 }
 
 /// <summary>
-/// 伤害上限（难以杀灭 / 无实体）走 ModifyDamage 就够，但「滑溜」「无实体」还会在
-/// 生命损失阶段把数值压到 1，所以生命损失也要还原一次。只对本模组指定的那个目标生效，
-/// 避免影响同一帧里其它来源的伤害。
+/// 伤害上限（难以杀灭 / 无实体）走 ModifyDamage 就够。
 /// </summary>
 [HarmonyPatch(typeof(Hook), nameof(Hook.ModifyHpLost))]
 internal static class DonQuixoteRawHpLossPatch
@@ -102,23 +97,17 @@ internal static class DonQuixoteRawHpLossPatch
     }
 }
 
-/// <summary>记录「当前正在结算无视上限伤害」的目标。</summary>
+/// <summary>
+/// 记录「当前正在结算无视上限伤害」的目标。
+/// </summary>
 internal static class DonQuixoteRawHpLossState
 {
     public static Creature DonQuixote_Target { get; set; }
 }
 
 /// <summary>
-/// 限伤的最后一层：有些 Boss（例如「下界亚波伦」）根本不走 Hook，
-/// 而是自己挂一个 <c>Creature.CurrentHp</c> setter 的 Harmony Prefix，
-/// 在「写血量」这一步把本次损失量压到它自己的能力层数上。
-/// 那种拦截在 Hook 之外，只还原 ModifyDamage / ModifyHpLost 是打不穿的。
-///
-/// 这里挂在同一个 setter 上，用优先级夹住它：
-/// ・Priority.High 的 Prefix 最先执行 → 记下调用方原本要写的值；
-/// ・Priority.Low 的 Prefix 最后执行 → 把值改回去。
-/// 只在「无视上限伤害」结算期间、且目标正是本次结算对象时生效，
-/// 不会影响其它来源的掉血（Boss 自己的阶段转换、回血等）。
+/// 限伤的最后一层：有些 Boss（例如「下界亚波伦」）不走 Hook，而是自己挂 <c>CurrentHp</c> setter 的 Prefix。
+/// 这里挂在同一个 setter 上，用 Priority.High 记下原值、Priority.Low 写回，夹住那次压缩。
 /// </summary>
 [HarmonyPatch(typeof(Creature), "CurrentHp", MethodType.Setter)]
 internal static class DonQuixotePiercingCurrentHpPatch
@@ -164,11 +153,7 @@ internal static class DonQuixotePiercingCurrentHpPatch
 
 /// <summary>
 /// 过人的毅力（升级版）的硬上限：整条 <see cref="Hook.ModifyHpLost"/> 跑完后再 clamp 一次。
-///
-/// 能力自己提供的 ModifyDamageCap / ModifyHpLostAfterOsty 只是链中的一环，
-/// 任何「突破限伤」类效果只要排在更晚的阶段（AfterOstyLate、或别的 mod 的 Postfix）
-/// 就能把数值改回去。这里作为最终兜底，保证持有者每次生命损失不超过 Amount。
-/// Postfix 用 Priority.High：Harmony 的 Postfix 按优先级升序执行，High 最后跑。
+/// Postfix 用 Priority.High，Harmony 的 Postfix 按优先级升序执行，High 最后跑。
 /// </summary>
 [HarmonyPatch(typeof(Hook), nameof(Hook.ModifyHpLost))]
 internal static class DonQuixoteGritHardCapPatch

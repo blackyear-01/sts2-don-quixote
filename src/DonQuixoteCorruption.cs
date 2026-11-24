@@ -13,7 +13,7 @@ using HarmonyLib;
 namespace DonQuixote;
 
 /// <summary>
-/// 堕落 X：堕落值达到阈值时，手牌里的这张牌无需打出就会被自动替换成堕落版本（原版「变化」效果）。
+/// 堕落 X：堕落值达到阈值时。
 /// </summary>
 internal static class DonQuixoteCorruption
 {
@@ -58,7 +58,9 @@ internal static class DonQuixoteCorruption
         await DonQuixote_TryCorruptCard(DonQuixote_context, DonQuixote_power.Amount, DonQuixote_card);
     }
 
-    /// <summary>把玩家手牌里所有已满足条件的牌都替换掉。</summary>
+    /// <summary>
+    /// 把玩家手牌里所有已满足条件的牌都替换掉。
+    /// </summary>
     internal static async Task DonQuixote_TryCorruptHand(
         PlayerChoiceContext DonQuixote_context,
         DonQuixotePowerCorruption DonQuixote_power,
@@ -117,10 +119,7 @@ internal static class DonQuixoteCorruption
             return;
         }
 
-        // 不在任何牌堆里的牌不能「变化」（抽牌刚结束、牌还在搬运，或者是刚从模板
-        // 克隆出来还没入堆的实例）。原版 CardCmd.Transform 会直接抛
-        // InvalidOperationException("... because it has no pile.")，联机下这个异常
-        // 会让两端后续动作错位，所以先跳过，等下次扫描。
+        // 不在任何牌堆里的牌不能「变化」（抽牌刚结束、牌还在搬运。
         if (DonQuixote_card.Pile == null)
         {
             DonQuixoteModEntry.DonQuixote_Logger?.Info(
@@ -130,8 +129,7 @@ internal static class DonQuixoteCorruption
 
         try
         {
-            // 附魔要跟着走：原卡带附魔（例如「不可摧毁卡牌」）时，转化出来的堕落卡
-            // 也必须保留同一个附魔，否则玩家花 30 血宴买的附魔会凭空消失。
+            // 附魔要跟着走：原卡带附魔（例如「不可摧毁卡牌」）时。
             EnchantmentModel DonQuixote_enchantment = DonQuixote_card.Enchantment;
             int DonQuixote_enchantAmount = DonQuixote_enchantment != null ? DonQuixote_enchantment.Amount : 0;
 
@@ -171,9 +169,7 @@ internal static class DonQuixoteCorruption
 }
 
 /// <summary>
-/// 任何牌被放进手牌之后都扫描一次手牌：抽牌之外还有大量来源会把牌直接塞进手牌
-/// （血铸/技巧/增幅把骑士长枪加入手牌、各种「生成一张牌加入手牌」的效果），
-/// 这些路径不会触发 AfterCardDrawn，所以必须在入堆之后补一次检查。
+/// 任何牌被放进手牌之后都扫描一次手牌：抽牌之外还有大量来源会把牌直接塞进手牌 （血铸/技巧/增幅把骑士长枪加入手牌、各种「生成一张牌加入手牌」的效果）。
 /// </summary>
 internal static class DonQuixoteHandAddCorruption
 {
@@ -228,7 +224,9 @@ internal static class DonQuixoteHandAddCorruption
     }
 }
 
-/// <summary>牌被放进手牌后（PileType 重载）。</summary>
+/// <summary>
+/// 牌被放进手牌后（PileType 重载）。
+/// </summary>
 [HarmonyPatch(typeof(CardPileCmd), "Add", new[]
 {
     typeof(CardModel), typeof(PileType), typeof(CardPilePosition), typeof(AbstractModel), typeof(bool)
@@ -246,7 +244,9 @@ internal static class DonQuixoteAddToHandPileTypePatch
     }
 }
 
-/// <summary>牌被放进手牌后（CardPile 重载）。</summary>
+/// <summary>
+/// 牌被放进手牌后（CardPile 重载）。
+/// </summary>
 [HarmonyPatch(typeof(CardPileCmd), "Add", new[]
 {
     typeof(CardModel), typeof(CardPile), typeof(CardPilePosition), typeof(AbstractModel), typeof(bool)
@@ -264,7 +264,9 @@ internal static class DonQuixoteAddToHandPilePatch
     }
 }
 
-/// <summary>多张牌被放进手牌后（PileType 重载）。</summary>
+/// <summary>
+/// 多张牌被放进手牌后（PileType 重载）。
+/// </summary>
 [HarmonyPatch(typeof(CardPileCmd), "Add", new[]
 {
     typeof(IEnumerable<CardModel>), typeof(PileType), typeof(CardPilePosition), typeof(AbstractModel), typeof(bool)
@@ -282,7 +284,9 @@ internal static class DonQuixoteAddManyToHandPileTypePatch
     }
 }
 
-/// <summary>多张牌被放进手牌后（CardPile 重载）。</summary>
+/// <summary>
+/// 多张牌被放进手牌后（CardPile 重载）。
+/// </summary>
 [HarmonyPatch(typeof(CardPileCmd), "Add", new[]
 {
     typeof(IEnumerable<CardModel>), typeof(CardPile), typeof(CardPilePosition), typeof(AbstractModel), typeof(bool),
@@ -301,7 +305,9 @@ internal static class DonQuixoteAddManyToHandPilePatch
     }
 }
 
-/// <summary>抽牌结束后立刻扫描手牌，保证堕落转化一定会被检查到。</summary>
+/// <summary>
+/// 抽牌结束后立刻扫描手牌，保证堕落转化一定会被检查到。
+/// </summary>
 [HarmonyPatch(typeof(CardPileCmd), nameof(CardPileCmd.Draw), new[] { typeof(PlayerChoiceContext), typeof(decimal), typeof(Player), typeof(bool) })]
 internal static class DonQuixoteDrawCorruptPatch
 {

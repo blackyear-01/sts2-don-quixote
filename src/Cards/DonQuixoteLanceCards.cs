@@ -22,12 +22,13 @@ namespace DonQuixote.Cards;
 
 /// <summary>
 /// 骑士长枪：只能由「血铸 / 技巧 / 增幅」放进手牌。
-/// 保留、打出后返回手牌；血铸加伤害、技巧加攻击段数、增幅加血铠与摇曳。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteKnightLance : ModCardTemplate, IDonQuixoteCorruptible, IDonQuixoteTokenCard
 {
-    /// <summary>卡面插画（资源\卡牌\骑士长枪.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\骑士长枪.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/knight_lance.png";
 
     public DonQuixoteKnightLance()
@@ -55,7 +56,9 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
         new DynamicVar("Wavering", 3m),
     };
 
-    /// <summary>打出后回到手牌（照抄原版「粒子墙」ParticleWall 的写法）。</summary>
+    /// <summary>
+    /// 打出后回到手牌（照抄原版「粒子墙」ParticleWall 的写法）。
+    /// </summary>
     protected override CardLocation GetResultLocationForCardPlay()
     {
         CardLocation DonQuixote_location = base.GetResultLocationForCardPlay();
@@ -75,11 +78,11 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
         }
 
         Creature DonQuixote_owner = Owner.Creature;
-        // 打出时闪一下「举枪突刺」的立绘（资源\人物\长枪.png）
+        // 打出时闪一下「举枪突刺」的立绘（资源\人物\长枪.png）。
         DonQuixoteLancePose.DonQuixote_Play(DonQuixote_owner);
         int DonQuixote_bonus = DonQuixoteLance.DonQuixote_ForgeBonus(DonQuixote_owner);
         int DonQuixote_hits = 1 + DonQuixoteLance.DonQuixote_TechniqueBonus(DonQuixote_owner);
-        // 基础值用常量：DynamicVars 里的数字只负责卡面显示，避免重复加成
+        // 基础值用常量：DynamicVars 里的数字只负责卡面显示，避免重复加成。
         decimal DonQuixote_damage = 3m + DonQuixote_bonus;
 
         for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_hits; DonQuixote_i++)
@@ -118,7 +121,9 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodFeastLance : DonQuixoteBloodFeastCard, IDonQuixoteCorruptedCard, IDonQuixoteTokenCard
 {
-    /// <summary>卡面插画（资源\卡牌\饱食鲜血的长枪.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\饱食鲜血的长枪.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_feast_lance.png";
 
     public DonQuixoteBloodFeastLance()
@@ -144,7 +149,9 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
 
     public override int DonQuixote_BloodFeastCost => DonQuixote_Var("BloodFeast");
 
-    /// <summary>打出后回到手牌（照抄原版「粒子墙」ParticleWall 的写法）。</summary>
+    /// <summary>
+    /// 打出后回到手牌（照抄原版「粒子墙」ParticleWall 的写法）。
+    /// </summary>
     protected override CardLocation GetResultLocationForCardPlay()
     {
         CardLocation DonQuixote_location = base.GetResultLocationForCardPlay();
@@ -163,15 +170,15 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
             return;
         }
 
-        // 血宴 1：条件触发 —— 足 1 点血宴才会触发流血效果，伤害本身不受影响。
+        // 血宴 1：条件触发。
         bool DonQuixote_feastPaid = await DonQuixote_TriggerBloodFeast(DonQuixote_ctx);
 
         Creature DonQuixote_owner = Owner.Creature;
-        // 打出时闪一下「举枪突刺」的立绘（资源\人物\长枪.png）
+        // 打出时闪一下「举枪突刺」的立绘（资源\人物\长枪.png）。
         DonQuixoteLancePose.DonQuixote_Play(DonQuixote_owner);
         int DonQuixote_bonus = DonQuixoteLance.DonQuixote_ForgeBonus(DonQuixote_owner);
         int DonQuixote_hits = 1 + DonQuixoteLance.DonQuixote_TechniqueBonus(DonQuixote_owner);
-        // 基础值用常量：DynamicVars 里的数字只负责卡面显示，避免重复加成
+        // 基础值用常量：DynamicVars 里的数字只负责卡面显示，避免重复加成。
         decimal DonQuixote_damage = 6m + DonQuixote_bonus;
         bool DonQuixote_all = DonQuixoteLance.DonQuixote_LanceHitsAll(DonQuixote_owner);
 
@@ -218,7 +225,9 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
     }
 }
 
-/// <summary>凝聚鲜血：1 费，对自身施加 6 级流血，血铸 3（升级 6）。</summary>
+/// <summary>
+/// 凝聚鲜血：1 费，对自身施加 6 级流血，血铸 3（升级 6）。
+/// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteCondenseBlood : ModCardTemplate, IDonQuixoteBloodForgeCard
 {
@@ -262,11 +271,15 @@ public sealed class DonQuixoteCondenseBlood : ModCardTemplate, IDonQuixoteBloodF
     }
 }
 
-/// <summary>战术技巧：1 费，技巧 1、消耗 1 张牌、丢弃 1 张牌（升级获得保留）。</summary>
+/// <summary>
+/// 战术技巧：1 费，技巧 1、消耗 1 张牌、丢弃 1 张牌（升级获得保留）。
+/// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteTacticalTechnique : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\战术技巧.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\战术技巧.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/tactical_technique.png";
 
     public DonQuixoteTacticalTechnique()
@@ -322,7 +335,9 @@ public sealed class DonQuixoteTacticalTechnique : ModCardTemplate
     }
 }
 
-/// <summary>如骑士般提供保护：2 费能力，堕落 40，血铸 3 / 技巧 2 / 增幅 5，骑士长枪获得重放 1。</summary>
+/// <summary>
+/// 如骑士般提供保护：2 费能力。
+/// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteKnightlyProtection : ModCardTemplate, IDonQuixoteCorruptible, IDonQuixoteBloodForgeCard
 {
@@ -371,9 +386,7 @@ public sealed class DonQuixoteKnightlyProtection : ModCardTemplate, IDonQuixoteC
             return;
         }
 
-        // 「重放 1」必须先挂上，再走血铸/技巧/增幅：
-        // 血铸是第一次触发时发骑士长枪的时机，那时若还没有这个状态，
-        // 发出来的长枪 BaseReplayCount 就是 0，之后再也不会补上。
+        // 「重放 1」必须先挂上。
         await PowerCmd.Apply<DonQuixotePowerKnightProtection>(DonQuixote_ctx, Owner.Creature, 1m, Owner.Creature, this, false);
 
         int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
@@ -388,7 +401,9 @@ public sealed class DonQuixoteKnightlyProtection : ModCardTemplate, IDonQuixoteC
     }
 }
 
-/// <summary>用鲜血荡涤前路（如骑士般提供保护的堕落版）：1 费能力，饱食鲜血的长枪攻击全体敌人。</summary>
+/// <summary>
+/// 用鲜血荡涤前路（如骑士般提供保护的堕落版）：1 费能力，饱食鲜血的长枪攻击全体敌人。
+/// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodSweep : ModCardTemplate, IDonQuixoteCorruptedCard, IDonQuixoteBloodForgeCard
 {
@@ -436,7 +451,9 @@ public sealed class DonQuixoteBloodSweep : ModCardTemplate, IDonQuixoteCorrupted
     }
 }
 
-/// <summary>鲜血重铸：2 费能力，每消耗 30 点血宴获得 3 点硬血（升级固有）。</summary>
+/// <summary>
+/// 鲜血重铸：2 费能力，每消耗 30 点血宴获得 3 点硬血（升级固有）。
+/// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodRecast : ModCardTemplate
 {
@@ -461,11 +478,15 @@ public sealed class DonQuixoteBloodRecast : ModCardTemplate
     }
 }
 
-/// <summary>无法摆脱的可怖的疾病：2 费能力，回合开始时给予全场 2 层流血（升级 3 层并获得保留）。</summary>
+/// <summary>
+/// 无法摆脱的可怖的疾病：2 费能力，回合开始时给予全场 2 层流血（升级 3 层并获得保留）。
+/// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteDreadfulDisease : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\无法摆脱的可怖疾病.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\无法摆脱的可怖疾病.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/dreadful_disease.png";
 
     public DonQuixoteDreadfulDisease()
@@ -498,13 +519,14 @@ public sealed class DonQuixoteDreadfulDisease : ModCardTemplate
 }
 
 /// <summary>
-/// 硬血11式-贯穿：3 费，硬血 5、对目标造成 6 点伤害 3 次、施加 4 层流血，
-/// 再触发目标等于其余层数的流血，最后把目标流血层数压到 1 层。
+/// 硬血11式-贯穿：3 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodPierce : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌 对应 png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_pierce.png";
 
     public DonQuixoteHardBloodPierce()
@@ -572,13 +594,14 @@ public sealed class DonQuixoteHardBloodPierce : ModCardTemplate
 }
 
 /// <summary>
-/// 硬血3式-突袭：2 费，消耗至多 50 点血宴，每消耗 10 点获得 1 点硬血（升级 5 点），
-/// 造成 14 点伤害、获得造成伤害量的血宴、对目标施加 3 层流血。
+/// 硬血3式-突袭：2 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodRaid : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌 对应 png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_raid.png";
 
     public DonQuixoteHardBloodRaid()
@@ -637,7 +660,7 @@ public sealed class DonQuixoteHardBloodRaid : ModCardTemplate
 }
 
 /// <summary>
-/// 伤口破坏（公平的决斗的堕落版）：2 费，解除敌方随机 1 个正面增益、施加 1 层伤口破坏，消耗（升级解除 2 个）。
+/// 伤口破坏（公平的决斗的堕落版）：2 费。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteWoundDestruction : ModCardTemplate, IDonQuixoteCorruptedCard
@@ -666,8 +689,7 @@ public sealed class DonQuixoteWoundDestruction : ModCardTemplate, IDonQuixoteCor
             return;
         }
 
-        // 与「公平的决斗」共用同一份黑名单：沙坑（无厌沙虫的吞人计数）、
-        // 多实例状态、本模组状态等都不能解，解掉会让战斗流程/绑定出问题。
+        // 与「公平的决斗」共用同一份黑名单：沙坑（无厌沙虫的吞人计数）、多实例状态、本模组状态等都不能解。
         List<PowerModel> DonQuixote_buffs = DonQuixote_play.Target.Powers
             .Where(DonQuixote_power => DonQuixote_power != null
                 && DonQuixote_power.Type == PowerType.Buff

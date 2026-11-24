@@ -7,10 +7,7 @@ using MegaCrit.Sts2.Core.Models;
 namespace DonQuixote;
 
 /// <summary>
-/// 卡框 / 能量图标替换：
-/// ・本模组的普通卡统一使用「卡框 1」，堕落版本的卡使用「卡框 2」。
-/// ・能量图标换成模组自己的 74x74 图标（卡面费用、卡池图标）。
-/// 原版卡框是 ui_atlas 里的图集区域，用 Texture2D 直接覆盖即可整张替换。
+/// 卡框 / 能量图标替换：- 本模组的普通卡统一使用「卡框 1」。
 /// </summary>
 internal static class DonQuixoteCardVisuals
 {
@@ -39,13 +36,17 @@ internal static class DonQuixoteCardVisuals
         return DonQuixote_texture;
     }
 
-    /// <summary>是否为本模组的卡（含堕落版本）。</summary>
+    /// <summary>
+    /// 是否为本模组的卡（含堕落版本）。
+    /// </summary>
     public static bool DonQuixote_IsOurCard(CardModel DonQuixote_card)
     {
         return DonQuixote_card != null && DonQuixote_card.GetType().Namespace == "DonQuixote.Cards";
     }
 
-    /// <summary>是否为堕落版本的卡。</summary>
+    /// <summary>
+    /// 是否为堕落版本的卡。
+    /// </summary>
     public static bool DonQuixote_IsCorrupted(CardModel DonQuixote_card)
     {
         return DonQuixote_card is IDonQuixoteCorruptedCard;
@@ -68,7 +69,9 @@ internal static class DonQuixoteCardVisuals
     }
 }
 
-/// <summary>卡框：普通卡 -> 卡框 1，堕落卡 -> 卡框 2。</summary>
+/// <summary>
+/// 卡框：普通卡 -> 卡框 1，堕落卡 -> 卡框 2。
+/// </summary>
 [HarmonyPatch(typeof(CardModel), nameof(CardModel.Frame), MethodType.Getter)]
 internal static class DonQuixoteCardFramePatch
 {
@@ -82,7 +85,9 @@ internal static class DonQuixoteCardFramePatch
     }
 }
 
-/// <summary>卡面费用图标：换成模组的能量图标。</summary>
+/// <summary>
+/// 卡面费用图标：换成模组的能量图标。
+/// </summary>
 [HarmonyPatch(typeof(CardModel), nameof(CardModel.EnergyIcon), MethodType.Getter)]
 internal static class DonQuixoteCardEnergyIconPatch
 {
@@ -101,7 +106,9 @@ internal static class DonQuixoteCardEnergyIconPatch
     }
 }
 
-/// <summary>卡池能量图标路径：卡池路径由 EnergyColorName 拼出来，这里改成模组的图标。</summary>
+/// <summary>
+/// 卡池能量图标路径：卡池路径由 EnergyColorName 拼出来，这里改成模组的图标。
+/// </summary>
 [HarmonyPatch(typeof(CardPoolModel), nameof(CardPoolModel.EnergyIconPath), MethodType.Getter)]
 internal static class DonQuixoteCardPoolEnergyIconPatch
 {
@@ -115,9 +122,7 @@ internal static class DonQuixoteCardPoolEnergyIconPatch
 }
 
 /// <summary>
-/// 关键词的升级效果：原版卡在升级前就把关键词抄进本地集合，
-/// 只靠覆写 CanonicalKeywords 时「升级后去掉消耗 / 升级后获得固有」不会显示，
-/// 这里按卡面实际状态强制修正一次。
+/// 关键词的升级效果：原版卡在升级前就把关键词抄进本地集合。
 /// </summary>
 [HarmonyPatch(typeof(CardModel), nameof(CardModel.GetKeywordsWithSources))]
 internal static class DonQuixoteKeywordUpgradePatch

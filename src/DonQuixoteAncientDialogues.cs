@@ -11,20 +11,18 @@ namespace DonQuixote;
 
 /// <summary>
 /// 先古对话：给所有先古事件补上「堂吉诃德」专属的对话组。
-///
-/// 先古对话由 <see cref="AncientEventModel.DefineDialogues"/> 定义，游戏在
-/// <c>DialogueSet</c> 取值时缓存并用先古自己的 Id.Entry 生成本地化键：
-///   {先古}.talk.{角色}.{对话序号}-{行序号}.ancient / .char（.next 为按钮文本）
-/// 所以这里只需要往 CharacterDialogues 里塞一段对话，再重新跑一次
-/// PopulateLocKeys，键就自动对上了。文本本身写在 localization/*/ancients.json。
 /// </summary>
 [HarmonyPatch(typeof(AncientEventModel), "get_DialogueSet")]
 internal static class DonQuixoteAncientDialoguePatch
 {
-    /// <summary>角色 ModelId.Entry，与 localization/*/characters.json 的前缀一致。</summary>
+    /// <summary>
+    /// 角色 ModelId.Entry.
+    /// </summary>
     public const string DonQuixote_CharEntry = "DON_QUIXOTE_CHARACTER_DON_QUIXOTE_CHARACTER";
 
-    /// <summary>先古 Entry -> 该先古对话的行数（行内容在本地化里，按行号拆 ancient/char）。</summary>
+    /// <summary>
+    /// 先古 Entry -> 该先古对话的行数（行内容在本地化。
+    /// </summary>
     private static readonly Dictionary<string, int> DonQuixote_LineCounts = new Dictionary<string, int>
     {
         ["NEOW"] = 3,
@@ -38,7 +36,9 @@ internal static class DonQuixoteAncientDialoguePatch
         ["VAKUU"] = 1,
     };
 
-    /// <summary>已经处理过的 DialogueSet（游戏里每个先古只缓存一个实例）。</summary>
+    /// <summary>
+    /// 已经处理过的 DialogueSet（游戏里每个先古只缓存一个实例）。
+    /// </summary>
     private static readonly ConditionalWeakTable<AncientDialogueSet, object> DonQuixote_Done =
         new ConditionalWeakTable<AncientDialogueSet, object>();
 
@@ -50,7 +50,9 @@ internal static class DonQuixoteAncientDialoguePatch
         DonQuixote_Apply(__instance, __result);
     }
 
-    /// <summary>把堂吉诃德的对话塞进这一份 DialogueSet（幂等）。</summary>
+    /// <summary>
+    /// 把堂吉诃德的对话塞进这一份 DialogueSet（幂等）。
+    /// </summary>
     internal static void DonQuixote_Apply(AncientEventModel DonQuixote_ancient, AncientDialogueSet DonQuixote_set)
     {
         try
@@ -93,8 +95,7 @@ internal static class DonQuixoteAncientDialoguePatch
                 return;
             }
 
-            // 表里若已有「堂吉诃德」的条目（可能是别的模组或引擎自动补的占位对话），
-            // 直接换成我们这条：重复追加会让同一段对话出现两次，也可能残留空的占位对话。
+            // 表里若已有「堂吉诃德」的条目（可能是别的模组或引擎自动补的占位对话）。
             IReadOnlyList<AncientDialogue> DonQuixote_existing;
             if (DonQuixote_table.TryGetValue(DonQuixote_CharEntry, out DonQuixote_existing)
                 && DonQuixote_existing != null
@@ -128,7 +129,9 @@ internal static class DonQuixoteAncientDialoguePatch
         }
     }
 
-    /// <summary>取一条对话第一行的本地化键（用来判断这条对话到底能不能显示）。</summary>
+    /// <summary>
+    /// 取一条对话第一行的本地化键（用来判断这条对话到底能不能显示）。
+    /// </summary>
     private static string DonQuixote_LocKeyOf(AncientDialogue DonQuixote_dialogue)
     {
         if (DonQuixote_dialogue == null || DonQuixote_dialogue.Lines.Count == 0)
@@ -164,14 +167,15 @@ internal static class DonQuixoteAncientDialoguePatch
 
         return new AncientDialogue(DonQuixote_sfx)
         {
-            // 每次遇到都触发：VisitIndex = 0 + IsRepeating = true，
-            // 这样只要见过一次（charVisits >= 0 永远成立）就会被选进来。
+            // 每次遇到都触发：VisitIndex = 0 + IsRepeating = true。
             VisitIndex = 0,
             IsRepeating = true,
         };
     }
 
-    /// <summary>启动自检：把每个先古的对话集读一遍并把结果写进日志，便于定位。</summary>
+    /// <summary>
+    /// 启动自检：把每个先古的对话集读一遍并把结果写进日志，便于定位。
+    /// </summary>
     internal static void DonQuixote_SelfTest()
     {
         try
@@ -243,7 +247,6 @@ internal static class DonQuixoteAncientDialoguePatch
 
 /// <summary>
 /// 兜底：即使 visit 计数把它排到了「首次见面对话」后面，也保证选出堂吉诃德的那条。
-/// 只在角色是堂吉诃德、且这一份 DialogueSet 里确实有我们那组对话时生效。
 /// </summary>
 [HarmonyPatch(typeof(AncientDialogueSet), nameof(AncientDialogueSet.GetValidDialogues))]
 internal static class DonQuixoteAncientDialogueSelectPatch
@@ -284,9 +287,7 @@ internal static class DonQuixoteAncientDialogueSelectPatch
                 return;
             }
 
-            // 游戏在 NEventRoom 里用 Rng.Chaotic.NextItem 从这个池子里随机抽一条，
-            // 只把我们的插到最前面并不能保证播的是它。用户要的是「每次遇到都播堂吉诃德的对话」，
-            // 所以直接把候选池换成我们这一组。
+            // 游戏在 NEventRoom 里用 Rng.Chaotic.NextItem 从这个池子里随机抽一条。
             __result = new List<AncientDialogue>(DonQuixote_mine);
         }
         catch (Exception DonQuixote_exception)

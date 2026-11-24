@@ -3,9 +3,7 @@ using STS2RitsuLib.Scaffolding.Visuals.Definition;
 namespace DonQuixote;
 
 /// <summary>
-/// Static frame cues for the non-Spine combat visuals: RitsuLib drives the
-/// <c>Sprite2D</c> named <c>Visuals</c> in
-/// <c>res://DonQuixote/scenes/creature_visuals/don_quixote.tscn</c>.
+/// Static frame cues for the non-Spine combat visuals: RitsuLib drives the Sprite2D named Visuals in res://DonQuixote/scenes/creature_visuals/don_quixote.tscn.
 /// </summary>
 internal static class DonQuixoteCombatCues
 {

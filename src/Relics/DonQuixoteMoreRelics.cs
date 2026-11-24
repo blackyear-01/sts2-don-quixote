@@ -34,13 +34,7 @@ public sealed class DonQuixoteSanchoFollower : ModRelicTemplate
 
     public override string CustomBigIconPath => "res://DonQuixote/images/relics/sancho_big.png";
 
-    // 联机不同步修复（关键）：
-    // 这里原来用「遗物实例自己的 private int 计数器」判断第几回合，并且挂在 AfterPlayerTurnStart 上。
-    // 联机开战时游戏会用主机发来的序列化玩家数据重建「其它玩家」的遗物（自家遗物不重建），
-    // 这个计数器不在存档/同步数据里 → 远端那份被清零，自家那份还留着上局累计值
-    // → 两端对「现在是不是该给摇曳」的判断不一致 → 各端只给自己加 2 层 → 开战校验和不同 → 掉线。
-    // 现在改用 CombatState.RoundNumber（两端一致且参与校验和）判定，并在
-    // AfterSideTurnStart（原版对「回合开始加能力」的推荐钩子，见 AbstractModel 注释）里结算。
+    // 联机不同步修复（关键）：这里原来用「遗物实例自己的 private int 计数器」判断第几回合。
     public override async Task AfterSideTurnStart(
         CombatSide DonQuixote_side,
         IReadOnlyList<Creature> DonQuixote_participants,
@@ -138,8 +132,7 @@ public sealed class DonQuixoteGullinbursti : ModRelicTemplate
 public sealed class DonQuixoteNikolina : ModRelicTemplate
 {
     /// <summary>
-    /// 已经换算成力量的「消耗血宴总数」额度。同样是遗物上的可变状态，
-    /// 必须序列化，否则联机开战同步会把客机这份重置成 0，导致重复加力量（状态不同步）。
+    /// 已经换算成力量的「消耗血宴总数」额度。
     /// </summary>
     [MegaCrit.Sts2.Core.Saves.Runs.SavedProperty(
         MegaCrit.Sts2.Core.Saves.Runs.SerializationCondition.SaveIfNotTypeDefault)]
@@ -154,8 +147,7 @@ public sealed class DonQuixoteNikolina : ModRelicTemplate
     public override string CustomBigIconPath => "res://DonQuixote/images/relics/nikolina_big.png";
 
     /// <summary>
-    /// 「消耗血宴总数」是每场战斗的临时能力，战斗结束就没了；
-    /// 这个换算额度如果跟着跨战斗留着，第二场战斗就永远凑不满新的 30 点。
+    /// 「消耗血宴总数」是每场战斗的临时能力，战斗结束就没了。
     /// </summary>
     public override Task BeforeCombatStart()
     {
@@ -163,7 +155,7 @@ public sealed class DonQuixoteNikolina : ModRelicTemplate
         return Task.CompletedTask;
     }
 
-    // 每有 30 点「消耗血宴总数」获得 1 点力量
+    // 每有 30 点「消耗血宴总数」获得 1 点力量。
     public override async Task AfterPowerAmountChanged(
         PlayerChoiceContext DonQuixote_choiceContext,
         PowerModel DonQuixote_power,
@@ -233,10 +225,7 @@ public sealed class DonQuixoteMoonFlight : ModRelicTemplate
     public override string CustomBigIconPath => "res://DonQuixote/images/relics/moon_flight_big.png";
 
     /// <summary>
-    /// 每张堕落牌首次被打出后，只给「打出的这张牌」记上折扣（见
-    /// <see cref="DonQuixoteMoonFlightState"/>）。折扣本身由
-    /// <see cref="DonQuixoteCorruptedCostPatch"/> 在费用钩子里减，这里只负责记账，
-    /// 所以没打出过的堕落牌价格不受影响。
+    /// 每张堕落牌首次被打出后。
     /// </summary>
     public override Task AfterCardPlayed(PlayerChoiceContext DonQuixote_choiceContext, CardPlay DonQuixote_cardPlay)
     {
@@ -266,8 +255,7 @@ public sealed class DonQuixoteMoonFlight : ModRelicTemplate
 public sealed class DonQuixoteProofOfVictory : ModRelicTemplate
 {
     /// <summary>
-    /// 待发放的力量。必须是 [SavedProperty]：联机开战时远端玩家的遗物会被
-    /// 主机发来的序列化数据重建，未序列化的字段会被清零（两端不一致 → 不同步）。
+    /// 待发放的力量。
     /// </summary>
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     public bool DonQuixote_pendingStrength { get; set; }
@@ -303,8 +291,7 @@ public sealed class DonQuixoteProofOfVictory : ModRelicTemplate
         }
     }
 
-    // 同桑丘：挂在 AfterPlayerTurnStart 上会落在「每个玩家各自的回合准备」里，
-    // 联机时一端的准备被暂停就会让结算时机/次数不一致。改为 AfterSideTurnStart。
+    // 同桑丘：挂在 AfterPlayerTurnStart 上会落在「每个玩家各自的回合准备」里。
     public override async Task AfterSideTurnStart(
         CombatSide DonQuixote_side,
         IReadOnlyList<Creature> DonQuixote_participants,

@@ -14,14 +14,6 @@ namespace DonQuixote.Cards;
 
 /// <summary>
 /// 幸福笑容如鲜花般绽放之地：4 费能力（稀有，堂吉诃德卡池但不可通过选卡获得）。
-/// 堕落 80、保留。
-///
-/// 打出后战场换成拉曼却乐园的游乐园夜景并奏响《欢迎来到拉曼查乐园》；能力持续
-/// <see cref="DonQuixote_Turns"/> 回合，每个回合开始时全体友方单位获得 3 层
-/// 血编的荆棘、20 层摇曳【血魔】并清除负面效果，且持续期间摇曳不会在回合开始时消失
-/// （见 <see cref="DonQuixotePowerHappySmileLand"/>）。
-///
-/// 升级：能耗 -1、持续回合 +1（文档「升级后：减少1点能耗……后4回合」）。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHappySmileLand : ModCardTemplate, IDonQuixoteCorruptible, IDonQuixoteUnselectableCard
@@ -54,7 +46,9 @@ public sealed class DonQuixoteHappySmileLand : ModCardTemplate, IDonQuixoteCorru
         new DynamicVar("Wavering", DonQuixoteStageRules.DonQuixote_WaveringPerTurn),
     };
 
-    /// <summary>卡面插画（资源\卡牌\幸福笑容如鲜花般绽放之地.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\幸福笑容如鲜花般绽放之地.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/happy_smile_land.png";
 
     protected override async Task OnPlay(PlayerChoiceContext DonQuixote_choiceContext, CardPlay DonQuixote_cardPlay)
@@ -83,13 +77,6 @@ public sealed class DonQuixoteHappySmileLand : ModCardTemplate, IDonQuixoteCorru
 
 /// <summary>
 /// 噩梦的拉曼却领：4 费能力（稀有，堂吉诃德卡池但不可通过选卡获得），保留。
-/// 「幸福笑容如鲜花般绽放之地」的堕落版本，也由「血魔长老的本能」直接发放。
-///
-/// 持续 <see cref="DonQuixote_Turns"/> 回合：每个回合开始时全体友方单位翻倍身上的增益
-/// 并清除所有负面效果，所有敌方单位的负面效果翻倍并清除所有增益（沙坑除外），
-/// 且持续期间摇曳【血魔】不会在回合开始时消失。
-///
-/// 升级：能耗 -1、持续回合 +1。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteNightmareLand : ModCardTemplate, IDonQuixoteCorruptedCard
@@ -108,7 +95,9 @@ public sealed class DonQuixoteNightmareLand : ModCardTemplate, IDonQuixoteCorrup
 
     private const decimal DonQuixote_Turns = 3m;
 
-    /// <summary>卡面插画（资源\卡牌\噩梦的拉曼却领.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\噩梦的拉曼却领.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/nightmare_land.png";
 
     protected override async Task OnPlay(PlayerChoiceContext DonQuixote_choiceContext, CardPlay DonQuixote_cardPlay)

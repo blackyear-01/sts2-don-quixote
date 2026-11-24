@@ -36,12 +36,14 @@ internal static class DonQuixoteCardHoverTipsPatch
     }
 }
 
-/// <summary>卡牌 → 悬停说明的对照表。</summary>
+/// <summary>
+/// 卡牌 → 悬停说明的对照表。
+/// </summary>
 internal static class DonQuixoteHoverTips
 {
     private static readonly Dictionary<string, string[]> DonQuixote_Table = new Dictionary<string, string[]>(StringComparer.Ordinal)
     {
-        // ── 早期卡牌 ──
+        // ── 早期卡牌 ──。
         ["DonQuixoteHardBloodGuard"] = new[] { "wavering" },
         ["DonQuixoteBloodHunger"] = new[] { "bleed" },
         ["DonQuixoteFragileFragility"] = new[] { "weak", "bleed" },
@@ -60,7 +62,7 @@ internal static class DonQuixoteHoverTips
         ["DonQuixoteFollowerConversion"] = new[] { "follower" },
         ["DonQuixoteFamilyResponsibility"] = new[] { "responsibility" },
 
-        // ── 第二批（补全：卡面描述里出现了对应关键词，但此前没有挂悬停说明） ──
+        // ── 第二批（补全：卡面描述里出现了对应关键词，但此前没有挂悬停说明） ──。
         ["DonQuixoteKnightCharge"] = new[] { "corruption", "dueltarget", "bleed" },
         ["DonQuixoteFeastMoment"] = new[] { "bloodfeast", "impulse", "hardblood" },
         ["DonQuixoteBloodCarousel"] = new[] { "bleed" },
@@ -90,7 +92,7 @@ internal static class DonQuixoteHoverTips
         ["DonQuixoteCladInBlood"] = new[] { "bloodarmor" },
         ["DonQuixoteFairDuel"] = new[] { "corruption", "dueltarget" },
 
-        // ── 第三批（第三批新增卡牌与后续补写） ──
+        // ── 第三批（第三批新增卡牌与后续补写） ──。
         ["DonQuixoteAbandonAll"] = new[] { "wavering" },
         ["DonQuixoteAdventureOver"] = new[] { "bloodfeast", "wavering", "hardblood" },
         ["DonQuixoteAdventureSight"] = new[] { "corruption", "bloodfeast", "vulnerable" },
@@ -141,14 +143,13 @@ internal static class DonQuixoteHoverTips
     {
         List<IHoverTip> DonQuixote_tips = new List<IHoverTip>();
 
-        // 「堕落 X」的牌：把堕落版本整张卡作为悬停说明显示在旁边，
-        // 和原版「先制打击」悬停时会显示「小刀」是同一种表现。
+        // 「堕落 X」的牌：把堕落版本整张卡作为悬停说明显示在旁边。
         DonQuixote_AddCorruptedPreview(DonQuixote_card, DonQuixote_tips);
 
-        // 「血铸 / 技巧 / 增幅」的牌：把它会给出的骑士长枪也挂在旁边
+        // 「血铸 / 技巧 / 增幅」的牌：把它会给出的骑士长枪也挂在旁边。
         DonQuixote_AddDerivativePreviews(DonQuixote_card, DonQuixote_tips);
 
-        // 附魔类效果（不可摧毁卡牌）
+        // 附魔类效果（不可摧毁卡牌）。
         DonQuixote_AddEnchantmentPreviews(DonQuixote_card, DonQuixote_tips);
 
         string[] DonQuixote_keys;
@@ -191,9 +192,6 @@ internal static class DonQuixoteHoverTips
 
     /// <summary>
     /// 把「堕落版本」整张卡挂到悬停说明里，位置紧跟在原卡的说明之后。
-    /// 只在卡实现 <see cref="IDonQuixoteCorruptible"/> 时生效；取不到就静默跳过，
-    /// 不能因为悬停说明把整张卡的信息面板弄崩。
-    /// 原卡已升级时，旁边的堕落版本也显示升级后的样子（数值与费用一起变）。
     /// </summary>
     private static void DonQuixote_AddCorruptedPreview(CardModel DonQuixote_card, List<IHoverTip> DonQuixote_tips)
     {
@@ -210,7 +208,7 @@ internal static class DonQuixoteHoverTips
                 return;
             }
 
-            // 第二个参数是 upgrade：true 时原版会自己 MutableClone + Upgrade，不污染 Canonical 实例。
+            // 第二个参数是 upgrade：true 时原版会自己 MutableClone + Upgrade。
             IHoverTip DonQuixote_tip = HoverTipFactory.FromCard(DonQuixote_canonical, DonQuixote_card.IsUpgraded);
             if (DonQuixote_tip != null)
             {
@@ -225,8 +223,7 @@ internal static class DonQuixoteHoverTips
     }
 
     /// <summary>
-    /// 「血铸 / 技巧 / 增幅」会在战斗中把骑士长枪（或堕落版的饱食鲜血的长枪）放进手牌，
-    /// 这里把那张衍生卡作为悬停说明挂在带这些关键词的卡旁边，方便直接看到它会变成什么。
+    /// 「血铸 / 技巧 / 增幅」会在战斗中把骑士长枪（或堕落版的饱食鲜血的长枪）放进手牌。
     /// </summary>
     private static readonly Dictionary<string, Func<CardModel>> DonQuixote_DerivativePreviews =
         new Dictionary<string, Func<CardModel>>(StringComparer.Ordinal)
@@ -266,7 +263,9 @@ internal static class DonQuixoteHoverTips
         }
     }
 
-    /// <summary>「不可摧毁卡牌」附魔的悬停说明。</summary>
+    /// <summary>
+    /// 「不可摧毁卡牌」附魔的悬停说明。
+    /// </summary>
     private static void DonQuixote_AddEnchantmentPreviews(CardModel DonQuixote_card, List<IHoverTip> DonQuixote_tips)
     {
         if (!DonQuixote_IndestructibleCards.Contains(DonQuixote_card.GetType().Name))
@@ -359,7 +358,9 @@ internal static class DonQuixoteHoverTips
         }
     }
 
-    /// <summary>把卡牌上的对应数值传给提示，让说明里带上具体数字。</summary>
+    /// <summary>
+    /// 把卡牌上的对应数值传给提示，让说明里带上具体数字。
+    /// </summary>
     private static int? DonQuixote_Amount(CardModel DonQuixote_card, string DonQuixote_key)
     {
         string DonQuixote_varName;

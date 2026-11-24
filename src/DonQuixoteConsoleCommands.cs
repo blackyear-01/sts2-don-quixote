@@ -18,7 +18,6 @@ namespace DonQuixote;
 
 /// <summary>
 /// 控制台命令：dq_corruption &lt;value&gt; — 把当前角色的「堕落值」直接设为指定数字。
-/// 堕落值不足时先用原版 power 命令创建：power DON_QUIXOTE_POWER_CORRUPTION 1 0。
 /// </summary>
 public sealed class DonQuixoteCorruptionConsoleCmd : AbstractConsoleCmd
 {
@@ -72,8 +71,7 @@ public sealed class DonQuixoteCorruptionConsoleCmd : AbstractConsoleCmd
 }
 
 /// <summary>
-/// 控制台命令：dq_corruption_rate &lt;value&gt; — 设置「向本能堕落的骑士」
-/// 每回合施加的堕落值计数。
+/// 控制台命令：dq_corruption_rate &lt;value&gt; — 设置「向本能堕落的骑士」 每回合施加的堕落值计数。
 /// </summary>
 public sealed class DonQuixoteCorruptionRateConsoleCmd : AbstractConsoleCmd
 {
@@ -104,8 +102,7 @@ public sealed class DonQuixoteCorruptionRateConsoleCmd : AbstractConsoleCmd
 }
 
 /// <summary>
-/// 控制台命令：dq_bleed &lt;strength&gt; &lt;layers&gt; [target-index] —
-/// 给敌人叠加流血强度与层数（不指定目标时默认第一个敌人）。
+/// 控制台命令：dq_bleed &lt;strength&gt; &lt;layers&gt; [target-index] — 给敌人叠加流血强度与层数（不指定目标时默认第一个敌人）。
 /// </summary>
 public sealed class DonQuixoteBleedConsoleCmd : AbstractConsoleCmd
 {
@@ -269,8 +266,7 @@ public sealed class DonQuixoteBloodFeastConsoleCmd : AbstractConsoleCmd
 }
 
 /// <summary>
-/// 控制台命令：dq_degenerate &lt;increase|decrease&gt; &lt;amount&gt; —
-/// 增减「向本能堕落的骑士」的堕落计数（遗物下方显示的数字）。
+/// 控制台命令：dq_degenerate &lt;increase|decrease&gt; &lt;amount&gt; — 增减「向本能堕落的骑士」的堕落计数（遗物下方显示的数字）。
 /// </summary>
 public sealed class DonQuixoteDegenerateConsoleCmd : AbstractConsoleCmd
 {
@@ -336,7 +332,9 @@ public sealed class DonQuixoteDegenerateConsoleCmd : AbstractConsoleCmd
         return new CmdResult(DonQuixote_sync, true, $"degenerate counter -> {DonQuixote_next}");
     }
 
-    /// <summary>把计数变化同步到战斗中的堕落值，方便在战斗里直接观察堕落转化。</summary>
+    /// <summary>
+    /// 把计数变化同步到战斗中的堕落值，方便在战斗里直接观察堕落转化。
+    /// </summary>
     public static async Task DonQuixote_SyncCombatCorruption(Player DonQuixote_player, int DonQuixote_delta)
     {
         if (DonQuixote_player?.Creature == null || DonQuixote_delta == 0)
@@ -435,8 +433,7 @@ internal static class DonQuixoteConsoleCommandPatch
 }
 
 /// <summary>
-/// 控制台命令：dq_enchant [index] —— 花费 30 点血宴给手牌附魔「不可摧毁卡牌」。
-/// （这是「向本能堕落的骑士」右键附魔的临时替代入口）
+/// 控制台命令：dq_enchant [index]。
 /// </summary>
 public sealed class DonQuixoteEnchantConsoleCmd : AbstractConsoleCmd
 {

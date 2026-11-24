@@ -47,8 +47,7 @@ public sealed class DonQuixoteCharacter
         {
             IconTexturePath = "res://DonQuixote/images/char/icon.png",
             IconOutlineTexturePath = "res://DonQuixote/images/char/icon_outline.png",
-            // The top bar portrait instantiates CharacterModel.Icon, which is a
-            // scene; without this the game falls back to another character.
+            // The top bar portrait instantiates CharacterModel.Icon, which is a scene.
             IconPath = "res://DonQuixote/scenes/character_icon.tscn",
             CharacterSelectIconPath = "res://DonQuixote/images/charui/char_select_icon.png",
             // The game loads this path as a scene, not as a texture.
@@ -59,18 +58,14 @@ public sealed class DonQuixoteCharacter
         Scenes = new CharacterSceneAssetSet
         {
             VisualsPath = "res://DonQuixote/scenes/creature_visuals/don_quixote.tscn",
-            // RitsuLib derives these three scene paths from the entry id when they
-            // are left empty (鈥?don_quixote_character_don_quixote_character_*.tscn),
-            // and a failed load aborts the room transition ("black screen"), so
-            // borrow the Ironclad scenes until Don Quixote gets its own.
+            // RitsuLib derives these three scene paths from the entry id when they are left empty (鈥?don_quixote_character_don_quixote_character_*.tscn), and a failed load aborts the room transition ("black screen"), so borrow the Ironclad scenes until Don Quixote gets its own.
             EnergyCounterPath = "res://scenes/combat/energy_counters/ironclad_energy_counter.tscn",
             // 商店 / 火堆立绘：用模组自己的 spine 立绘（闲置循环 anim relaxed_loop）。
             MerchantAnimPath = "res://DonQuixote/scenes/merchant/don_quixote_merchant.tscn",
             RestSiteAnimPath = "res://DonQuixote/scenes/rest_site/don_quixote_rest_site.tscn",
         },
         VisualCues = DonQuixoteCombatCues.DonQuixote_Cues,
-        // 人物独有内容注册（文档 04-14 第 "人物独有的内容注册" 节）：美味饼干会按
-        // 人物显示不同图标，这里只在堂吉诃德的局内替换成饼干贴图，原版数据不动。
+        // 人物独有内容注册（文档 04-14 第 "人物独有的内容注册" 节）：美味饼干会按 人物显示不同图标。
         VanillaRelicVisualOverrides = new[]
         {
             new CharacterVanillaRelicVisualOverride(
@@ -84,8 +79,7 @@ public sealed class DonQuixoteCharacter
     };
 
     /// <summary>
-    /// Prefer the Spine rig, fall back to the frame-based rig when the spine
-    /// resources cannot be resolved.
+    /// Prefer the Spine rig, fall back to the frame-based rig when the spine resources cannot be resolved.
     /// </summary>
     protected override NCreatureVisuals? TryCreateCreatureVisuals()
     {

@@ -15,24 +15,28 @@ using MegaCrit.Sts2.Core.Models;
 namespace DonQuixote;
 
 /// <summary>
-/// 「血铸X / 技巧X / 增幅X」三个关键词的实现。
-/// 三者都只在每场战斗第一次触发时把「骑士长枪」塞进手牌，
-/// 之后累计的数值只用来强化两把长枪。
+/// 带「血铸X」关键词的卡：硬血不足时不能打出。
 /// </summary>
-/// <summary>带「血铸X」关键词的卡：硬血不足时不能打出。</summary>
 public interface IDonQuixoteBloodForgeCard
 {
     int DonQuixote_ForgeCost { get; }
 }
 
+/// <summary>
+/// 「血铸X / 技巧X / 增幅X」三个关键词的实现。
+/// </summary>
 public static class DonQuixoteLance
 {
     public const int DonQuixote_CorruptionThreshold = 40;
 
-    /// <summary>原版火堆锻造（升级卡牌）用的音效文件名。</summary>
+    /// <summary>
+    /// 原版火堆锻造（升级卡牌）用的音效文件名。
+    /// </summary>
     private const string DonQuixote_SmithClip = "card_smith.mp3";
 
-    /// <summary>叠在锻造音上的一层提示音，让触发更明显。</summary>
+    /// <summary>
+    /// 叠在锻造音上的一层提示音，让触发更明显。
+    /// </summary>
     private const string DonQuixote_ChimeClip = "relic_get.mp3";
 
     public static int DonQuixote_ForgeBonus(Creature DonQuixote_creature)
@@ -57,7 +61,6 @@ public static class DonQuixoteLance
 
     /// <summary>
     /// 「如骑士般提供保护」带来的长枪重放次数 = 该状态的层数。
-    /// 打多张保护卡时状态层数累加，长枪也就多重放几次（原来固定 1 次，叠加不生效）。
     /// </summary>
     public static int DonQuixote_LanceReplayCount(Creature DonQuixote_creature)
     {
@@ -96,13 +99,7 @@ public static class DonQuixoteLance
             return;
         }
 
-        // 血铸 / 技巧 / 增幅 三个关键词共享同一个「本场已发长枪」标记，
-        // 否则一张卡同时带三个关键词会连发三把长枪。
-        // 注意：血铸硬血不足时 amount 会是 0，但「第一次血铸发长枪」仍然要触发，
-        // 所以这里不能因为 amount <= 0 就整体跳过。
-        //
-        // 例外：长枪被消耗掉（消耗牌堆里躺着）时视为「枪没了」，下一次关键词触发重新发一把，
-        // 并把旧枪的数值继承过来。否则玩家一旦把枪消耗掉，这场战斗就再也拿不到枪。
+        // 血铸 / 技巧 / 增幅 三个关键词共享同一个「本场已发长枪」标记。
         bool DonQuixote_first = !DonQuixote_LanceAlreadyGranted(DonQuixote_player)
             || !DonQuixote_HasLance(DonQuixote_player);
 
@@ -112,7 +109,7 @@ public static class DonQuixoteLance
                 DonQuixote_ctx, DonQuixote_player.Creature, DonQuixote_amount, DonQuixote_player.Creature, DonQuixote_source, false);
         }
 
-        // 每次触发都播火堆锻造（升级）音效
+        // 每次触发都播火堆锻造（升级）音效。
         DonQuixote_PlayForgeSfx();
 
         if (DonQuixote_first)
@@ -121,7 +118,7 @@ public static class DonQuixoteLance
             await DonQuixote_EnsureLanceInHand(DonQuixote_player, DonQuixote_source);
         }
 
-        // 让手牌/牌堆里两把长枪的卡面数字同步（放在发牌之后，新牌也能立刻显示正确数字）
+        // 让手牌/牌堆里两把长枪的卡面数字同步（放在发牌之后，新牌也能立刻显示正确数字）。
         DonQuixote_RefreshLanceStats(DonQuixote_player);
     }
 
@@ -160,8 +157,7 @@ public static class DonQuixoteLance
     }
 
     /// <summary>
-    /// 把「血铸 / 技巧 / 增幅」的累计值写进两把长枪的 DynamicVars（只用于卡面显示，
-    /// 实际结算在卡牌 OnPlay 里用常量基数自己算，避免重复加成）。
+    /// 把「血铸 / 技巧 / 增幅」的累计值写进两把长枪的 DynamicVars（只用于卡面显示。
     /// </summary>
     public static void DonQuixote_RefreshLanceStats(Player DonQuixote_player)
     {
@@ -209,8 +205,6 @@ public static class DonQuixoteLance
                         DonQuixote_SetDisplay(DonQuixote_card, "Wavering", 3m + DonQuixote_amplify);
 
                         // 「重放」只在「如骑士般提供保护」挂着时才有，次数 = 该状态的层数。
-                        // BaseReplayCount 只影响卡面显示与实际结算次数，必须每次刷新都同步，
-                        // 否则长枪先生成（重放 0）、后打保护时永远拿不到重放。
                         int DonQuixote_replay = DonQuixote_LanceReplayCount(DonQuixote_owner);
                         if (DonQuixote_knightLance.BaseReplayCount != DonQuixote_replay)
                         {
@@ -245,7 +239,9 @@ public static class DonQuixoteLance
         DonQuixote_var.PreviewValue = DonQuixote_value;
     }
 
-    /// <summary>播放原版火堆锻造（铁匠升级卡牌）音效。</summary>
+    /// <summary>
+    /// 播放原版火堆锻造（铁匠升级卡牌）音效。
+    /// </summary>
     public static void DonQuixote_PlayForgeSfx()
     {
         try
@@ -257,8 +253,7 @@ public static class DonQuixoteLance
                 return;
             }
 
-            // 主音：火堆锻造。原版这里用 1f，实际打起来很容易被 BGM 和其它音效盖住，
-            // 所以把音量抬到 1.8（线性音量，2 才是 2 倍）让「血铸 / 技巧 / 增幅」一耳朵能听出来。
+            // 主音：火堆锻造。
             DonQuixote_audio.Play(
                 DonQuixote_SmithClip, 1.8f, MegaCrit.Sts2.Core.Audio.Debug.PitchVariance.Small);
 
@@ -273,7 +268,9 @@ public static class DonQuixoteLance
         }
     }
 
-    /// <summary>把这次打出的卡「放回手牌」。CardPlay.ResultPile 是 init-only，只能反射赋值。</summary>
+    /// <summary>
+    /// 把这次打出的卡「放回手牌」。
+    /// </summary>
     public static void DonQuixote_SetResultPileToHand(CardPlay DonQuixote_play)
     {
         try
@@ -290,12 +287,6 @@ public static class DonQuixoteLance
 
     /// <summary>
     /// 战斗中的各个牌堆里是否已经有一把长枪：本体「骑士长枪」或堕落版「饱食鲜血的长枪」。
-    /// 长枪是战斗内 token（不进牌组），所以扫全部战斗牌堆是安全的，不会跨战斗误判。
-    ///
-    /// 注意**不算消耗堆**：长枪被消耗掉（附魔消耗、虚无、强制消耗等）之后就不再算「手里有枪」，
-    /// 下一次血铸 / 技巧 / 增幅会重新发一把，并把旧枪的数值继承过来
-    /// （见 <see cref="DonQuixote_InheritExhaustedLance"/>）。
-    /// 否则被消耗掉的长枪会永远躺在消耗堆里挡住发牌，玩家再也拿不到枪。
     /// </summary>
     public static bool DonQuixote_HasLance(Player DonQuixote_player)
     {
@@ -329,7 +320,9 @@ public static class DonQuixoteLance
         return false;
     }
 
-    /// <summary>把「骑士长枪」放进手牌（手牌里已经有一张就不再重复给）。</summary>
+    /// <summary>
+    /// 把「骑士长枪」放进手牌（手牌里已经有一张就不再重复给）。
+    /// </summary>
     public static async Task DonQuixote_EnsureLanceInHand(Player DonQuixote_player, CardModel DonQuixote_source)
     {
         if (DonQuixote_player?.Creature == null || DonQuixote_player.Creature.CombatState == null)
@@ -339,12 +332,7 @@ public static class DonQuixoteLance
 
         try
         {
-            // 去重：手牌 / 抽牌堆 / 弃牌堆 / 消耗堆 / 打出区 里只要已经有一把长枪
-            // （本体「骑士长枪」或堕落版「饱食鲜血的长枪」）就不再发。
-            // 只查手牌会漏两种最常见的情况：
-            //  ・长枪正处在打出流程或弃牌堆里（打出后回手，但途中不在手牌）；
-            //  ・堕落值到 40 后长枪被转化成「饱食鲜血的长枪」，手牌里查不到本体，
-            //    于是同一次增幅又发一张 —— 这就是「手里同时有两把长枪」的来源。
+            // 去重：手牌 / 抽牌堆 / 弃牌堆 / 消耗堆 / 打出区 里只要已经有一把长枪 （本体「骑士长枪」或堕落版「饱食鲜血的长枪」）就不再发。
             if (DonQuixote_HasLance(DonQuixote_player))
             {
                 return;
@@ -393,9 +381,7 @@ public static class DonQuixoteLance
     }
 
     /// <summary>
-    /// 新发的长枪继承消耗堆里上一把长枪的数值：升级状态、各个 DynamicVar 的卡面值、
-    /// 以及重放次数。长枪被消耗掉后重新发放时玩家不该吃亏，所以把旧的强化原样带过来。
-    /// 标准数值（血铸 / 技巧 / 增幅）随后仍由 <see cref="DonQuixote_RefreshLanceStats"/> 重算。
+    /// 新发的长枪继承消耗堆里上一把长枪的数值：升级状态、各个 DynamicVar 的卡面值、以及重放次数。
     /// </summary>
     private static void DonQuixote_InheritExhaustedLance(Player DonQuixote_player, CardModel DonQuixote_newLance)
     {

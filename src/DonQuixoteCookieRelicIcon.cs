@@ -8,10 +8,7 @@ using MegaCrit.Sts2.Core.Runs;
 namespace DonQuixote;
 
 /// <summary>
-/// 美味饼干（YUMMY_COOKIE）是原版先古遗物，原版把它画在一张共享图集里，
-/// 因此 RitsuLib 的 VanillaRelicVisualOverrides 只有在游戏真的去查贴图路径时
-/// 才会生效。这里额外加一层保险：局内角色是堂吉诃德时，直接把 RelicModel.Icon /
-/// IconOutline 的返回值替换成我们的饼干贴图，其它角色、原版数据都不动。
+/// 美味饼干（YUMMY_COOKIE）是原版先古遗物。
 /// </summary>
 internal static class DonQuixoteCookieRelicIcon
 {
@@ -30,8 +27,7 @@ internal static class DonQuixoteCookieRelicIcon
     private static readonly HashSet<string> DonQuixote_SeenEntries = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// 这枚遗物的持有者是不是堂吉诃德。图鉴/未获得时 Owner 为空，返回 false，
-    /// 于是原版角色和图鉴里的图标都保持原样。
+    /// 这枚遗物的持有者是不是堂吉诃德。
     /// </summary>
     internal static bool DonQuixote_IsDonQuixoteRelic(RelicModel DonQuixote_Relic)
     {

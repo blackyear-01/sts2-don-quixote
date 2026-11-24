@@ -17,9 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace DonQuixote.Enchantments;
 
 /// <summary>
-/// 附魔「不可摧毁卡牌」：此卡被消耗或虚无时，自动打出并进入弃牌堆，
-/// 不会进入消耗牌堆，但是造成的最终伤害 -80%。
-/// 无具体目标的技能牌指向最左侧目标；能力牌被自动打出后不进入弃牌堆。
+/// 附魔「不可摧毁卡牌」：此卡被消耗或虚无时。
 /// </summary>
 [RegisterEnchantment]
 public sealed class DonQuixoteIndestructibleCard : ModEnchantmentTemplate
@@ -37,13 +35,6 @@ public sealed class DonQuixoteIndestructibleCard : ModEnchantmentTemplate
 
     /// <summary>
     /// 被消耗/虚无而自动打出时，造成的最终伤害 -80%。
-    ///
-    /// 这个修正**不在这里做**：AutoPlay 的 OnPlay 是交给 BranchingPlayerChoiceContext 跑的，
-    /// 遇到暂停/分支时 AutoPlay 的 await 会先返回、自动打出深度随即归零，
-    /// 真正结算伤害时标志已经是 false，-80% 就静默失效了。
-    /// 现在改由 <see cref="DonQuixoteIndestructibleDamagePatch"/> 在
-    /// <c>Hook.ModifyDamage</c> 的尾部按「本次 CardPlay 是否 IsAutoPlay」处理，
-    /// 这里必须返回 1，否则会被乘两次。
     /// </summary>
     public override decimal EnchantDamageMultiplicative(decimal DonQuixote_originalDamage, ValueProp DonQuixote_props)
     {
@@ -51,30 +42,34 @@ public sealed class DonQuixoteIndestructibleCard : ModEnchantmentTemplate
     }
 }
 
-/// <summary>附魔状态与「消耗→自动打出→进弃牌堆」的实现。</summary>
+/// <summary>
+/// 附魔状态与「消耗→自动打出→进弃牌堆」的实现。
+/// </summary>
 internal static class DonQuixoteIndestructibleState
 {
-    /// <summary>永久附魔的 Amount（硬血传授这类「给了就一直留着」的卡）。</summary>
+    /// <summary>
+    /// 永久附魔的 Amount（硬血传授这类「给了就一直留着」的卡）。
+    /// </summary>
     public const int DonQuixote_PermanentAmount = 1;
 
     /// <summary>
     /// 临时附魔的 Amount（过人的毅力：只保留到本回合结束，敌方回合结束时回收）。
-    /// 用 Amount 做标记而不是另开一个附魔类，是因为 Amount 跟着卡牌一起存档/同步，
-    /// 两端判定一致；另建类还要多一份本地化与图标。
     /// </summary>
     public const int DonQuixote_TemporaryAmount = 2;
 
     /// <summary>
-    /// 自动打出的嵌套深度。用计数而不是 bool：一张附魔卡自动打出时，
-    /// 它的效果可能又消耗掉另一张附魔卡（那张牌也会自动打出），
-    /// 内层结束时把标志清成 false，外层剩下的结算就丢了 -80%。
+    /// 自动打出的嵌套深度。
     /// </summary>
     private static int DonQuixote_AutoPlayDepth;
 
-    /// <summary>是否正处在「消耗→自动打出」的流程中（伤害 -80% 用）。</summary>
+    /// <summary>
+    /// 是否正处在「消耗→自动打出」的流程中（伤害 -80% 用）。
+    /// </summary>
     public static bool DonQuixote_AutoPlaying => DonQuixote_AutoPlayDepth > 0;
 
-    /// <summary>正在自动打出中的卡，防止消耗流程递归。</summary>
+    /// <summary>
+    /// 正在自动打出中的卡，防止消耗流程递归。
+    /// </summary>
     private static readonly HashSet<CardModel> DonQuixote_Consuming =
         new HashSet<CardModel>(ReferenceEqualityComparer.Instance);
 
@@ -93,12 +88,6 @@ internal static class DonQuixoteIndestructibleState
 
     /// <summary>
     /// 只有「这张卡自己正在被自动打出」才放行消耗拦截。
-    ///
-    /// 之前用的是全局开关：一张附魔卡自动打出期间，它顺手消耗掉的另一张附魔卡
-    /// 也会被放行，于是那张牌直接进了消耗堆，既没有被自动打出，
-    /// 卡上的「消耗血宴 / 消耗硬血」以及随之而来的一整套效果（消耗血宴总数、
-    /// 遗物发货、尼古莉娜加力量……）都不会结算。改成按卡判定后，
-    /// 嵌套的消耗仍然会各自走一遍完整的「消耗→自动打出」。
     /// </summary>
     public static bool DonQuixote_IsAutoPlaying(CardModel DonQuixote_card)
     {
@@ -109,16 +98,15 @@ internal static class DonQuixoteIndestructibleState
 
     /// <summary>
     /// 附魔状态只认卡牌自身的 <see cref="CardModel.Enchantment"/>。
-    /// 之前这里还有「按玩家 + 卡牌条目记账」的本地字典，那份数据不会同步到队友，
-    /// 于是主机认为「这张牌带不可摧毁」、客户端认为「不带」，
-    /// 消耗时一端进弃牌堆另一端进消耗堆 —— 多人游戏直接数据不同步。已删除。
     /// </summary>
     public static bool DonQuixote_HasEnchantment(CardModel DonQuixote_card)
     {
         return DonQuixote_card?.Enchantment is DonQuixoteIndestructibleCard;
     }
 
-    /// <summary>消耗一次附魔：只看这张牌现在是否带着「不可摧毁卡牌」。</summary>
+    /// <summary>
+    /// 消耗一次附魔：只看这张牌现在是否带着「不可摧毁卡牌」。
+    /// </summary>
     public static bool DonQuixote_TryUse(CardModel DonQuixote_card)
     {
         return DonQuixote_HasEnchantment(DonQuixote_card);
@@ -126,8 +114,6 @@ internal static class DonQuixoteIndestructibleState
 
     /// <summary>
     /// 回收本回合临时挂上的「不可摧毁卡牌」附魔（过人的毅力用）。
-    /// 只清 Amount == 临时值 的那些，硬血传授给的永久附魔不受影响。
-    /// 两端都在敌方回合结束时跑同一段扫描，牌堆内容一致，所以不需要另外记账。
     /// </summary>
     public static void DonQuixote_ReclaimTemporary(Creature DonQuixote_creature)
     {
@@ -179,11 +165,7 @@ internal static class DonQuixoteIndestructibleState
             return null;
         }
 
-        // 只有「虚无」那条路径需要这个标记：它的调用方在 Exhaust 之后还会无条件
-        // CardPileCmd.Add(card, Exhaust)，得靠标记改投弃牌堆。
-        // CardCmd.Exhaust 的补丁是整段替换（return false），原版后续不会再加一次；
-        // 在那里打标记只会永远留在 Pending 里，之后这张牌每次进消耗堆都被误重定向，
-        // 表现为「附魔过的卡再也消耗不掉 / 打不出去」。
+        // 只有「虚无」那条路径需要这个标记：它的调用方在 Exhaust 之后还会无条件 CardPileCmd.Add(card, Exhaust)。
         if (DonQuixote_markForRedirect)
         {
             DonQuixoteIndestructibleRedirect.DonQuixote_Mark(DonQuixote_card);
@@ -221,18 +203,14 @@ internal static class DonQuixoteIndestructibleState
         }
         finally
         {
-            // 一定得在 finally 里注销：中途抛异常时如果漏了，这张卡会永远被当成
-            // 「正在自动打出」，以后它每次被消耗都会被放行、再也不会自动打出。
+            // 一定得在 finally 里注销：中途抛异常时如果漏了。
             DonQuixote_Consuming.Remove(DonQuixote_card);
             DonQuixote_ExitAutoPlay();
         }
 
         if (!DonQuixote_isPower)
         {
-            // 「打出后返回手牌」的卡（骑士长枪这类）在 AutoPlay 收尾时已经按
-            // GetResultLocationForCardPlay 回到手牌了。这里再搬一次会把它从手牌塞进弃牌堆，
-            // 卡牌模型的归属牌堆和界面上的位置就此错开，之后这张牌再也点不动、打不出去。
-            // 所以只在它没回手时才补进弃牌堆。
+            // 「打出后返回手牌」的卡（骑士长枪这类）在 AutoPlay 收尾时已经按 GetResultLocationForCardPlay 回到手牌了。
             CardPile? DonQuixote_pile = DonQuixote_card.Pile;
             if (DonQuixote_pile == null || DonQuixote_pile.Type != PileType.Hand)
             {
@@ -245,8 +223,7 @@ internal static class DonQuixoteIndestructibleState
             }
         }
 
-        // 兜底：自动打出中途失败时卡可能不属于任何牌堆（悬空），
-        // 之后既不在手牌也不在弃牌堆，等于永久消失。放回弃牌堆。
+        // 兜底：自动打出中途失败时卡可能不属于任何牌堆（悬空）。
         if (DonQuixote_card.Pile == null)
         {
             await CardPileCmd.Add(DonQuixote_card, PileType.Discard, CardPilePosition.Top, (AbstractModel)null, true);
@@ -261,15 +238,6 @@ internal static class DonQuixoteIndestructibleState
 
 /// <summary>
 /// 附魔「不可摧毁卡牌」被消耗而导致自动打出时，最终伤害 -80%。
-///
-/// 之前这条写在 <see cref="DonQuixoteIndestructibleCard.EnchantDamageMultiplicative"/> 里，
-/// 靠「自动打出深度 &gt; 0」这个全局标志判定。问题在于
-/// <c>CardCmd.AutoPlay</c> 内部是 <c>branchingPlayerChoiceContext.AssignTaskAndWaitForPauseOrCompletion</c>，
-/// 一旦碰到暂停/分支，AutoPlay 的 await 会先收线，我们的 <c>finally</c> 把深度清零，
-/// 而真正结算伤害是在那之后 —— 此时标志已经是 false，-80% 就被静默跳过了。
-/// 这里改用本次 <see cref="CardPlay.IsAutoPlay"/>（卡牌打出的固有属性，与 await 时序无关），
-/// 并且放在 <c>Hook.ModifyDamage</c> 的**尾部**，所有增伤修正算完之后再乘 0.2，
-/// 正好对应描述里的「造成的最终伤害 -80%」。
 /// </summary>
 [HarmonyPatch(typeof(Hook), nameof(Hook.ModifyDamage))]
 internal static class DonQuixoteIndestructibleDamagePatch
@@ -293,8 +261,7 @@ internal static class DonQuixoteIndestructibleDamagePatch
             return;
         }
 
-        // 主判定走 CardPlay.IsAutoPlay；个别伤害路径不带 cardPlay 时，
-        // 回退到「这张卡正在走消耗→自动打出流程」的标记。
+        // 主判定走 CardPlay.IsAutoPlay。
         bool DonQuixote_autoPlaying = __7?.IsAutoPlay == true
             || DonQuixoteIndestructibleState.DonQuixote_IsAutoPlaying(DonQuixote_card);
         if (!DonQuixote_autoPlaying)
@@ -309,7 +276,9 @@ internal static class DonQuixoteIndestructibleDamagePatch
     }
 }
 
-/// <summary>拦截消耗流程：带有「不可摧毁卡牌」附魔的卡不进入消耗牌堆。</summary>
+/// <summary>
+/// 拦截消耗流程：带有「不可摧毁卡牌」附魔的卡不进入消耗牌堆。
+/// </summary>
 [HarmonyPatch(typeof(CardCmd), nameof(CardCmd.Exhaust))]
 internal static class DonQuixoteIndestructibleExhaustPatch
 {
@@ -324,11 +293,9 @@ internal static class DonQuixoteIndestructibleExhaustPatch
         }
 
         // 只放行「这张卡自己的自动打出」：它打完还要走原版的进堆流程。
-        // 同一次流程里被顺手消耗的其它附魔卡不能被放行，否则它们的血宴结算会被吞掉。
         if (DonQuixoteIndestructibleState.DonQuixote_IsAutoPlaying(__1))
         {
-            // 例外：「打出后返回手牌」的卡（骑士长枪这类）在 AutoPlay 收尾时已经回到手牌，
-            // 再放行原版 Exhaust 就会把它从手牌吞进消耗堆，之后这张牌再也打不出来。
+            // 例外：「打出后返回手牌」的卡（骑士长枪这类）在 AutoPlay 收尾时已经回到手牌。
             if (__1.Pile?.Type == PileType.Hand)
             {
                 DonQuixoteIndestructibleRedirect.DonQuixote_Consume(__1);
@@ -353,7 +320,9 @@ internal static class DonQuixoteIndestructibleExhaustPatch
     }
 }
 
-/// <summary>虚无 / 未打出的卡离开手牌时走的是这条路径，同样拦下来。</summary>
+/// <summary>
+/// 虚无 / 未打出的卡离开手牌时走的是这条路径，同样拦下来。
+/// </summary>
 [HarmonyPatch(typeof(CardModel), nameof(CardModel.MoveToResultPileWithoutPlaying))]
 internal static class DonQuixoteIndestructibleMovePatch
 {
@@ -377,9 +346,7 @@ internal static class DonQuixoteIndestructibleMovePatch
 }
 
 /// <summary>
-/// 虚无的结算方（CombatManager.ResolveTurnEndCardEffects）在 CardCmd.Exhaust 之后
-/// 还会无条件 CardPileCmd.Add(card, PileType.Exhaust.GetPile(player), ...)，
-/// 所以要在这里把「刚被附魔拦下」的卡改投到弃牌堆。
+/// 虚无的结算方（CombatManager.ResolveTurnEndCardEffects）在 CardCmd.Exhaust 之后 还会无条件 CardPileCmd.Add(card, PileType.Exhaust.GetPile(player), ...).
 /// </summary>
 internal static class DonQuixoteIndestructibleRedirect
 {

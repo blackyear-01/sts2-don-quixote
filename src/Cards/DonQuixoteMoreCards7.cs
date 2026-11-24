@@ -20,16 +20,14 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace DonQuixote.Cards;
 
 /// <summary>
-/// 过人的毅力：1 费技能。未升级：本回合受到的伤害 -75%；
-/// 升级：本回合每次受到的伤害固定最多 2 点。
-/// 「本回合」到敌方回合结束为止（敌人是在自己回合里打人的），
-/// 同时给手中除诅咒与状态外的所有卡挂上「不可摧毁卡牌」附魔，
-/// 这些附魔也会在敌方回合结束时被回收（见 DonQuixoteIndestructibleState.DonQuixote_ReclaimTemporary）。
+/// 过人的毅力：1 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteExtraordinaryGrit : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\过人的毅力.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\过人的毅力.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/extraordinary_grit.png";
 
     public DonQuixoteExtraordinaryGrit()
@@ -87,13 +85,13 @@ public sealed class DonQuixoteExtraordinaryGrit : ModCardTemplate
 
 /// <summary>
 /// 援护反击：2 费技能，获得 1 层援护防御，消耗（升级后 1 费）。
-/// 只在联机里出现 —— 单人没有「友方单位」，这张牌没有任何意义，
-/// 所以标成 MultiplayerOnly，单人奖励与商店都不会刷到它。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteGuardRiposte : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\援护反击.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\援护反击.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/guard_riposte.png";
 
     public DonQuixoteGuardRiposte()
@@ -101,7 +99,9 @@ public sealed class DonQuixoteGuardRiposte : ModCardTemplate
     {
     }
 
-    /// <summary>只进联机卡池（<see cref="MegaCrit.Sts2.Core.Models.CardPoolModel.GetUnlockedCards"/> 按它过滤）。</summary>
+    /// <summary>
+    /// 只进联机卡池（<see cref="MegaCrit.Sts2.Core.Models.CardPoolModel.GetUnlockedCards"/> 按它过滤）。
+    /// </summary>
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { CardKeyword.Exhaust };
@@ -129,12 +129,13 @@ public sealed class DonQuixoteGuardRiposte : ModCardTemplate
 
 /// <summary>
 /// 援护反击（衍生攻击）：0 费无色攻击，造成 6 点伤害并施加 2 级流血。
-/// 只在「援护防御」触发时被打出。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteGuardRiposteStrike : ModCardTemplate
 {
-    /// <summary>援护防御判定用的固定伤害（不吃任何加成，只用来比较大小）。</summary>
+    /// <summary>
+    /// 援护防御判定用的固定伤害（不吃任何加成，只用来比较大小）。
+    /// </summary>
     public const int DonQuixote_BaseDamage = 6;
 
     public DonQuixoteGuardRiposteStrike()
@@ -142,7 +143,9 @@ public sealed class DonQuixoteGuardRiposteStrike : ModCardTemplate
     {
     }
 
-    /// <summary>衍生攻击同样只属于联机（跟着援护反击走）。</summary>
+    /// <summary>
+    /// 衍生攻击同样只属于联机（跟着援护反击走）。
+    /// </summary>
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
     protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
@@ -182,7 +185,6 @@ public sealed class DonQuixoteGuardRiposteStrike : ModCardTemplate
 
 /// <summary>
 /// 勇敢骑士的决心：2 费能力，堕落 40 / 骑士词条，获得「心-勇敢的骑士」。
-/// 升级后减少 1 点耗能。堕落版本是单独的「望」。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteResoluteHeart : ModCardTemplate, IDonQuixoteCorruptible
@@ -198,7 +200,9 @@ public sealed class DonQuixoteResoluteHeart : ModCardTemplate, IDonQuixoteCorrup
 
     public CardModel DonQuixote_CorruptedCanonical => ModelDb.Card<DonQuixoteHope>();
 
-    /// <summary>「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。</summary>
+    /// <summary>
+    /// 「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。
+    /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixoteKeywords.DonQuixote_Knight };
 
     public DonQuixoteResoluteHeart()
@@ -230,7 +234,6 @@ public sealed class DonQuixoteResoluteHeart : ModCardTemplate, IDonQuixoteCorrup
 
 /// <summary>
 /// 望：2 费技能，获得 1 层「望」，消耗（升级后获得保留）。
-/// 它是「勇敢骑士的决心」的堕落版本，只能由堕落生成，不进卡池。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHope : ModCardTemplate, IDonQuixoteCorruptedCard
@@ -265,13 +268,14 @@ public sealed class DonQuixoteHope : ModCardTemplate, IDonQuixoteCorruptedCard
 }
 
 /// <summary>
-/// 舍弃身后之物踏上冒险：2 费技能，消耗所有手牌；每消耗 1 张抽 1 张牌并获得 1 层摇曳【血魔】
-/// （升级后每张 2 层）。
+/// 舍弃身后之物踏上冒险：2 费技能，消耗所有手牌。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteAbandonAll : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\舍弃身后之物踏上冒险.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\舍弃身后之物踏上冒险.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/abandon_all.png";
 
     public DonQuixoteAbandonAll()
@@ -328,9 +332,7 @@ public sealed class DonQuixoteAbandonAll : ModCardTemplate
 }
 
 /// <summary>
-/// 硬血传授：1 费技能，**需消耗 5 点硬血才能打出**（硬血不足时这张牌直接不能打出）；
-/// 选择抽牌堆 1 张卡附魔「不可摧毁卡牌」并加入手牌（升级后 2 张）。
-/// 注意它只是「消耗硬血」，不是「血铸」—— 不会再给长枪加伤害。
+/// 硬血传授：1 费技能，需消耗 5 点硬血才能打出（硬血不足时这张牌直接不能打出）。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodTeaching : ModCardTemplate, IDonQuixoteHardBloodCost
@@ -396,9 +398,7 @@ public sealed class DonQuixoteHardBloodTeaching : ModCardTemplate, IDonQuixoteHa
 }
 
 /// <summary>
-/// 冒险的见闻：2 费攻击，堕落 40 / 骑士词条，血宴 10：
-/// 造成 8 点伤害、施加 2 层易损、增幅 2；若这一下打掉 15 点以上生命，获得 20 层血宴。
-/// 升级：11 点伤害、增幅 5、30 层血宴。
+/// 冒险的见闻：2 费攻击。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteAdventureSight : DonQuixoteBloodFeastCard, IDonQuixoteCorruptible
@@ -414,7 +414,9 @@ public sealed class DonQuixoteAdventureSight : DonQuixoteBloodFeastCard, IDonQui
 
     public CardModel DonQuixote_CorruptedCanonical => ModelDb.Card<DonQuixoteHazyMemory>();
 
-    /// <summary>「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。</summary>
+    /// <summary>
+    /// 「骑士」词条：对有[gold]决斗对象[/gold]的敌人伤害 +50%。
+    /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixoteKeywords.DonQuixote_Knight };
 
     public DonQuixoteAdventureSight()
@@ -485,14 +487,14 @@ public sealed class DonQuixoteAdventureSight : DonQuixoteBloodFeastCard, IDonQui
 }
 
 /// <summary>
-/// 朦胧的回忆（勇敢骑士的决心的堕落版）：2 费攻击，
-/// 造成 8 点伤害并从消耗牌堆自选 1 张加入手牌；血宴 10：获得 3 层复还的血之冲动；
-/// 血宴 20：技巧 2、增幅 1（升级：11 点伤害，第二档降到 15）。
+/// 朦胧的回忆（勇敢骑士的决心的堕落版）：2 费攻击。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHazyMemory : ModCardTemplate, IDonQuixoteCorruptedCard
 {
-    /// <summary>卡面插画（资源\卡牌\朦胧的回忆.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\朦胧的回忆.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hazy_memory.png";
 
     public DonQuixoteHazyMemory()
@@ -546,17 +548,12 @@ public sealed class DonQuixoteHazyMemory : ModCardTemplate, IDonQuixoteCorrupted
             .Execute(DonQuixote_ctx);
 
         // 从消耗牌堆里自选 1 张加入手牌（原来是从弃牌堆随机拿 1 张）。
-        //
-        // 用 FromSimpleGrid 而不是 FromCombatPile：原版没有任何卡是「从消耗牌堆选牌」，
-        // NCombatPileCardSelectScreen 对 Exhaust 堆没有验证过；SimpleGrid 是通用卡牌网格，
-        // 只要给它一组牌就行，稳定得多。
         CardPile DonQuixote_exhaust = PileType.Exhaust.GetPile(Owner);
         if (DonQuixote_exhaust != null && DonQuixote_exhaust.Cards.Count > 0)
         {
             List<CardModel> DonQuixote_choices = DonQuixote_exhaust.Cards.ToList();
 
-            // 提示文本必须有对应的 .selectionScreenPrompt 键，否则该属性会直接抛异常，
-            // 表现为打出后卡牌停在画面中间、选牌界面不出现。
+            // 提示文本必须有对应的 .selectionScreenPrompt 键。
             CardSelectorPrefs DonQuixote_pickPrefs = new CardSelectorPrefs(SelectionScreenPrompt, 1);
             List<CardModel> DonQuixote_picked =
                 (await CardSelectCmd.FromSimpleGrid(DonQuixote_ctx, DonQuixote_choices, Owner, DonQuixote_pickPrefs))
@@ -595,7 +592,9 @@ public sealed class DonQuixoteHazyMemory : ModCardTemplate, IDonQuixoteCorrupted
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteReinforceDefense : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\援护防御.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\援护防御.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/reinforce_defense.png";
 
     public DonQuixoteReinforceDefense()

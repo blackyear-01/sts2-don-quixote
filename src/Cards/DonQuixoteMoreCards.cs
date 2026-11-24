@@ -17,7 +17,9 @@ using STS2RitsuLib.Scaffolding.Content;
 
 namespace DonQuixote.Cards;
 
-/// <summary>需要消耗硬血的卡：硬血不足时仍可打出，按实际消耗结算。</summary>
+/// <summary>
+/// 需要消耗硬血的卡：硬血不足时仍可打出，按实际消耗结算。
+/// </summary>
 public abstract class DonQuixoteHardBloodCard : ModCardTemplate
 {
     protected DonQuixoteHardBloodCard(int DonQuixote_cost, CardType DonQuixote_type, CardRarity DonQuixote_rarity, TargetType DonQuixote_target)
@@ -139,8 +141,7 @@ public sealed class DonQuixoteClotIntoArmor : DonQuixoteBloodFeastCard
 }
 
 /// <summary>
-/// 令血凝固，缠绕于你我身周（联机）：2 费，血宴 10，全体友方获得 3 级流血与 8 层血铠，
-/// 自身额外获得 6 层硬血（升级：血宴 15，5 级流血，15 层血铠，自身额外 10 层硬血）。
+/// 令血凝固，缠绕于你我身周（联机）：2 费，血宴 10，全体友方获得 3 级流血与 8 层血铠，自身额外获得 6 层硬血（升级：血宴 15，5 级流血，15 层血铠，自身额外 10 层硬血）。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteFreezeBloodAroundUs : DonQuixoteBloodFeastCard
@@ -197,13 +198,14 @@ public sealed class DonQuixoteFreezeBloodAroundUs : DonQuixoteBloodFeastCard
 }
 
 /// <summary>
-/// 堂吉诃德派硬血 2 式-桩：2 费，硬血 5，造成 14 点伤害并施加 4 级流血；
-/// 升级：额外触发对方 3 次流血效果，并因此减少 3 层流血。
+/// 堂吉诃德派硬血 2 式-桩：2 费，硬血 5，造成 14 点伤害并施加 4 级流血。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodPile : DonQuixoteHardBloodCard
 {
-    /// <summary>卡面插画（资源\卡牌\堂吉诃德派硬血2式-桩.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\堂吉诃德派硬血2式-桩.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_pile.png";
 
     public DonQuixoteHardBloodPile()
@@ -259,13 +261,14 @@ public sealed class DonQuixoteHardBloodPile : DonQuixoteHardBloodCard
 }
 
 /// <summary>
-/// 被刺穿吧：3 费，血宴 20，虚无，获得 1 层复还的血之冲动（升级 2 层），
-/// 造成目标最大生命值 20% 的伤害，消耗。
+/// 被刺穿吧：3 费，血宴 20，虚无，获得 1 层复还的血之冲动（升级 2 层），造成目标最大生命值 20% 的伤害，消耗。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBePierced : DonQuixoteBloodFeastCard
 {
-    /// <summary>卡面插画（资源\卡牌\被刺穿吧.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\被刺穿吧.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/be_pierced.png";
 
     public DonQuixoteBePierced()
@@ -298,7 +301,6 @@ public sealed class DonQuixoteBePierced : DonQuixoteBloodFeastCard
             DonQuixote_choiceContext, Owner.Creature, DonQuixote_Var("Impulse"), Owner.Creature, this, false);
 
         // 百分比伤害：先按目标最大生命值向上取整算出基础值，再乘堕落值增伤（每 10 点 +5%）。
-        // 之后走普通攻击结算：力量、易伤照常二次修正，唯独虚弱不参与减伤。
         decimal DonQuixote_baseDamage = decimal.Ceiling(
             DonQuixote_cardPlay.Target.MaxHp * DynamicVars["Percent"].BaseValue / 100m);
         decimal DonQuixote_damage = decimal.Ceiling(DonQuixote_ScaledDamage(DonQuixote_baseDamage));
@@ -331,7 +333,9 @@ public sealed class DonQuixoteBePierced : DonQuixoteBloodFeastCard
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBeRunThrough : DonQuixoteBloodFeastCard
 {
-    /// <summary>卡面插画（资源\卡牌\被贯穿吧.png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\被贯穿吧.png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/be_run_through.png";
 
     public DonQuixoteBeRunThrough()
@@ -352,8 +356,7 @@ public sealed class DonQuixoteBeRunThrough : DonQuixoteBloodFeastCard
 
     protected override void OnUpgrade()
     {
-        // 升级后不再消耗。关键词是实例上缓存的集合，升级不会重新按 CanonicalKeywords 算，
-        // 必须显式移除（只写 `IsUpgraded ? 空 : Exhaust` 是不会生效的）。
+        // 升级后不再消耗。
         RemoveKeyword(CardKeyword.Exhaust);
     }
 
@@ -445,12 +448,13 @@ public sealed class DonQuixoteBloodBackflow : DonQuixoteBloodFeastCard
 
 /// <summary>
 /// 眷属转化（联机）：3 费，对一名友方施加 1 层眷属，消耗（升级后不再消耗）。
-/// 场上已有两名眷属时，把最早的一名转成血袋。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteFollowerConversion : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\眷属转化.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\眷属转化.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/follower_conversion.png";
 
     public DonQuixoteFollowerConversion()
@@ -467,7 +471,9 @@ public sealed class DonQuixoteFollowerConversion : ModCardTemplate
         RemoveKeyword(CardKeyword.Exhaust);
     }
 
-    /// <summary>按「转化先后」记录场上的眷属，用来判定「第三名眷属进场时把最后转化的那名变成血袋」。</summary>
+    /// <summary>
+    /// 按「转化先后」记录场上的眷属，用来判定「第三名眷属进场时把最后转化的那名变成血袋」。
+    /// </summary>
     private static readonly List<Creature> DonQuixote_FollowerOrder = new List<Creature>();
 
     protected override async Task OnPlay(PlayerChoiceContext DonQuixote_choiceContext, CardPlay DonQuixote_cardPlay)
@@ -526,7 +532,9 @@ public sealed class DonQuixoteFollowerConversion : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteFamilyResponsibility : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\家族的责任.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\家族的责任.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/family_responsibility.png";
 
     public DonQuixoteFamilyResponsibility()

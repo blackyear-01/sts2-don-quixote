@@ -14,19 +14,13 @@ namespace DonQuixote.Relics;
 
 /// <summary>
 /// 光荣的决斗（先古遗物，白月骑士-巴里给的堂吉诃德专属）。
-///
-/// 遗物.docx：战斗开始时第一张带有血铸关键词的卡牌打出时，
-/// 血铸将不会导致硬血消耗带来全额影响
-/// —— 即「第一次血铸不真的扣硬血，但效果照常按全额结算」。
-///
-/// 实现挂在 <see cref="DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood"/> 上：
-/// 每场战斗第一次消耗时直接返回想要消耗的数额（视为消耗成功、伤害加成照给），
-/// 但不动硬血的层数。用 <see cref="DonQuixote_Used"/> 记录，进战斗时重置。
 /// </summary>
 [RegisterRelic(typeof(DonQuixoteRelicPool))]
 public sealed class DonQuixoteGloriousDuel : ModRelicTemplate
 {
-    /// <summary>本场战斗是否已经免过一次硬血消耗。必须序列化，联机两端要一致。</summary>
+    /// <summary>
+    /// 本场战斗是否已经免过一次硬血消耗。
+    /// </summary>
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     public bool DonQuixote_Used { get; set; }
 
@@ -46,7 +40,7 @@ public sealed class DonQuixoteGloriousDuel : ModRelicTemplate
     }
 
     /// <summary>
-    /// 尝试消耗这次硬血。返回 true 表示「这次免单，但按全额结算」。
+    /// 尝试消耗这次硬血。
     /// </summary>
     public static bool DonQuixote_TrySpare(Creature DonQuixote_owner, int DonQuixote_amount)
     {

@@ -21,10 +21,14 @@ public sealed class DonQuixotePowerBloodfiendMight : ModPowerTemplate
 {
     private const int DonQuixote_HealPerAttack = 2;
 
-    /// <summary>和卡面的 {Strength} 一致：每回合开始给 2 层临时强壮。</summary>
+    /// <summary>
+    /// 和卡面的 {Strength} 一致：每回合开始给 2 层临时强壮。
+    /// </summary>
     private const int DonQuixote_TempStrengthPerTurn = 2;
 
-    /// <summary>自检用：确认每回合实际给出去的临时强壮层数。</summary>
+    /// <summary>
+    /// 自检用：确认每回合实际给出去的临时强壮层数。
+    /// </summary>
     public static string DonQuixote_Probe()
     {
         return "tempStrength=" + DonQuixote_TempStrengthPerTurn
@@ -39,7 +43,9 @@ public sealed class DonQuixotePowerBloodfiendMight : ModPowerTemplate
 
     public override string CustomBigIconPath => "res://DonQuixote/images/powers/bloodfiend_might_big.png";
 
-    /// <summary>每次攻击（不是每段伤害）恢复 2 点生命。</summary>
+    /// <summary>
+    /// 每次攻击（不是每段伤害）恢复 2 点生命。
+    /// </summary>
     public override async Task AfterAttack(
         PlayerChoiceContext DonQuixote_choiceContext,
         MegaCrit.Sts2.Core.Commands.Builders.AttackCommand DonQuixote_command)
@@ -91,14 +97,15 @@ public sealed class DonQuixotePowerBloodfiendMight : ModPowerTemplate
 }
 
 /// <summary>
-/// 永恒饥渴：每回合开始时消耗至多 30 点血宴，每消耗 X 点恢复 1 点生命，
-/// 然后触发全体敌方单位 1 次流血并减少 1 层。
+/// 永恒饥渴：每回合开始时消耗至多 30 点血宴。
 /// </summary>
 public sealed class DonQuixotePowerEternalThirst : ModPowerTemplate
 {
     private const int DonQuixote_FeastCostPerTurn = 30;
 
-    /// <summary>每多少点血宴换 1 点生命（升级 15 → 10）。</summary>
+    /// <summary>
+    /// 每多少点血宴换 1 点生命（升级 15 → 10）。
+    /// </summary>
     [MegaCrit.Sts2.Core.Saves.Runs.SavedProperty(
         MegaCrit.Sts2.Core.Saves.Runs.SerializationCondition.SaveIfNotTypeDefault)]
     public int DonQuixote_HealPer { get; set; } = 15;
@@ -136,8 +143,7 @@ public sealed class DonQuixotePowerEternalThirst : ModPowerTemplate
             return;
         }
 
-        // 这里的「消耗」不属于卡面的「血宴 X / 至多消耗 X 点血宴」，
-        // 所以只扣血宴、不累计「消耗血宴总数」。
+        // 这里的「消耗」不属于卡面的「血宴 X / 至多消耗 X 点血宴」。
         int DonQuixote_have = DonQuixoteBloodMagic.DonQuixote_BloodFeast(DonQuixote_owner);
         int DonQuixote_spend = DonQuixote_have > DonQuixote_FeastCostPerTurn
             ? DonQuixote_FeastCostPerTurn

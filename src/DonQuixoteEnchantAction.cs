@@ -20,22 +20,15 @@ namespace DonQuixote;
 
 /// <summary>
 /// 右键附魔「不可摧毁卡牌」的联网实现。
-///
-/// 为什么不直接用 RitsuLib 的「右键绑定」：那条路径要把点到的模型换成跨端身份令牌
-/// （ModModelIdentityRegistry 的全局自增序号）再让各端解析回来。只要两端的状态有过一次
-/// 细微差异（例如流血触发次数不同导致某个 power 被重新创建），序号就会错位，客户端解析失败后
-/// 会**静默跳过**——主机扣了 30 血宴并附魔，客户端什么都没做，于是触发 StateDivergence 掉线。
-///
-/// 这里改成自己注册一个托管网络动作，载荷只有「谁的牌 + 哪个牌堆 + 堆内序号 + 牌 id」，
-/// 这些信息两端本来就一致，执行时各自按同样的规则重新找到那张牌，
-/// 因此不再依赖任何跨端身份映射。
 /// </summary>
 internal static class DonQuixoteEnchantAction
 {
     private const string DonQuixote_ModuleId = "donquixote";
     private const string DonQuixote_ActionKey = "indestructible_enchant";
 
-    /// <summary>载荷里的牌堆序号只是「提示」，找不到就退回按牌 id 扫描，两端规则一致。</summary>
+    /// <summary>
+    /// 载荷里的牌堆序号只是「提示」，找不到就退回按牌 id 扫描，两端规则一致。
+    /// </summary>
     internal readonly struct DonQuixoteEnchantPayload
     {
         public DonQuixoteEnchantPayload(ulong ownerNetId, string cardEntry, PileType pileType, int index)
@@ -93,7 +86,6 @@ internal static class DonQuixoteEnchantAction
 
     /// <summary>
     /// 请求一次附魔：能走行动队列就走队列（各端都会执行），单机则直接本地结算。
-    /// 返回 false 表示条件不满足、没有做任何事。
     /// </summary>
     public static bool DonQuixote_Request(Player DonQuixote_player, CardModel DonQuixote_card)
     {
@@ -128,8 +120,7 @@ internal static class DonQuixoteEnchantAction
             return true;
         }
 
-        // 只有单机（根本没有 NetService）才允许本地直接结算；
-        // 联机下如果没能入队，就只能放弃，绝不能单端改状态，否则必然数据不同步。
+        // 只有单机（根本没有 NetService）才允许本地直接结算。
         if (RunManager.Instance?.NetService != null)
         {
             DonQuixoteModEntry.DonQuixote_Logger?.Warn(
@@ -185,8 +176,7 @@ internal static class DonQuixoteEnchantAction
     }
 
     /// <summary>
-    /// 两端共用同一份结算逻辑：按「牌堆 + 序号 + 牌 id」重新找到那张牌，再扣血宴、附魔、加消耗血宴总数。
-    /// 任何一步不满足就整体放弃，保证两端要么都做、要么都不做。
+    /// 两端共用同一份结算逻辑：按「牌堆 + 序号 + 牌 id」重新找到那张牌。
     /// </summary>
     private static async Task DonQuixote_Apply(
         PlayerChoiceContext DonQuixote_ctx,
@@ -222,8 +212,6 @@ internal static class DonQuixoteEnchantAction
             CardCmd.Enchant<DonQuixoteIndestructibleCard>(DonQuixote_card, 1m);
 
             // 遗物效果：附魔成功时获得 30 点「消耗血宴总数」。
-            // 必须走 Accumulate 这一支，不能直接 PowerCmd.Apply —— 遗物发货检查挂在那里，
-            // 直接加层数会让「消耗血宴总数满 325 发卡」整条路失效（曾经就是这么漏发的）。
             await DonQuixoteBloodMagic.DonQuixote_AccumulateFeastTotal(
                 DonQuixote_ctx,
                 DonQuixote_player.Creature,

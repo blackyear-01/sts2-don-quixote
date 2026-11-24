@@ -22,7 +22,6 @@ namespace DonQuixote.Cards;
 
 /// <summary>
 /// 令伤口撕裂，令鲜血绽放（决斗宣告的堕落版）：2 费攻击，造成 13 点伤害并施加 2 层伤口破坏，消耗。
-/// 升级后减 1 点耗能。只能由「决斗宣告」腐化而来，不进卡池。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteWoundBloom : ModCardTemplate, IDonQuixoteCorruptedCard
@@ -75,13 +74,14 @@ public sealed class DonQuixoteWoundBloom : ModCardTemplate, IDonQuixoteCorrupted
 }
 
 /// <summary>
-/// 侧耳倾听的故事与激荡的心情：2 费技能，堕落 40，获得 5 层临时强壮、恢复 3 点能量，
-/// 消耗手牌中所有状态牌，每消耗 1 张获得 1 层摇曳【血魔】（升级 10 层强壮、4 点能量）。
+/// 侧耳倾听的故事与激荡的心情：2 费技能。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteListenToStories : ModCardTemplate, IDonQuixoteCorruptible
 {
-    /// <summary>卡面插画（资源\卡牌\侧耳倾听的故事与激荡的心情.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\侧耳倾听的故事与激荡的心情.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/listen_to_stories.png";
 
     public const int DonQuixote_CorruptionThreshold = 40;
@@ -100,8 +100,7 @@ public sealed class DonQuixoteListenToStories : ModCardTemplate, IDonQuixoteCorr
     {
     }
 
-    // 卡面文案里没有「消耗」，所以不加 Exhaust：打出的这张正常进弃牌堆，
-    // 只会消耗手牌里的状态牌。
+    // 卡面文案里没有「消耗」。
     protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
     {
         new DynamicVar("Corruption", 40m),
@@ -160,15 +159,14 @@ public sealed class DonQuixoteListenToStories : ModCardTemplate, IDonQuixoteCorr
 }
 
 /// <summary>
-/// 冒险结束了……（侧耳倾听的堕落版）：3 费攻击，消耗至多 200 点血宴，
-/// 每消耗 1 点使本卡基础伤害 +0.5%；获得剩余血宴 1/2 的摇曳【血魔】；
-/// 造成 26 点伤害，按伤害量的 10% 获得硬血，并把所有状态牌与诅咒牌变成「手足们在呼唤我」。
-/// 升级后造成 2 次伤害。只能由「侧耳倾听」腐化而来，不进卡池（稀有度与母卡同为稀有）。
+/// 冒险结束了……（侧耳倾听的堕落版）：3 费攻击。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteAdventureOver : ModCardTemplate, IDonQuixoteCorruptedCard
 {
-    /// <summary>卡面插画（资源\卡牌\冒险结束了....webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\冒险结束了....webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/adventure_over.png";
 
     public DonQuixoteAdventureOver()
@@ -296,13 +294,14 @@ public sealed class DonQuixoteAdventureOver : ModCardTemplate, IDonQuixoteCorrup
 }
 
 /// <summary>
-/// 手足们在呼唤我（诅咒）：无法主动打出，回合结束时自动打出；
-/// 损失 1 点生命，全场友方单位获得 2 层血宴，随后消耗。
+/// 手足们在呼唤我（诅咒）：无法主动打出，回合结束时自动打出。
 /// </summary>
 [RegisterCard(typeof(CurseCardPool))]
 public sealed class DonQuixoteCallOfKin : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌\手足们在呼唤我.webp）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌\手足们在呼唤我.webp）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/call_of_kin.png";
 
     public DonQuixoteCallOfKin()
@@ -310,11 +309,7 @@ public sealed class DonQuixoteCallOfKin : ModCardTemplate
     {
     }
 
-    // 「不能被打出」+「虚无」：
-    // 游戏在回合结束时会先把这些牌移进打出区（有出牌动画），执行 OnTurnEndInHand，
-    // 再因为「虚无」把它们消耗掉 —— 这就是原版 Regret / Decay 那套「留在手牌里
-    // 回合结束触发」的机制。之前挂在 AfterSideTurnEnd 上不行：那个时候手牌已经被
-    // 收进弃牌堆，Pile.Type != Hand，永远提前 return，所以看起来「没有自动打出」。
+    // 「不能被打出」+「虚无」：游戏在回合结束时会先把这些牌移进打出区（有出牌动画）。
     public override IEnumerable<CardKeyword> CanonicalKeywords => new[]
     {
         CardKeyword.Unplayable,
@@ -327,10 +322,14 @@ public sealed class DonQuixoteCallOfKin : ModCardTemplate
         new DynamicVar("Feast", 10m),
     };
 
-    /// <summary>开启「回合结束时若在手牌中则触发」的原版机制。</summary>
+    /// <summary>
+    /// 开启「回合结束时若在手牌中则触发」的原版机制。
+    /// </summary>
     public override bool HasTurnEndInHandEffect => true;
 
-    /// <summary>由 CombatManager 在回合结束、把牌移进打出区之后调用。</summary>
+    /// <summary>
+    /// 由 CombatManager 在回合结束、把牌移进打出区之后调用。
+    /// </summary>
     protected override async Task OnTurnEndInHand(PlayerChoiceContext DonQuixote_ctx)
     {
         await DonQuixote_Fire(DonQuixote_ctx);
@@ -417,7 +416,7 @@ public sealed class DonQuixoteFatherDeath : ModCardTemplate
 }
 
 /// <summary>
-/// 于镜中无法呈现倒影之人：2 费技能，获得 1 层无实体（升级减 1 点耗能）。不消耗。
+/// 于镜中无法呈现倒影之人：2 费技能，获得 1 层无实体（升级减 1 点耗能）。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteNoReflection : ModCardTemplate
@@ -552,14 +551,14 @@ public sealed class DonQuixoteDuelWithLance : ModCardTemplate, IDonQuixoteBloodF
 }
 
 /// <summary>
-/// 堂吉诃德式硬血 5 式-追踪：1 费攻击，消耗至多 30 点血宴、每 5 点换 1 层硬血，
-/// 造成 15 点伤害并施加 8 级流血；伤害大于 25 回 1 点能量、大于 35 抽 1 张牌，
-/// 击杀目标时对另一名敌人重放 1 次。升级后两个阈值降为 20 / 30。
+/// 堂吉诃德式硬血 5 式-追踪：1 费攻击。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHardBloodTrack : ModCardTemplate
 {
-    /// <summary>卡面插画（资源\卡牌 对应 png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/hard_blood_track.png";
 
     public DonQuixoteHardBloodTrack()
@@ -675,13 +674,14 @@ public sealed class DonQuixoteHardBloodTrack : ModCardTemplate
 }
 
 /// <summary>
-/// 堂吉诃德派硬血奥义-La Sangre：5 费技能，血宴 100，保留；直接击杀目标敌人
-/// （代码杀，绕过免死效果），使用后从牌组中永久移除。升级后固有。
+/// 堂吉诃德派硬血奥义-La Sangre：5 费技能，血宴 100，保留。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteLaSangre : DonQuixoteBloodFeastCard
 {
-    /// <summary>卡面插画（资源\卡牌 对应 png）。</summary>
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
     public override string CustomPortraitPath => "res://DonQuixote/images/cards/la_sangre.png";
 
     public DonQuixoteLaSangre()
@@ -696,8 +696,7 @@ public sealed class DonQuixoteLaSangre : DonQuixoteBloodFeastCard
         new DynamicVar("BloodFeast", 100m),
     };
 
-    // 卡面写明「需消耗 100 点血宴才能打出」，升级前后都一样：
-    // 血宴不足时由 CanPlay 拦截，不能打出。
+    // 卡面写明「需消耗 100 点血宴才能打出」。
     public override int DonQuixote_BloodFeastCost => DonQuixote_Var("BloodFeast");
 
     public override bool DonQuixote_BloodFeastMustPay => true;
@@ -719,18 +718,13 @@ public sealed class DonQuixoteLaSangre : DonQuixoteBloodFeastCard
         await DonQuixote_TriggerBloodFeast(DonQuixote_ctx);
 
         // 参考控制台 "win" 的做法：先把目标身上的能力全部清掉，再走一次真正的 Kill。
-        //
-        // 很多 Boss 的「免死 / 限伤 / 阶段保护」都挂在自己的 Power 上（例如下界亚波伦的
-        // ApocalypticRadiancePower + ApollyonDirectDeathProtection 会 patch 掉
-        // KillWithoutCheckingWinCondition，把任何击杀转成一次小额扣血）。
-        // Power 被移除后，那些 Prefix 查不到 Power 就会直接放行，Kill 才是真击杀。
         if (!DonQuixote_target.IsDead)
         {
             DonQuixote_target.RemoveAllPowersInternalExcept();
             await CreatureCmd.Kill(DonQuixote_target, true);
         }
 
-        // Kill 内部走的是 KillWithoutCheckingWinCondition，胜利判定要自己补一次。
+        // Kill 内部走的是 KillWithoutCheckingWinCondition.
         if (CombatManager.Instance.IsInProgress)
         {
             await CombatManager.Instance.CheckWinCondition();
@@ -739,7 +733,9 @@ public sealed class DonQuixoteLaSangre : DonQuixoteBloodFeastCard
         await DonQuixote_RemoveFromDeck();
     }
 
-    /// <summary>使用后从牌组中永久移除（参考原版 DeprecatedCard 的 DeckVersion 写法）。</summary>
+    /// <summary>
+    /// 使用后从牌组中永久移除（参考原版 DeprecatedCard 的 DeckVersion 写法）。
+    /// </summary>
     private async Task DonQuixote_RemoveFromDeck()
     {
         try

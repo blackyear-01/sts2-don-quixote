@@ -6,9 +6,7 @@ using STS2RitsuLib;
 namespace DonQuixote;
 
 /// <summary>
-/// One-shot diagnostic: tries to load the hand-authored Spine resources so we
-/// can see in godot.log whether JSON skeletons and the .spatlas wrapper are
-/// accepted by the spine-godot runtime.
+/// One-shot diagnostic: tries to load the hand-authored Spine resources so we can see in godot.log whether JSON skeletons and the .spatlas wrapper are accepted by the spine-godot runtime.
 /// </summary>
 internal static class DonQuixoteSpineProbe
 {

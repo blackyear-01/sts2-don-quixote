@@ -8,8 +8,7 @@ using MegaCrit.Sts2.Core.Nodes.Rooms;
 namespace DonQuixote;
 
 /// <summary>
-/// Plays Don Quixote's guard pose when an attack is completely absorbed by
-/// block (the base game would play the regular hit pose there).
+/// Plays Don Quixote's guard pose when an attack is completely absorbed by block (the base game would play the regular hit pose there).
 /// </summary>
 internal static class DonQuixoteCombatPose
 {
@@ -41,8 +40,7 @@ internal static class DonQuixoteCombatPose
         {
             DonQuixote_Node.SpineAnimation.SetAnimation(DonQuixote_DefendAnim, false, 0);
 
-            // 用户手改的 spine 里可能没有 defend 动画，spine 只打日志不抛异常，
-            // 所以这里用当前动画名做一次特性探测，失败后就不再尝试。
+            // 用户手改的 spine 里可能没有 defend 动画。
             string DonQuixote_current = DonQuixote_Node.SpineAnimation.GetCurrentAnimationName(0);
             if (!string.Equals(DonQuixote_current, DonQuixote_DefendAnim, StringComparison.OrdinalIgnoreCase))
             {
@@ -64,8 +62,7 @@ internal static class DonQuixoteCombatPose
     }
 
     /// <summary>
-    /// True when the creature was just fully blocked, in which case the regular
-    /// hit trigger must not overwrite the guard pose.
+    /// True when the creature was just fully blocked, in which case the regular hit trigger must not overwrite the guard pose.
     /// </summary>
     public static bool DonQuixote_IsGuarding(Creature DonQuixote_Creature)
     {
@@ -126,8 +123,7 @@ internal static class DonQuixoteBlockedDamagePatch
 }
 
 /// <summary>
-/// The base game fires the hit trigger for fully blocked attacks; keep the
-/// guard pose instead, and drop the guard on any real hit.
+/// The base game fires the hit trigger for fully blocked attacks.
 /// </summary>
 [HarmonyPatch(typeof(NCreature), nameof(NCreature.SetAnimationTrigger))]
 internal static class DonQuixoteAnimationTriggerPatch

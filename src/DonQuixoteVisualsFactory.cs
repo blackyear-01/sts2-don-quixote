@@ -6,9 +6,7 @@ using STS2RitsuLib;
 namespace DonQuixote;
 
 /// <summary>
-/// Instantiates Don Quixote's combat rig, preferring the hand-authored Spine
-/// scene and falling back to the frame-based Sprite2D scene when the spine
-/// resources cannot be resolved by the runtime.
+/// Instantiates Don Quixote's combat rig, preferring the hand-authored Spine scene and falling back to the frame-based Sprite2D scene when the spine resources cannot be resolved by the runtime.
 /// </summary>
 internal static class DonQuixoteVisualsFactory
 {

@@ -13,10 +13,6 @@ namespace DonQuixote.Acts;
 
 /// <summary>
 /// 折射轨道线的线性地图：先古 → 宝箱 → 商店 → 休息 → Boss。
-///
-/// 这一层不刷普通怪和精英（文档要求），而原版 <see cref="StandardActMap"/> 会强制
-/// 在地图第一行放怪物节点、其余未分配节点也退化成怪物，所以这里不用标准地图，
-/// 照 <c>GoldenPathActMap</c> 的做法手搓一条单列地图。
 /// </summary>
 public sealed class DonQuixoteRefractionRailMap : ActMap
 {
@@ -24,7 +20,9 @@ public sealed class DonQuixoteRefractionRailMap : ActMap
 
     private const int DonQuixote_Middle = 3;
 
-    /// <summary>除先古与 Boss 外的房间：宝箱、商店、休息。</summary>
+    /// <summary>
+    /// 除先古与 Boss 外的房间：宝箱、商店、休息。
+    /// </summary>
     private static readonly MapPointType[] DonQuixote_Rooms =
     {
         MapPointType.Treasure,
@@ -78,15 +76,12 @@ public sealed class DonQuixoteRefractionRailMap : ActMap
 
 /// <summary>
 /// 折射轨道线：第三层「荣耀」结束、进入建筑师之前多出来的一层。
-///
-/// ・美术全部复用「荣耀」：靠 <see cref="DonQuixoteRailActPathPatch"/> 把
-///   <c>ActModel.FilePathIdentifier</c> 改成 glory，休息室背景 / 地图背景 / 战场背景
-///   就都指向荣耀的原始资源，不用额外塞一套图。
-/// ・房间只有宝箱 / 商店 / 休息 + Boss（白月骑士-巴里），先古是参孙。
 /// </summary>
 public sealed class DonQuixoteRefractionRail : ActModel
 {
-    /// <summary>进建筑师的最后一层之后就是它，所以固定排在荣耀（Index 2）后面。</summary>
+    /// <summary>
+    /// 进建筑师的最后一层之后就是它，所以固定排在荣耀（Index 2）后面。
+    /// </summary>
     public override int Index => 3;
 
     public override bool IsDefault => true;

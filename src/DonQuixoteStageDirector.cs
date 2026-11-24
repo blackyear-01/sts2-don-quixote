@@ -17,24 +17,6 @@ namespace DonQuixote;
 
 /// <summary>
 /// 战场舞台：把「幸福笑容如鲜花般绽放之地 / 噩梦的拉曼却领」两张能力卡变成真正的场景演出。
-///
-/// 做法
-/// ----
-/// ・背景：一张铺满全屏的 <see cref="TextureRect"/>，挂到
-///   <c>%CombatSceneContainer</c> 的 1 号位（紧跟原版 BgContainer、排在角色容器之前），
-///   位置计算统一交给 <see cref="DonQuixoteSceneOverlay"/>。只换天幕、不动角色和地面逻辑；
-///   能力结束时淡出销毁，原版背景一直在下面躺着，天然「复原」。
-/// ・帝王蟹（Kaiser Crab）这种「敌怪画在背景里」的场次整段跳过画面（只播音乐），
-///   否则覆盖图会把 BOSS 一起盖掉。
-/// ・音乐：新开一个 <see cref="AudioStreamPlayer"/> 播 ogg（原版音乐走 FMOD，塞不进自定义曲目），
-///   同时把游戏自己的 BGM 音量压到 0（不 StopMusic，避免还原时把 FMOD 事件状态搞乱），
-///   演出结束时把音量设回玩家的设置值。
-///
-/// 多人优先级
-/// ----------
-/// 两端都只根据「已经同步的能力实例」推算当前该放哪一个：按持有者在大厅里的座位号升序，
-/// 同一个人重复打出则后打的优先。主机是 0 号座位，所以谁和主机同时打出都以主机为准，
-/// 而且两端算出来的结果一致，不会出现各端各放一套的错位。
 /// </summary>
 internal static class DonQuixoteStageDirector
 {
@@ -53,8 +35,7 @@ internal static class DonQuixoteStageDirector
     private const double DonQuixote_TickSeconds = 0.4;
 
     /// <summary>
-    /// 覆盖图在原背景层里留的富余（像素）。BgContainer 有 <c>offset_left/right = 23</c>，
-    /// 并不正好落在屏幕中心，铺满时四周各多留一圈才不会露边。
+    /// 覆盖图在原背景层里留的富余（像素）。
     /// </summary>
     private const float DonQuixote_OverlayMargin = 96f;
 
@@ -71,7 +52,9 @@ internal static class DonQuixoteStageDirector
 
     private static long DonQuixote_Counter;
 
-    /// <summary>当前正在展示的舞台；空串表示没有舞台（原版场景）。</summary>
+    /// <summary>
+    /// 当前正在展示的舞台；空串表示没有舞台（原版场景）。
+    /// </summary>
     private static string DonQuixote_Shown = string.Empty;
 
     private static Control? DonQuixote_Overlay;
@@ -87,8 +70,7 @@ internal static class DonQuixoteStageDirector
     private static bool DonQuixote_Watching;
 
     /// <summary>
-    /// 当前覆盖层已经存在了多久（秒）。淡入 tween 万一被打断/丢弃，alpha 会卡在中间，
-    /// watchdog 靠这个计时把最终状态强行补成完全不透明。
+    /// 当前覆盖层已经存在了多久（秒）。
     /// </summary>
     private static double DonQuixote_OverlayAge;
 
@@ -96,7 +78,6 @@ internal static class DonQuixoteStageDirector
 
     /// <summary>
     /// 这一场「有舞台能力、但故意不画覆盖图」（帝王蟹这种敌怪画在背景里的场次）。
-    /// 记下来就不会被 watchdog 每 0.4 秒重新尝试一遍。
     /// </summary>
     private static bool DonQuixote_Suppressed;
 
@@ -104,7 +85,9 @@ internal static class DonQuixoteStageDirector
     // 能力卡调用的入口
     // ------------------------------------------------------------------
 
-    /// <summary>某个舞台能力被挂上了：登记并刷新当前该展示的舞台。</summary>
+    /// <summary>
+    /// 某个舞台能力被挂上了：登记并刷新当前该展示的舞台。
+    /// </summary>
     public static void DonQuixote_Enter(string DonQuixote_Stage, PowerModel DonQuixote_Power)
     {
         try
@@ -127,7 +110,9 @@ internal static class DonQuixoteStageDirector
         }
     }
 
-    /// <summary>某个舞台能力消失了（战斗结束、被驱散）：注销并刷新。</summary>
+    /// <summary>
+    /// 某个舞台能力消失了（战斗结束、被驱散）：注销并刷新。
+    /// </summary>
     public static void DonQuixote_Exit(PowerModel DonQuixote_Power)
     {
         try
@@ -144,7 +129,9 @@ internal static class DonQuixoteStageDirector
         }
     }
 
-    /// <summary>离开战斗：清空登记、淡出舞台、把 BGM 音量还回去。</summary>
+    /// <summary>
+    /// 离开战斗：清空登记、淡出舞台、把 BGM 音量还回去。
+    /// </summary>
     public static void DonQuixote_Reset()
     {
         DonQuixote_Requests.Clear();
@@ -157,7 +144,9 @@ internal static class DonQuixoteStageDirector
         DonQuixoteWhiteMoonBackdrop.DonQuixote_Resume();
     }
 
-    /// <summary>自检探针。</summary>
+    /// <summary>
+    /// 自检探针。
+    /// </summary>
     public static string DonQuixote_Probe()
     {
         return $"stages={DonQuixote_Requests.Count} shown={(string.IsNullOrEmpty(DonQuixote_Shown) ? "none" : DonQuixote_Shown)} "
@@ -165,7 +154,9 @@ internal static class DonQuixoteStageDirector
             + $"ducked={DonQuixote_Ducked} last={DonQuixote_LastNote}";
     }
 
-    /// <summary>启动自检：两张背景、两首曲子、两张卡必须都能取到。</summary>
+    /// <summary>
+    /// 启动自检：两张背景、两首曲子、两张卡必须都能取到。
+    /// </summary>
     public static string DonQuixote_ContentProbe()
     {
         string DonQuixote_happyBg = DonQuixote_HasBackground(DonQuixote_StageHappy);
@@ -206,8 +197,7 @@ internal static class DonQuixoteStageDirector
     }
 
     /// <summary>
-    /// 读 PCK 里的原始 ogg。先试 LoadFromFile（直接读文件），失败再退回
-    /// FileAccess + LoadFromBuffer —— 不同 Godot 小版本对 res:// 内的原始音频文件宽容度不一样。
+    /// 读 PCK 里的原始 ogg。
     /// </summary>
     private static AudioStreamOggVorbis? DonQuixote_LoadOgg(string DonQuixote_Path)
     {
@@ -238,7 +228,9 @@ internal static class DonQuixoteStageDirector
         return null;
     }
 
-    /// <summary>两张舞台卡必须取得到，顺便把费用/稀有度打进日志便于对照文档核对。</summary>
+    /// <summary>
+    /// 两张舞台卡必须取得到，顺便把费用/稀有度打进日志便于对照文档核对。
+    /// </summary>
     private static string DonQuixote_HasCards()
     {
         try
@@ -284,7 +276,9 @@ internal static class DonQuixoteStageDirector
         DonQuixote_Show(DonQuixote_Wanted);
     }
 
-    /// <summary>把已经不在了的能力（被驱散、持有者换场）从登记表里剔掉。</summary>
+    /// <summary>
+    /// 把已经不在了的能力（被驱散、持有者换场）从登记表里剔掉。
+    /// </summary>
     private static void DonQuixote_Prune()
     {
         DonQuixote_Requests.RemoveAll(DonQuixote_IsGone);
@@ -390,8 +384,7 @@ internal static class DonQuixoteStageDirector
     }
 
     /// <summary>
-    /// 兜底：淡入 tween 被打断（节点被换掉、引擎丢 tween 等）时 alpha 会停在中间，
-    /// 看着就像「背景没了」。这里在超过一个淡入时长后直接把不透明度设满。
+    /// 兜底：淡入 tween 被打断（节点被换掉、引擎丢 tween 等）时 alpha 会停在中间。
     /// </summary>
     private static void DonQuixote_EnsureOverlayOpaque()
     {
@@ -409,8 +402,7 @@ internal static class DonQuixoteStageDirector
 
         DonQuixote_OverlayAge += DonQuixote_TickSeconds;
 
-        // 原版背景层偶尔会在战斗中被重建（换 Encounter / 重新 SetUpBackground），
-        // 节点也可能被换掉父级 —— 每轮重新贴一次位置，自愈。
+        // 原版背景层偶尔会在战斗中被重建（换 Encounter / 重新 SetUpBackground）。
         NCombatRoom? DonQuixote_Room = NCombatRoom.Instance;
         if (DonQuixote_Room != null)
         {
@@ -462,8 +454,7 @@ internal static class DonQuixoteStageDirector
         DonQuixote_Shown = DonQuixote_Stage;
         DonQuixote_OverlayAge = 0.0;
 
-        // 帝王蟹这类「敌怪画在背景场景里」的场次：盖住背景等于盖住 BOSS，
-        // 所以整段画面跳过，只保留音乐。
+        // 帝王蟹这类「敌怪画在背景场景里」的场次：盖住背景等于盖住 BOSS。
         if (DonQuixoteSceneOverlay.DonQuixote_BackgroundOwnsEnemies(DonQuixote_Room))
         {
             DonQuixote_Suppressed = true;
@@ -489,9 +480,7 @@ internal static class DonQuixoteStageDirector
             return;
         }
 
-        // 挂到 %CombatSceneContainer 的 1 号位（紧跟原版背景层、排在角色容器之前），
-        // 位置由 DonQuixoteSceneOverlay 统一计算 —— 客机/主机、背景缩放多少都不会压到角色。
-        // **不去改原版背景的 Visible**：原背景一直躺着，最坏情况只是没换成舞台图。
+        // 挂到 %CombatSceneContainer 的 1 号位（紧跟原版背景层、排在角色容器之前）。
         TextureRect DonQuixote_Frame = new TextureRect
         {
             Name = DonQuixote_OverlayName,
@@ -508,8 +497,7 @@ internal static class DonQuixoteStageDirector
             DonQuixote_Frame, DonQuixote_Room, DonQuixoteSceneOverlay.DonQuixote_OrderStage);
         DonQuixoteSceneOverlay.DonQuixote_Fill(DonQuixote_Frame, DonQuixote_Room, DonQuixote_OverlayMargin);
 
-        // 巴里战里白月骑士自己的背景也挂在同一层：舞台卡是完整的一张天幕，
-        // 让它暂时让位，否则两张全屏图叠着、谁在上面全看谁后挂。
+        // 巴里战里白月骑士自己的背景也挂在同一层：舞台卡是完整的一张天幕。
         DonQuixoteWhiteMoonBackdrop.DonQuixote_Suspend();
 
         Tween DonQuixote_Tween = DonQuixote_Frame.CreateTween();
@@ -550,8 +538,7 @@ internal static class DonQuixoteStageDirector
 
         if (DonQuixote_Player != null && GodotObject.IsInstanceValid(DonQuixote_Player))
         {
-            // 音乐用一整个 AudioStreamPlayer 换掉，淡出后直接销毁，不做暂停续播 ——
-            // 两张卡互相顶替时更干净，也不会出现两条曲子叠在一起。
+            // 音乐用一整个 AudioStreamPlayer 换掉，淡出后直接销毁，不做暂停续播。
             Tween DonQuixote_Tween = DonQuixote_Player.CreateTween();
             DonQuixote_Tween.TweenProperty(DonQuixote_Player, "volume_db", -42.0f, DonQuixote_FadeOut);
             DonQuixote_Tween.TweenCallback(Callable.From(() =>
@@ -625,7 +612,9 @@ internal static class DonQuixoteStageDirector
         }
     }
 
-    /// <summary>把游戏自己的 BGM 压低到 0（不是停播）：还原时只要把音量写回去就行。</summary>
+    /// <summary>
+    /// 把游戏自己的 BGM 压低到 0（不是停播）：还原时只要把音量写回去就行。
+    /// </summary>
     private static void DonQuixote_Duck()
     {
         if (DonQuixote_Ducked)
@@ -768,9 +757,7 @@ internal static class DonQuixoteStageDirector
 internal static class DonQuixoteStageCards
 {
     /// <summary>
-    /// 派生一张卡塞进手牌。<paramref name="DonQuixote_Upgrade"/> 为真时直接发升级版
-    /// （遗物的「升级版」写法就是靠它）。返回值表示是否真的发到手，
-    /// 调用方要按结果推进「已经发过几次」的计数，不要先记数后发货。
+    /// 派生一张卡塞进手牌。
     /// </summary>
     public static async Task<bool> DonQuixote_Grant<T>(Player? DonQuixote_Player, bool DonQuixote_Upgrade = false)
         where T : CardModel
@@ -804,8 +791,7 @@ internal static class DonQuixoteStageCards
 
             if (DonQuixote_Upgrade)
             {
-                // 和原版「直接给升级版」一样：先升，再收尾（Finalize 会清掉用于
-                // 显示升级前后差异的临时状态）。
+                // 和原版「直接给升级版」一样：先升。
                 DonQuixote_Card.UpgradeInternal();
                 DonQuixote_Card.FinalizeUpgradeInternal();
             }
@@ -826,15 +812,13 @@ internal static class DonQuixoteStageCards
 }
 
 /// <summary>
-/// 血宴奖励：**消耗血宴总数**每满 325 点，发一张对应的舞台能力卡。
-/// ・血魔的本能      → 幸福笑容如鲜花般绽放之地
-/// ・血魔长老的本能  → 噩梦的拉曼却领（长老优先，两件都在只发长老那张）
-/// 发放次数记在遗物自己的 [SavedProperty] 上：这是会被存档 + 联机同步的字段，
-/// 不会出现「客机重开又发一遍」的情况。
+/// 血宴奖励：消耗血宴总数每满 325 点，发一张对应的舞台能力卡。
 /// </summary>
 internal static class DonQuixoteFeastReward
 {
-    /// <summary>消耗血宴总数的发放门槛（遗物.docx：325 点）。</summary>
+    /// <summary>
+    /// 消耗血宴总数的发放门槛（遗物.docx：325 点）。
+    /// </summary>
     public const int DonQuixote_Threshold = 325;
 
     public static async Task DonQuixote_Check(Creature DonQuixote_creature)
@@ -877,7 +861,6 @@ internal static class DonQuixoteFeastReward
             if (DonQuixote_elder != null)
             {
                 // 长老优先：两件都在时按长老结算，普通那件不再单独发货。
-                // 长老发的仍是「幸福笑容如鲜花般绽放之地」，只是升级版（不是噩梦的拉曼却领）。
                 await DonQuixote_GrantUpTo(
                     DonQuixote_player,
                     DonQuixote_steps,
@@ -906,8 +889,7 @@ internal static class DonQuixoteFeastReward
     }
 
     /// <summary>
-    /// 补发到第 steps 次。先发货、成功之后才把「已发几次」写进遗物 ——
-    /// 反过来会在发货失败（手牌已满、不在战斗里等）时把次数白吃掉，卡就永远不发了。
+    /// 补发到第 steps 次。
     /// </summary>
     private static async Task DonQuixote_GrantUpTo(
         Player DonQuixote_player,

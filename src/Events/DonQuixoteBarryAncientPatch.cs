@@ -10,12 +10,6 @@ namespace DonQuixote.Events;
 
 /// <summary>
 /// 把先古「巴里」塞进荣耀（第三层）的先古池。
-///
-/// 遗物.docx 写的是「巴里只会在荣耀这章生成」。原版荣耀的先古是硬编码的三个
-/// （Nonupeipe / Tanx / Vakuu），没法从数据侧追加，所以只能在两个 getter 上补：
-/// ・<see cref="ActModel.GetUnlockedAncients"/> —— 真正决定这一层能抽到哪些先古；
-/// ・<see cref="Glory.AllAncients"/> —— 图鉴 / 统计用。
-/// 两处都做成「已经包含就不再追加」，避免重复访问时越加越多。
 /// </summary>
 [HarmonyPatch(typeof(Glory), nameof(Glory.GetUnlockedAncients))]
 internal static class DonQuixoteGloryAncientPoolPatch

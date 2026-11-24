@@ -8,15 +8,14 @@ namespace DonQuixote;
 
 /// <summary>
 /// 右键交互：持有「向本能堕落的骑士」时，右键手牌消耗 30 点血宴，为其附魔「不可摧毁卡牌」。
-///
-/// 这里只负责「本地判定 + 发起一次同步行动」，真正的结算在 <see cref="DonQuixoteEnchantAction"/> 里，
-/// 由各端的行动队列各自执行，因此不会出现「只有主机生效」的情况。
 /// </summary>
 internal static class DonQuixoteRightClick
 {
     public const int DonQuixote_EnchantCost = 30;
 
-    /// <summary>优先级高于 RitsuLib 内置的右键同步处理器（int.MinValue），由我们自己接管这次右键。</summary>
+    /// <summary>
+    /// 优先级高于 RitsuLib 内置的右键同步处理器（int.MinValue）。
+    /// </summary>
     private sealed class DonQuixoteEnchantHandler : IModRightClickHandler
     {
         public int Priority => 1000;
@@ -61,7 +60,7 @@ internal static class DonQuixoteRightClick
             return false;
         }
 
-        // 只有玩家完全掌控回合（CombatPlayPhaseOnly）时才能入队，否则这次右键直接忽略。
+        // 只有玩家完全掌控回合（CombatPlayPhaseOnly）时才能入队。
         MegaCrit.Sts2.Core.Runs.RunManager DonQuixote_run = MegaCrit.Sts2.Core.Runs.RunManager.Instance;
         if (DonQuixote_run == null)
         {

@@ -8,15 +8,6 @@ namespace DonQuixote;
 
 /// <summary>
 /// 「飞天而奔月」的堕落牌费用折扣。
-///
-/// 一开始是把折扣写进每张堕落牌的 <c>CanonicalEnergyCost</c> 覆写里，但那个值只在
-/// 卡牌实例创建（CardEnergyCost 构造）时被读一次，之后玩家再打出第一张堕落牌拿到
-/// 折扣，手里那些牌的费用不会重新计算 —— 看起来就是「遗物效果没触发」。
-///
-/// 改成挂在原版的费用钩子上：只要这张堕落牌本场战斗里已经被打出过（见
-/// <see cref="DonQuixoteMoonFlightState"/>），就把它的费用减 1。这个钩子每次计算
-/// 费用都会跑，所以手牌/抽牌堆里的牌立刻跟着变，而且折扣只落在真正打出过的那些
-/// 牌上，没打过的堕落牌价格不变。
 /// </summary>
 [HarmonyPatch(typeof(Hook), nameof(Hook.ModifyEnergyCostInCombat))]
 internal static class DonQuixoteCorruptedCostPatch

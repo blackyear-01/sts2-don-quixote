@@ -8,16 +8,6 @@ namespace DonQuixote;
 
 /// <summary>
 /// 白月骑士的「挨打反应」：用两段贴图区分「真的掉血」和「被格挡吃干净」。
-///
-/// 原版伤害结算在 <c>CreatureCmd.Damage</c> 里逐目标依次做：
-/// <c>DamageBlockInternal</c>（扣格挡）→ <c>LoseHpInternal</c>（扣血）。
-/// 两个都是同步方法，所以在 Block 的后缀里记下「这次挡了多少」，
-/// 在 LoseHp 的后缀里一次性判定：
-/// ・UnblockedDamage &gt; 0  → 受伤（掉了血）
-/// ・否则刚挡过伤害      → 防御（打铁）
-///
-/// 用后缀而不是重写 <c>CreatureCmd.Damage</c>，是因为它是 async，
-/// Harmony 的 async 后缀要额外接管 Task 续体，容易在联机下乱序。
 /// </summary>
 internal static class DonQuixoteWhiteMoonReactions
 {
@@ -25,7 +15,9 @@ internal static class DonQuixoteWhiteMoonReactions
 
     private static int DonQuixote_PendingBlocked;
 
-    /// <summary>DamageBlockInternal 后缀：记录这一下被格挡吸收的量（只关心白月骑士）。</summary>
+    /// <summary>
+    /// DamageBlockInternal 后缀：记录这一下被格挡吸收的量（只关心白月骑士）。
+    /// </summary>
     public static void DonQuixote_NoteBlocked(Creature DonQuixote_Target, decimal DonQuixote_Blocked)
     {
         if (DonQuixote_Target == null || DonQuixote_Blocked <= 0m)
@@ -42,7 +34,9 @@ internal static class DonQuixoteWhiteMoonReactions
         DonQuixote_PendingBlocked = (int)DonQuixote_Blocked;
     }
 
-    /// <summary>LoseHpInternal 后缀：按有没有真掉血决定播哪张图。</summary>
+    /// <summary>
+    /// LoseHpInternal 后缀：按有没有真掉血决定播哪张图。
+    /// </summary>
     public static void DonQuixote_NoteHpLoss(Creature DonQuixote_Target, DamageResult DonQuixote_Result)
     {
         if (DonQuixote_Target == null || DonQuixote_Result == null)
@@ -92,7 +86,9 @@ internal static class DonQuixoteWhiteMoonReactions
     }
 }
 
-/// <summary>扣格挡的后缀：只记录，不改结算。</summary>
+/// <summary>
+/// 扣格挡的后缀：只记录，不改结算。
+/// </summary>
 [HarmonyPatch(typeof(Creature), nameof(Creature.DamageBlockInternal))]
 internal static class DonQuixoteWhiteMoonBlockPatch
 {
@@ -102,7 +98,9 @@ internal static class DonQuixoteWhiteMoonBlockPatch
     }
 }
 
-/// <summary>扣血的后缀：判定受伤 / 防御。</summary>
+/// <summary>
+/// 扣血的后缀：判定受伤 / 防御。
+/// </summary>
 [HarmonyPatch(typeof(Creature), nameof(Creature.LoseHpInternal))]
 internal static class DonQuixoteWhiteMoonHpLossPatch
 {
@@ -113,16 +111,14 @@ internal static class DonQuixoteWhiteMoonHpLossPatch
 }
 
 /// <summary>
-/// 意图刷新时（玩家回合开始就会刷）：只要下一手是「意图3」，
-/// 就把拉弓动作放到瞄准帧并一直端着，直到这手打完再播射击。
-///
-/// 意图3 期间挨打也不再切受伤/防御图（见 <see cref="DonQuixoteWhiteMoonPose"/> 的
-/// <c>DonQuixote_OathInProgress</c> 判定），所以这一整套拉弓一定完整播完。
+/// 意图刷新时（玩家回合开始就会刷）：只要下一手是「意图3」。
 /// </summary>
 [HarmonyPatch(typeof(NCreature), nameof(NCreature.UpdateIntent))]
 internal static class DonQuixoteWhiteMoonIntentPatch
 {
-    /// <summary>和 <c>DonQuixoteWhiteMoonKnight.DonQuixote_MoveOath</c> 保持一致。</summary>
+    /// <summary>
+    /// 和 DonQuixoteWhiteMoonKnight.DonQuixote_MoveOath 保持一致。
+    /// </summary>
     private const string DonQuixote_OathStateId = "WHITE_MOON_OATH";
 
     private static void Postfix(NCreature __instance)

@@ -8,9 +8,7 @@ using MegaCrit.Sts2.Core.Models;
 namespace DonQuixote.Acts;
 
 /// <summary>
-/// 启动自检：确认「折射轨道线」真的挂进了原版的章节列表，
-/// 并且它的 Boss 遭遇、先古、自定义地图都能取到。
-/// 日志里搜 <c>selftest rail</c> 即可。
+/// 启动自检：确认「折射轨道线」真的挂进了原版的章节列表。
 /// </summary>
 internal static class DonQuixoteRefractionRailProbe
 {
@@ -26,9 +24,7 @@ internal static class DonQuixoteRefractionRailProbe
             var DonQuixote_acts = ModelDb.Acts.ToList();
             DonQuixote_sb.Append(" acts=").Append(DonQuixote_acts.Count);
 
-            // 我们**刻意不**出现在 ModelDb.Acts 里：那张表是全局的，塞进去会让
-            // 每一局都变 4 幕，其它第四幕 mod（goety 等）就会认为位置被占而卡死。
-            // 只在本局抽签结果（ActModel.GetRandomList）末尾追加，所以这里应为 clean。
+            // 我们刻意不出现在 ModelDb.Acts 里：那张表是全局的。
             bool DonQuixote_present = DonQuixote_acts.Any(DonQuixote_a =>
                 ReferenceEquals(DonQuixote_a, DonQuixote_rail));
             DonQuixote_sb.Append(" globalList=").Append(DonQuixote_present ? "polluted" : "clean");
@@ -49,9 +45,7 @@ internal static class DonQuixoteRefractionRailProbe
             bool DonQuixote_barry = ModelDb.AncientEvent<Events.DonQuixoteAncientBarry>() != null;
             DonQuixote_sb.Append(" barry=").Append(DonQuixote_barry ? "ok" : "missing");
 
-            // 先古事件背景：EventModel.CreateBackgroundScene 走
-            // res://scenes/events/background_scenes/<entry>.tscn，场景里再引贴图。
-            // 这两处曾经缺过文件、也引错过图（引成白月骑士的战斗背景），所以每次启动都核一遍。
+            // 先古事件背景：EventModel.CreateBackgroundScene 走 res://scenes/events/background_scenes/<entry>.tscn.
             DonQuixote_sb.Append(" ancientbg=").Append(DonQuixote_AncientBg());
 
             // 白月骑士：两个白月状态是否注册 + 逐帧贴图是否齐全。
@@ -62,14 +56,15 @@ internal static class DonQuixoteRefractionRailProbe
             DonQuixote_sb.Append(" failed=").Append(DonQuixote_Exception.Message);
         }
 
-        // 第四层是 index 3，原版 TreasureRoom 的构造函数硬校验 actIndex<=2，
-        // 曾经导致点宝箱节点直接黑屏。这里每次启动都试构造一次，确认放行补丁生效。
+        // 第四层是 index 3。
         DonQuixote_sb.Append(" treasure3=").Append(DonQuixote_TreasureRoomOk() ? "ok" : "blocked");
 
         return DonQuixote_sb.ToString();
     }
 
-    /// <summary>第四层（actIndex=3）的宝箱房现在能否构造。false 说明放行补丁没挂上。</summary>
+    /// <summary>
+    /// 第四层（actIndex=3）的宝箱房现在能否构造。
+    /// </summary>
     private static bool DonQuixote_TreasureRoomOk()
     {
         try
@@ -83,7 +78,9 @@ internal static class DonQuixoteRefractionRailProbe
         }
     }
 
-    /// <summary>两个先古的背景场景 + 贴图是否都在（2/2 表示场景与图都存在）。</summary>
+    /// <summary>
+    /// 两个先古的背景场景 + 贴图是否都在（2/2 表示场景与图都存在）。
+    /// </summary>
     private static string DonQuixote_AncientBg()    {
         var DonQuixote_pairs = new[]
         {
@@ -122,9 +119,7 @@ internal static class DonQuixoteRefractionRailProbe
     }
 
     /// <summary>
-    /// 白月骑士的战斗资源自检：
-    /// <c>duel=ok glory=ok frames=20/20</c> 表示两个白月状态注册成功、
-    /// 逐帧贴图（闲置/受伤/防御/4 帧挥砍/16 帧拉弓）全部在 PCK 里。
+    /// 白月骑士的战斗资源自检：duel=ok glory=ok frames=20/20 表示两个白月状态注册成功、逐帧贴图（闲置/受伤/防御/4 帧挥砍/16 帧拉弓）全部在 PCK 里。
     /// </summary>
     private static string DonQuixote_WhiteMoon()
     {
@@ -163,7 +158,6 @@ internal static class DonQuixoteRefractionRailProbe
         DonQuixote_sb.Append(" frames=").Append(DonQuixote_ok).Append('/').Append(DonQuixote_paths.Count);
 
         // 骨架（死亡图 / 全部姿势已经走 spine，帧图只在骨架加载失败时兜底）。
-        // 只查存在性、不实例化：Vulkan 下实例化 Spine 会申请大块缓冲。
         var DonQuixote_spine = new List<string>
         {
             "res://DonQuixote/animations/barry_skel_data.tres",
