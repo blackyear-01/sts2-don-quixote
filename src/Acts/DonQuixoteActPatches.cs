@@ -32,6 +32,11 @@ internal static class DonQuixoteActListPatch
     {
         try
         {
+            if (!DonQuixoteSettingsPage.DonQuixote_RailEnabled)
+            {
+                return;
+            }
+
             if (__result is not List<ActModel> DonQuixote_List)
             {
                 return;
@@ -116,6 +121,11 @@ internal static class DonQuixoteRailDeferPatch
     {
         try
         {
+            if (!DonQuixoteSettingsPage.DonQuixote_RailEnabled)
+            {
+                return;
+            }
+
             int actIndex = __args != null && __args.Length > 0 && __args[0] is int DonQuixote_Index
                 ? DonQuixote_Index
                 : -1;

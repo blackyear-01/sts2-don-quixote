@@ -25,6 +25,9 @@ public static class DonQuixoteModEntry
         // 自定义关键词必须在卡牌实例创建之前注册（卡牌构造期会 AddKeyword）。
         DonQuixoteKeywords.DonQuixote_Register();
 
+        // 设置页要在补丁安装前注册，act 列表补丁会实时读取其中的开关。
+        DonQuixoteSettingsPage.DonQuixote_Register();
+
         ModTypeDiscoveryHub.RegisterModAssembly(DonQuixote_ModId, DonQuixote_Assembly);
 
         RitsuLibFramework.EnsureGodotScriptsRegistered(DonQuixote_Assembly, DonQuixote_Logger);
