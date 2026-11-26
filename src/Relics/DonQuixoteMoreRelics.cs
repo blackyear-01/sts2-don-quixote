@@ -249,7 +249,7 @@ public sealed class DonQuixoteMoonFlight : ModRelicTemplate
 }
 
 /// <summary>
-/// 胜利之证（先古）：战斗开始时获得 5 点力量；击杀流血强度大于 10 的敌人后，下回合获得 2 层力量。
+/// 胜利之证（稀有）：战斗开始时获得 5 点力量；击杀流血强度大于 10 的敌人后，下回合获得 2 层力量。
 /// </summary>
 [RegisterRelic(typeof(DonQuixoteRelicPool))]
 public sealed class DonQuixoteProofOfVictory : ModRelicTemplate
@@ -260,7 +260,7 @@ public sealed class DonQuixoteProofOfVictory : ModRelicTemplate
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     public bool DonQuixote_pendingStrength { get; set; }
 
-    public override RelicRarity Rarity => RelicRarity.Ancient;
+    public override RelicRarity Rarity => RelicRarity.Rare;
 
     public override string CustomIconPath => "res://DonQuixote/images/relics/victory_icon.png";
 
