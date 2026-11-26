@@ -37,9 +37,9 @@ internal static class DonQuixoteWhiteMoonReactions
     /// <summary>
     /// LoseHpInternal 后缀：按有没有真掉血决定播哪张图。
     /// </summary>
-    public static void DonQuixote_NoteHpLoss(Creature DonQuixote_Target, DamageResult DonQuixote_Result)
+    public static void DonQuixote_NoteHpLoss(Creature DonQuixote_Target, HpLossResult DonQuixote_Result)
     {
-        if (DonQuixote_Target == null || DonQuixote_Result == null)
+        if (DonQuixote_Target == null)
         {
             return;
         }
@@ -60,10 +60,10 @@ internal static class DonQuixoteWhiteMoonReactions
 
         try
         {
-            if (DonQuixote_Result.UnblockedDamage > 0)
+            if (DonQuixote_Result.hpLost > 0)
             {
                 DonQuixoteWhiteMoonPose.DonQuixote_PlayHurt(DonQuixote_Target);
-                DonQuixote_Log($"hurt unblocked={DonQuixote_Result.UnblockedDamage} blocked={DonQuixote_Blocked}");
+                DonQuixote_Log($"hurt unblocked={DonQuixote_Result.hpLost} blocked={DonQuixote_Blocked}");
                 return;
             }
 
@@ -104,7 +104,7 @@ internal static class DonQuixoteWhiteMoonBlockPatch
 [HarmonyPatch(typeof(Creature), nameof(Creature.LoseHpInternal))]
 internal static class DonQuixoteWhiteMoonHpLossPatch
 {
-    private static void Postfix(Creature __instance, DamageResult __result)
+    private static void Postfix(Creature __instance, HpLossResult __result)
     {
         DonQuixoteWhiteMoonReactions.DonQuixote_NoteHpLoss(__instance, __result);
     }

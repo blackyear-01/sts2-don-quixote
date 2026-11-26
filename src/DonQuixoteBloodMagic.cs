@@ -314,8 +314,53 @@ internal static class DonQuixoteBloodMagic
     }
 
     /// <summary>
-    /// 每消耗 1 点硬血，消耗硬血的牌基础伤害 +2。
+    /// 血铸一次的硬血结算结果。<see cref="DonQuixote_Paid"/> 是「额外伤害」要用的层数，
+    /// <see cref="DonQuixote_Tripled"/> 表示这次踩到了「光荣的决斗」的翻三倍。
     /// </summary>
+    public readonly struct DonQuixoteForgeSpend
+    {
+        public int DonQuixote_Paid { get; init; }
+
+        public bool DonQuixote_Tripled { get; init; }
+    }
+
+    /// <summary>
+    /// 血铸 X 的硬血部分：消耗至多 X 点硬血，返回实际结算的点数（硬血不够时按持有的算）。
+    /// </summary>
+    public static async Task<DonQuixoteForgeSpend> DonQuixote_SpendHardBloodForForge(
+        PlayerChoiceContext DonQuixote_ctx,
+        Creature DonQuixote_target,
+        int DonQuixote_forge)
+    {
+        if (DonQuixote_target == null || DonQuixote_forge <= 0)
+        {
+            return default;
+        }
+
+        // 光荣的决斗：每场第一次血铸不扣硬血，但仍按满额（含额外部分）结算并翻三倍。
+        if (Relics.DonQuixoteGloriousDuel.DonQuixote_TrySpare(DonQuixote_target, DonQuixote_forge))
+        {
+            return new DonQuixoteForgeSpend
+            {
+                DonQuixote_Paid = DonQuixote_forge,
+                DonQuixote_Tripled = true,
+            };
+        }
+
+        DonQuixotePowerHardBlood DonQuixote_hard = DonQuixote_Find<DonQuixotePowerHardBlood>(DonQuixote_target);
+        int DonQuixote_have = DonQuixote_hard?.Amount ?? 0;
+        int DonQuixote_paid = DonQuixote_have > DonQuixote_forge ? DonQuixote_forge : DonQuixote_have;
+        if (DonQuixote_paid <= 0)
+        {
+            return default;
+        }
+
+        await PowerCmd.ModifyAmount(
+            DonQuixote_ctx, DonQuixote_hard, -DonQuixote_paid, DonQuixote_target, (CardModel)null, false);
+
+        return new DonQuixoteForgeSpend { DonQuixote_Paid = DonQuixote_paid };
+    }
+
     public const decimal DonQuixote_HardBloodDamagePerPoint = 2m;
 
     /// <summary>

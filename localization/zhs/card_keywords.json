@@ -1,10 +1,10 @@
 {
   "DON_QUIXOTE_KEYWORD_BLOOD_FORGE.title": "血铸 X",
-  "DON_QUIXOTE_KEYWORD_BLOOD_FORGE.description": "打出这张牌时消耗 X 点[gold]硬血[/gold]，[gold]硬血[/gold]不足时仍可打出。\n每场战斗你第一次血铸时，将「骑士长枪」加入你的手牌；为「骑士长枪」和「饱食鲜血的长枪」增加额外 X 点伤害。\n若[gold]硬血[/gold]不足，则按实际消耗的每 1 点[gold]硬血[/gold]增加额外 1 点伤害。",
+  "DON_QUIXOTE_KEYWORD_BLOOD_FORGE.description": "打出这张牌时消耗 X 点[gold]硬血[/gold]，[gold]硬血[/gold]不足时仍可打出。\n每场战斗你第一次血铸时，将「骑士长枪」加入你的手牌；为「骑士长枪」和「饱食鲜血的长枪」增加额外 X 点伤害。\n若消耗了[gold]硬血[/gold]，每消耗 1 点再额外增加 1 点伤害。",
   "DON_QUIXOTE_KEYWORD_TECHNIQUE.title": "技巧 X",
-  "DON_QUIXOTE_KEYWORD_TECHNIQUE.description": "每场战斗你第一次技巧时，将「骑士长枪」加入你的手牌；为「骑士长枪」和「饱食鲜血的长枪」增加 X 段攻击。",
+  "DON_QUIXOTE_KEYWORD_TECHNIQUE.description": "每场战斗你第一次技巧时，将「骑士长枪」加入你的手牌；为「骑士长枪」和「饱食鲜血的长枪」增加 X 段攻击，为「饱食鲜血的长枪」施加[red]流血[/red]时额外施加 X 级。",
   "DON_QUIXOTE_KEYWORD_AMPLIFY.title": "增幅 X",
-  "DON_QUIXOTE_KEYWORD_AMPLIFY.description": "每场战斗你第一次增幅时，将「骑士长枪」加入你的手牌；为「骑士长枪」增加 X 层[gold]血铠[/gold]与 X 层[gold]摇曳【血魔】[/gold]，为「饱食鲜血的长枪」增加 X 次[red]流血[/red]触发次数。",
+  "DON_QUIXOTE_KEYWORD_AMPLIFY.description": "每场战斗你第一次增幅时，将「骑士长枪」加入你的手牌；为「骑士长枪」增加 X 层[gold]血铠[/gold]与 X 层[gold]摇曳【血魔】[/gold]，为「饱食鲜血的长枪」增加 X 次[red]流血[/red]触发次数、施加[red]流血[/red]强度增加 X 级。",
   "DON_QUIXOTE_KEYWORD_KNIGHT.title": "骑士",
   "DON_QUIXOTE_KEYWORD_KNIGHT.description": "对有[gold]决斗对象[/gold]的敌人造成的伤害+50%。"
 }

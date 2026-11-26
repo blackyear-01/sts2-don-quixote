@@ -263,6 +263,7 @@ public sealed class DonQuixoteHope : ModCardTemplate, IDonQuixoteCorruptedCard
 
     protected override void OnUpgrade()
     {
+        DynamicVars["Hope"].UpgradeValueBy(1m);
         AddKeyword(CardKeyword.Retain);
     }
 }
@@ -285,12 +286,12 @@ public sealed class DonQuixoteAbandonAll : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
     {
-        new DynamicVar("Wavering", 1m),
+        new DynamicVar("Wavering", 2m),
     };
 
     protected override void OnUpgrade()
     {
-        DynamicVars["Wavering"].UpgradeValueBy(1m);
+        DynamicVars["Wavering"].UpgradeValueBy(2m);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
@@ -492,7 +493,7 @@ public sealed class DonQuixoteAdventureSight : DonQuixoteBloodFeastCard, IDonQui
 }
 
 /// <summary>
-/// 朦胧的回忆（勇敢骑士的决心的堕落版）：2 费攻击。
+/// 朦胧的回忆（冒险的见闻的堕落版）：2 费攻击。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHazyMemory : ModCardTemplate, IDonQuixoteCorruptedCard

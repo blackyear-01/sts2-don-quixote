@@ -26,7 +26,7 @@
   "DON_QUIXOTE_POWER_BLOOD_ARMOR.title": "血铠",
   "DON_QUIXOTE_POWER_BLOOD_ARMOR.description": "为下一回合保留至多等量护甲，回合结束时层数-1。",
   "DON_QUIXOTE_POWER_BLOOD_THORNS.title": "血编的荆棘",
-  "DON_QUIXOTE_POWER_BLOOD_THORNS.description": "受到导致失去生命的攻击时，对攻击者施加3X级[red]流血[/red]强度，并失去1层层数。",
+  "DON_QUIXOTE_POWER_BLOOD_THORNS.description": "受到攻击时，对攻击者施加5X级[red]流血[/red]强度并触发X次[red]流血[/red]，然后失去1层层数。",
   "DON_QUIXOTE_POWER_CLOTTING_BLOOD.title": "正在凝固的血",
   "DON_QUIXOTE_POWER_CLOTTING_BLOOD.description": "使目标无法行动，持续等量回合（不受[gold]人工制品[/gold]影响）。",
   "DON_QUIXOTE_POWER_RESPONSIBILITY.title": "责任感",

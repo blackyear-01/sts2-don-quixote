@@ -109,9 +109,11 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
 
             await PowerCmd.Apply<DonQuixotePowerBloodArmor>(
                 DonQuixote_ctx, DonQuixote_ally, DonQuixote_armor, DonQuixote_owner, this, false);
-        }
 
-        await DonQuixoteBloodMagic.DonQuixote_GainWavering(DonQuixote_ctx, DonQuixote_owner, DonQuixote_wavering, this);
+            // 文档：为全体队友施加 3 层摇曳【血魔】（增幅再加）。
+            await DonQuixoteBloodMagic.DonQuixote_GainWavering(
+                DonQuixote_ctx, DonQuixote_ally, DonQuixote_wavering, this);
+        }
     }
 }
 
@@ -145,6 +147,7 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
         new DynamicVar("BloodFeast", 1m),
         new DynamicVar("Hits", 1m),
         new DynamicVar("Triggers", 1m),
+        new DynamicVar("Bleed", 1m),
     };
 
     public override int DonQuixote_BloodFeastCost => DonQuixote_Var("BloodFeast");
@@ -193,6 +196,10 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
         }
 
         int DonQuixote_triggers = 1 + DonQuixoteLance.DonQuixote_AmplifyBonus(DonQuixote_owner);
+        // 基础 1 级流血；技巧、增幅各再加 X 级。
+        int DonQuixote_bleed =
+            1 + DonQuixoteLance.DonQuixote_TechniqueBonus(DonQuixote_owner)
+              + DonQuixoteLance.DonQuixote_AmplifyBonus(DonQuixote_owner);
 
         foreach (Creature DonQuixote_target in DonQuixote_targets)
         {
@@ -210,6 +217,12 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
 
                 await CreatureCmd.Damage(
                     DonQuixote_ctx, DonQuixote_target, DonQuixote_damage, ValueProp.Move, DonQuixote_owner, this, DonQuixote_play);
+            }
+
+            if (!DonQuixote_target.IsDead && DonQuixote_bleed > 0)
+            {
+                await DonQuixoteBloodMagic.DonQuixote_ApplyBleed(
+                    DonQuixote_ctx, DonQuixote_target, DonQuixote_owner, this, DonQuixote_bleed, 0);
             }
 
             for (int DonQuixote_t = 0; DonQuixote_t < DonQuixote_triggers && DonQuixote_feastPaid; DonQuixote_t++)
@@ -245,13 +258,13 @@ public sealed class DonQuixoteCondenseBlood : ModCardTemplate, IDonQuixoteBloodF
 
     protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
     {
-        new DynamicVar("Bleed", 6m),
-        new DynamicVar("Forge", 3m),
+        new DynamicVar("Bleed", 8m),
+        new DynamicVar("Forge", 2m),
     };
 
     protected override void OnUpgrade()
     {
-        DynamicVars["Forge"].UpgradeValueBy(3m);
+        DynamicVars["Forge"].UpgradeValueBy(2m);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
@@ -264,10 +277,8 @@ public sealed class DonQuixoteCondenseBlood : ModCardTemplate, IDonQuixoteBloodF
         await DonQuixoteBloodMagic.DonQuixote_ApplyBleed(
             DonQuixote_ctx, Owner.Creature, Owner.Creature, this, DynamicVars["Bleed"].IntValue, 0);
 
-        int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
-            DonQuixote_ctx, Owner.Creature, DynamicVars["Forge"].IntValue, true);
-        await DonQuixoteLance.DonQuixote_Forge(
-            DonQuixote_ctx, Owner, DonQuixote_forgeSpent, this);
+        await DonQuixoteLance.DonQuixote_ForgeFromCard(
+            DonQuixote_ctx, Owner, DynamicVars["Forge"].IntValue, this);
     }
 }
 
@@ -372,7 +383,7 @@ public sealed class DonQuixoteKnightlyProtection : ModCardTemplate, IDonQuixoteC
 
     protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
     {
-        new DynamicVar("Forge", 3m),
+        new DynamicVar("Forge", 2m),
         new DynamicVar("Technique", 2m),
         new DynamicVar("Amplify", 5m),
         new DynamicVar("Corruption", 40m),
@@ -380,7 +391,7 @@ public sealed class DonQuixoteKnightlyProtection : ModCardTemplate, IDonQuixoteC
 
     protected override void OnUpgrade()
     {
-        DynamicVars["Forge"].UpgradeValueBy(2m);
+        DynamicVars["Forge"].UpgradeValueBy(1m);
         DynamicVars["Amplify"].UpgradeValueBy(5m);
     }
 
@@ -394,10 +405,8 @@ public sealed class DonQuixoteKnightlyProtection : ModCardTemplate, IDonQuixoteC
         // 「重放 1」必须先挂上。
         await PowerCmd.Apply<DonQuixotePowerKnightProtection>(DonQuixote_ctx, Owner.Creature, 1m, Owner.Creature, this, false);
 
-        int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
-            DonQuixote_ctx, Owner.Creature, DynamicVars["Forge"].IntValue, true);
-        await DonQuixoteLance.DonQuixote_Forge(
-            DonQuixote_ctx, Owner, DonQuixote_forgeSpent, this);
+        await DonQuixoteLance.DonQuixote_ForgeFromCard(
+            DonQuixote_ctx, Owner, DynamicVars["Forge"].IntValue, this);
         await DonQuixoteLance.DonQuixote_Technique(DonQuixote_ctx, Owner, DynamicVars["Technique"].IntValue, this);
         await DonQuixoteLance.DonQuixote_Amplify(DonQuixote_ctx, Owner, DynamicVars["Amplify"].IntValue, this);
 
@@ -433,14 +442,14 @@ public sealed class DonQuixoteBloodSweep : ModCardTemplate, IDonQuixoteCorrupted
 
     protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
     {
-        new DynamicVar("Forge", 2m),
+        new DynamicVar("Forge", 1m),
         new DynamicVar("Technique", 3m),
         new DynamicVar("Amplify", 1m),
     };
 
     protected override void OnUpgrade()
     {
-        DynamicVars["Forge"].UpgradeValueBy(3m);
+        DynamicVars["Forge"].UpgradeValueBy(2m);
         DynamicVars["Amplify"].UpgradeValueBy(1m);
     }
 
@@ -451,10 +460,8 @@ public sealed class DonQuixoteBloodSweep : ModCardTemplate, IDonQuixoteCorrupted
             return;
         }
 
-        int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
-            DonQuixote_ctx, Owner.Creature, DynamicVars["Forge"].IntValue, true);
-        await DonQuixoteLance.DonQuixote_Forge(
-            DonQuixote_ctx, Owner, DonQuixote_forgeSpent, this);
+        await DonQuixoteLance.DonQuixote_ForgeFromCard(
+            DonQuixote_ctx, Owner, DynamicVars["Forge"].IntValue, this);
         await DonQuixoteLance.DonQuixote_Technique(DonQuixote_ctx, Owner, DynamicVars["Technique"].IntValue, this);
         await DonQuixoteLance.DonQuixote_Amplify(DonQuixote_ctx, Owner, DynamicVars["Amplify"].IntValue, this);
         await PowerCmd.Apply<DonQuixotePowerBloodSweep>(DonQuixote_ctx, Owner.Creature, 1m, Owner.Creature, this, false);
@@ -462,7 +469,7 @@ public sealed class DonQuixoteBloodSweep : ModCardTemplate, IDonQuixoteCorrupted
 }
 
 /// <summary>
-/// 鲜血重铸：2 费能力，每消耗 30 点血宴获得 3 点硬血（升级固有）。
+/// 鲜血重铸：2 费能力，每消耗 6 点硬血血铸 1 次（升级减 1 费，并额外增幅 1）。
 /// </summary>
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodRecast : ModCardTemplate
@@ -474,7 +481,7 @@ public sealed class DonQuixoteBloodRecast : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        AddKeyword(CardKeyword.Innate);
+        EnergyCost.UpgradeBy(-1);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext DonQuixote_ctx, CardPlay DonQuixote_play)
@@ -485,6 +492,12 @@ public sealed class DonQuixoteBloodRecast : ModCardTemplate
         }
 
         await PowerCmd.Apply<DonQuixotePowerBloodRecast>(DonQuixote_ctx, Owner.Creature, 1m, Owner.Creature, this, false);
+
+        if (IsUpgraded)
+        {
+            DonQuixoteBloodMagic.DonQuixote_Find<DonQuixotePowerBloodRecast>(Owner.Creature)
+                ?.DonQuixote_Amplified = true;
+        }
     }
 }
 

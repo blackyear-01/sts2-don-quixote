@@ -74,7 +74,7 @@ public sealed class DonQuixoteSanchoFollower : ModRelicTemplate
 }
 
 /// <summary>
-/// 二代眷属-杜尔西内亚：战斗开始时获得 15 点血编的荆棘。
+/// 二代眷属-杜尔西内亚：战斗开始时获得 4 点血编的荆棘。
 /// </summary>
 [RegisterRelic(typeof(DonQuixoteRelicPool))]
 public sealed class DonQuixoteDulcinea : ModRelicTemplate
@@ -95,7 +95,7 @@ public sealed class DonQuixoteDulcinea : ModRelicTemplate
         }
 
         await PowerCmd.Apply<DonQuixotePowerBloodThorns>(
-            new BlockingPlayerChoiceContext(), Owner.Creature, 15m, Owner.Creature, null, false);
+            new BlockingPlayerChoiceContext(), Owner.Creature, 4m, Owner.Creature, null, false);
     }
 }
 
@@ -249,7 +249,7 @@ public sealed class DonQuixoteMoonFlight : ModRelicTemplate
 }
 
 /// <summary>
-/// 胜利之证（罕见）：击杀流血强度大于 10 的敌人后，下回合获得 2 层力量。
+/// 胜利之证（先古）：战斗开始时获得 5 点力量；击杀流血强度大于 10 的敌人后，下回合获得 2 层力量。
 /// </summary>
 [RegisterRelic(typeof(DonQuixoteRelicPool))]
 public sealed class DonQuixoteProofOfVictory : ModRelicTemplate
@@ -260,13 +260,27 @@ public sealed class DonQuixoteProofOfVictory : ModRelicTemplate
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     public bool DonQuixote_pendingStrength { get; set; }
 
-    public override RelicRarity Rarity => RelicRarity.Uncommon;
+    public override RelicRarity Rarity => RelicRarity.Ancient;
 
     public override string CustomIconPath => "res://DonQuixote/images/relics/victory_icon.png";
 
     public override string CustomIconOutlinePath => "res://DonQuixote/images/relics/victory_outline.png";
 
     public override string CustomBigIconPath => "res://DonQuixote/images/relics/victory_big.png";
+
+    public override async Task BeforeCombatStart()
+    {
+        // 上一场没结算掉的「下回合力量」不带进新战斗。
+        DonQuixote_pendingStrength = false;
+
+        if (Owner?.Creature == null)
+        {
+            return;
+        }
+
+        await PowerCmd.Apply<StrengthPower>(
+            new BlockingPlayerChoiceContext(), Owner.Creature, 5m, Owner.Creature, null, false);
+    }
 
     public override async Task AfterDamageGiven(
         PlayerChoiceContext DonQuixote_choiceContext,

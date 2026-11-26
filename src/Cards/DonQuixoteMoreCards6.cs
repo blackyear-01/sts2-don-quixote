@@ -215,7 +215,7 @@ public sealed class DonQuixoteWeaponMaintenance : ModCardTemplate, IDonQuixoteBl
 
     protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
     {
-        new DynamicVar("Forge", 3m),
+        new DynamicVar("Forge", 2m),
         new DynamicVar("Energy", 1m),
     };
 
@@ -226,10 +226,8 @@ public sealed class DonQuixoteWeaponMaintenance : ModCardTemplate, IDonQuixoteBl
             return;
         }
 
-        int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
-            DonQuixote_choiceContext, Owner.Creature, DynamicVars["Forge"].IntValue, true);
-        await DonQuixoteLance.DonQuixote_Forge(
-            DonQuixote_choiceContext, Owner, DonQuixote_forgeSpent, this);
+        await DonQuixoteLance.DonQuixote_ForgeFromCard(
+            DonQuixote_choiceContext, Owner, DynamicVars["Forge"].IntValue, this);
 
         await PowerCmd.Apply<EnergyNextTurnPower>(
             DonQuixote_choiceContext,
@@ -613,10 +611,8 @@ public sealed class DonQuixoteNoLongerWaver : ModCardTemplate, IDonQuixoteBloodF
         await DonQuixoteBloodMagic.DonQuixote_GainWavering(
             DonQuixote_choiceContext, Owner.Creature, DynamicVars["Wavering"].IntValue, this);
 
-        int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
-            DonQuixote_choiceContext, Owner.Creature, DynamicVars["Forge"].IntValue, true);
-        await DonQuixoteLance.DonQuixote_Forge(
-            DonQuixote_choiceContext, Owner, DonQuixote_forgeSpent, this);
+        await DonQuixoteLance.DonQuixote_ForgeFromCard(
+            DonQuixote_choiceContext, Owner, DynamicVars["Forge"].IntValue, this);
     }
 
     protected override void OnUpgrade()

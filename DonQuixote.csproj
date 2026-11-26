@@ -17,7 +17,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RestorePackagesPath>D:\sts2mod\tools\pkgs</RestorePackagesPath>
-    <RitsuLibReferenceTarget>0.113.0</RitsuLibReferenceTarget>
+    <RitsuLibReferenceTarget>0.114.0</RitsuLibReferenceTarget>
     <NoWarn>$(NoWarn);CS8618;CS0169</NoWarn>
   </PropertyGroup>
 
@@ -36,7 +36,7 @@
     </Reference>
   </ItemGroup>
 
-  <Import Project="D:\Steam\steamapps\workshop\content\2868840\3747602295\RitsuLib.References.props" />
+  <Import Project="D:\Steam\steamapps\common\Slay the Spire 2\mods\ritsulib\RitsuLib.References.props" />
 
   <!-- 程序集名是 DonQuixoteCiallo，但游戏的模组加载器只会找 <modId>.dll，故构建后再复制一份 DonQuixote.dll。 -->
   <Target Name="DonQuixote_CopyModDll" AfterTargets="Build">

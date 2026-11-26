@@ -95,7 +95,7 @@ public sealed class DonQuixotePowerBloodArmor : ModPowerTemplate
 }
 
 /// <summary>
-/// 血编的荆棘 X：受到导致失去生命的攻击时，对攻击者施加 3X 级流血强度，并失去 1 层。
+/// 血编的荆棘 X：受到攻击时，对攻击者施加 5X 级流血强度并触发 X 次流血，然后失去 1 层。
 /// </summary>
 public sealed class DonQuixotePowerBloodThorns : ModPowerTemplate
 {
@@ -120,16 +120,23 @@ public sealed class DonQuixotePowerBloodThorns : ModPowerTemplate
             return;
         }
 
-        if (DonQuixote_result.UnblockedDamage <= 0m || DonQuixote_dealer == null
+        if (DonQuixote_result == null || DonQuixote_dealer == null
             || ReferenceEquals(DonQuixote_dealer, Owner) || Amount <= 0)
         {
             return;
         }
 
-        // 文案：受到导致失去生命的攻击时，对攻击者施加 3X 级流血强度。
-        int DonQuixote_strength = Amount * 3;
+        // 文案：受到攻击时，对攻击者施加 5X 级流血强度并触发 X 次流血。
+        int DonQuixote_stacks = Amount;
+        int DonQuixote_strength = DonQuixote_stacks * 5;
         await DonQuixoteBloodMagic.DonQuixote_ApplyBleed(
             DonQuixote_choiceContext, DonQuixote_dealer, Owner, null, DonQuixote_strength, 0);
+
+        for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_stacks && !DonQuixote_dealer.IsDead; DonQuixote_i++)
+        {
+            await DonQuixoteBloodMagic.DonQuixote_TriggerBleed(
+                DonQuixote_choiceContext, DonQuixote_dealer, false);
+        }
 
         if (Amount <= 1)
         {

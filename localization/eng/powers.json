@@ -26,7 +26,7 @@
   "DON_QUIXOTE_POWER_BLOOD_ARMOR.title": "Blood Armor",
   "DON_QUIXOTE_POWER_BLOOD_ARMOR.description": "Keeps up to this much Block for your next turn; loses 1 stack at end of turn.",
   "DON_QUIXOTE_POWER_BLOOD_THORNS.title": "Blood-Woven Thorns",
-  "DON_QUIXOTE_POWER_BLOOD_THORNS.description": "When hit by an attack that makes it lose HP, apply 3X [red]Bleed[/red] to the attacker and lose 1 stack.",
+  "DON_QUIXOTE_POWER_BLOOD_THORNS.description": "When hit by an attack, apply 5X [red]Bleed[/red] to the attacker, trigger [red]Bleed[/red] X times on it, then lose 1 stack.",
   "DON_QUIXOTE_POWER_CLOTTING_BLOOD.title": "Clotting Blood",
   "DON_QUIXOTE_POWER_CLOTTING_BLOOD.description": "The target cannot act for this many turns (ignores [gold]Artifact[/gold]).",
   "DON_QUIXOTE_POWER_RESPONSIBILITY.title": "Responsibility",

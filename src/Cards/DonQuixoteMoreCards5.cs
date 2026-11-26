@@ -480,7 +480,7 @@ public sealed class DonQuixoteSanchoBloodImitation : ModCardTemplate, IDonQuixot
 
     protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
     {
-        new DynamicVar("Forge", 5m),
+        new DynamicVar("Forge", 3m),
         new DynamicVar("Amplify", 1m),
     };
 
@@ -496,10 +496,8 @@ public sealed class DonQuixoteSanchoBloodImitation : ModCardTemplate, IDonQuixot
             return;
         }
 
-        int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
-            DonQuixote_ctx, Owner.Creature, DynamicVars["Forge"].IntValue, true);
-        await DonQuixoteLance.DonQuixote_Forge(
-            DonQuixote_ctx, Owner, DonQuixote_forgeSpent, this);
+        await DonQuixoteLance.DonQuixote_ForgeFromCard(
+            DonQuixote_ctx, Owner, DynamicVars["Forge"].IntValue, this);
         await DonQuixoteLance.DonQuixote_Amplify(DonQuixote_ctx, Owner, DynamicVars["Amplify"].IntValue, this);
     }
 }
@@ -524,7 +522,7 @@ public sealed class DonQuixoteDuelWithLance : ModCardTemplate, IDonQuixoteBloodF
 
     protected override IEnumerable<DynamicVar> CanonicalVars => new DynamicVar[]
     {
-        new DynamicVar("Forge", 8m),
+        new DynamicVar("Forge", 4m),
         new DynamicVar("Duel", 1m),
     };
 
@@ -535,10 +533,8 @@ public sealed class DonQuixoteDuelWithLance : ModCardTemplate, IDonQuixoteBloodF
             return;
         }
 
-        int DonQuixote_forgeSpent = await DonQuixoteBloodMagic.DonQuixote_ConsumeHardBlood(
-            DonQuixote_ctx, Owner.Creature, DynamicVars["Forge"].IntValue, true);
-        await DonQuixoteLance.DonQuixote_Forge(
-            DonQuixote_ctx, Owner, DonQuixote_forgeSpent, this);
+        await DonQuixoteLance.DonQuixote_ForgeFromCard(
+            DonQuixote_ctx, Owner, DynamicVars["Forge"].IntValue, this);
 
         Creature DonQuixote_target = DonQuixote_play.Target;
         if (DonQuixote_target == null || DonQuixote_target.IsDead)

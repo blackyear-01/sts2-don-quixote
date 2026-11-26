@@ -786,6 +786,8 @@ internal static class DonQuixoteStageCards
             CardModel DonQuixote_Card = DonQuixote_Scope.CreateCard(DonQuixote_Canonical, DonQuixote_Player);
             if (DonQuixote_Card == null)
             {
+                DonQuixoteModEntry.DonQuixote_Logger?.Warn(
+                    "[DonQuixote] stage card grant failed: CreateCard returned null for " + typeof(T).Name, 0);
                 return false;
             }
 
@@ -796,7 +798,17 @@ internal static class DonQuixoteStageCards
                 DonQuixote_Card.FinalizeUpgradeInternal();
             }
 
-            await CardPileCmd.Add(DonQuixote_Card, PileType.Hand, CardPilePosition.Top, null, false);
+            var DonQuixote_result =
+                await CardPileCmd.Add(DonQuixote_Card, PileType.Hand, CardPilePosition.Top, null, false);
+
+            // 只有真的进了手牌才算发出去；否则调用方不推进计数，下次重试。
+            if (DonQuixote_result.cardAdded == null)
+            {
+                DonQuixoteModEntry.DonQuixote_Logger?.Warn(
+                    "[DonQuixote] stage card grant failed: add to hand rejected for " + typeof(T).Name, 0);
+                return false;
+            }
+
             DonQuixoteModEntry.DonQuixote_Logger?.Info(
                 "[DonQuixote] stage card granted: " + typeof(T).Name
                 + (DonQuixote_Upgrade ? " (upgraded)" : string.Empty), 0);
@@ -857,6 +869,12 @@ internal static class DonQuixoteFeastReward
             {
                 return;
             }
+
+            DonQuixoteModEntry.DonQuixote_Logger?.Info(
+                "[DonQuixote] feast reward check: total=" + DonQuixote_total
+                + " steps=" + DonQuixote_steps
+                + " relic=" + (DonQuixote_elder != null ? "elder" : "basic"),
+                0);
 
             if (DonQuixote_elder != null)
             {

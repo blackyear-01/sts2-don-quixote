@@ -122,15 +122,26 @@ public sealed class DonQuixotePowerWoundDestruction : ModPowerTemplate
 }
 
 /// <summary>
-/// 鲜血重铸：每消耗 30 点血宴获得 3 点硬血（升级后固有）。
+/// 鲜血重铸：每消耗 6 点硬血，血铸 1 次（升级后再增幅 1）。
 /// </summary>
 public sealed class DonQuixotePowerBloodRecast : ModPowerTemplate
 {
-    private const int DonQuixote_FeastStep = 30;
+    private const int DonQuixote_HardBloodStep = 6;
 
-    private const int DonQuixote_HardBloodGain = 3;
+    /// <summary>
+    /// 本次战斗中已经统计过的硬血消耗量。
+    /// </summary>
+    private int DonQuixote_Consumed;
 
-    private int DonQuixote_Paid;
+    /// <summary>
+    /// 已经结算过几次「血铸」。
+    /// </summary>
+    private int DonQuixote_Forges;
+
+    /// <summary>
+    /// 升级版：每次血铸同时增幅 1。
+    /// </summary>
+    public bool DonQuixote_Amplified;
 
     public override PowerType Type => PowerType.None;
 
@@ -147,22 +158,37 @@ public sealed class DonQuixotePowerBloodRecast : ModPowerTemplate
         Creature DonQuixote_applier,
         CardModel DonQuixote_cardSource)
     {
-        if (Owner == null || DonQuixote_power is not DonQuixotePowerFeastTotal)
+        if (Owner?.Player == null || DonQuixote_power is not DonQuixotePowerHardBlood)
         {
             return;
         }
 
-        int DonQuixote_total = DonQuixoteBloodMagic.DonQuixote_FeastTotal(Owner);
-        int DonQuixote_should = DonQuixote_total / DonQuixote_FeastStep * DonQuixote_HardBloodGain;
-        int DonQuixote_delta = DonQuixote_should - DonQuixote_Paid;
+        // 只统计硬血被消耗（层数减少）。
+        if (DonQuixote_amount >= 0m)
+        {
+            return;
+        }
+
+        DonQuixote_Consumed += (int)(-DonQuixote_amount);
+        int DonQuixote_should = DonQuixote_Consumed / DonQuixote_HardBloodStep;
+        int DonQuixote_delta = DonQuixote_should - DonQuixote_Forges;
         if (DonQuixote_delta <= 0)
         {
             return;
         }
 
-        DonQuixote_Paid = DonQuixote_should;
-        await PowerCmd.Apply<DonQuixotePowerHardBlood>(
-            DonQuixote_choiceContext, Owner, DonQuixote_delta, Owner, DonQuixote_cardSource, true);
+        DonQuixote_Forges = DonQuixote_should;
+        for (int DonQuixote_i = 0; DonQuixote_i < DonQuixote_delta; DonQuixote_i++)
+        {
+            await DonQuixoteLance.DonQuixote_Forge(
+                DonQuixote_choiceContext, Owner.Player, 1, DonQuixote_cardSource);
+
+            if (DonQuixote_Amplified)
+            {
+                await DonQuixoteLance.DonQuixote_Amplify(
+                    DonQuixote_choiceContext, Owner.Player, 1, DonQuixote_cardSource);
+            }
+        }
     }
 }
 

@@ -90,6 +90,32 @@ public static class DonQuixoteLance
         await DonQuixote_Grant<DonQuixotePowerLanceAmplify>(DonQuixote_ctx, DonQuixote_player, DonQuixote_amount, DonQuixote_source);
     }
 
+    /// <summary>
+    /// 血铸 X 的完整结算：消耗硬血 → 长枪加伤 X 点 + 每消耗 1 点硬血再加 1 点。
+    /// </summary>
+    public static async Task DonQuixote_ForgeFromCard(
+        PlayerChoiceContext DonQuixote_ctx, Player DonQuixote_player, int DonQuixote_forge, CardModel DonQuixote_source)
+    {
+        if (DonQuixote_player?.Creature == null || DonQuixote_forge <= 0)
+        {
+            return;
+        }
+
+        DonQuixoteBloodMagic.DonQuixoteForgeSpend DonQuixote_spend =
+            await DonQuixoteBloodMagic.DonQuixote_SpendHardBloodForForge(
+                DonQuixote_ctx, DonQuixote_player.Creature, DonQuixote_forge);
+
+        // 额外 X 点保底；消耗到硬血时每 1 点再加 1 点。
+        int DonQuixote_gain = DonQuixote_forge + DonQuixote_spend.DonQuixote_Paid;
+        if (DonQuixote_spend.DonQuixote_Tripled)
+        {
+            DonQuixote_gain *= 3;
+        }
+
+        await DonQuixote_Grant<DonQuixotePowerLanceForge>(
+            DonQuixote_ctx, DonQuixote_player, DonQuixote_gain, DonQuixote_source);
+    }
+
     private static async Task DonQuixote_Grant<T>(
         PlayerChoiceContext DonQuixote_ctx, Player DonQuixote_player, int DonQuixote_amount, CardModel DonQuixote_source)
         where T : PowerModel
@@ -114,46 +140,54 @@ public static class DonQuixoteLance
 
         if (DonQuixote_first)
         {
-            DonQuixote_MarkLanceGranted(DonQuixote_player);
-            await DonQuixote_EnsureLanceInHand(DonQuixote_player, DonQuixote_source);
+            // 发出去之后才记账：发牌失败（没有 scope / 手牌满）时留到下一次触发重试。
+            if (await DonQuixote_EnsureLanceInHand(DonQuixote_player, DonQuixote_source))
+            {
+                DonQuixote_MarkLanceGranted(DonQuixote_player);
+            }
         }
 
         // 让手牌/牌堆里两把长枪的卡面数字同步（放在发牌之后，新牌也能立刻显示正确数字）。
         DonQuixote_RefreshLanceStats(DonQuixote_player);
     }
 
-    private static ulong DonQuixote_LanceGrantedNetId;
-    private static MegaCrit.Sts2.Core.Combat.ICombatState DonQuixote_LanceGrantedCombat;
+    private static readonly Dictionary<ulong, MegaCrit.Sts2.Core.Combat.ICombatState> DonQuixote_LanceGranted =
+        new Dictionary<ulong, MegaCrit.Sts2.Core.Combat.ICombatState>();
 
     private static bool DonQuixote_LanceAlreadyGranted(Player DonQuixote_player)
     {
-        if (DonQuixote_player?.Creature?.CombatState == null)
+        MegaCrit.Sts2.Core.Combat.ICombatState DonQuixote_combatState = DonQuixote_player?.Creature?.CombatState;
+        if (DonQuixote_combatState == null)
         {
             return false;
         }
 
-        if (DonQuixote_LanceGrantedNetId == 0 || DonQuixote_LanceGrantedCombat == null)
+        MegaCrit.Sts2.Core.Combat.ICombatState DonQuixote_recorded;
+        if (!DonQuixote_LanceGranted.TryGetValue(DonQuixote_player.NetId, out DonQuixote_recorded)
+            || DonQuixote_recorded == null)
         {
             return false;
         }
 
-        if (!ReferenceEquals(DonQuixote_LanceGrantedCombat, DonQuixote_player.Creature.CombatState))
+        // 上一场战斗的记录，清掉。
+        if (!ReferenceEquals(DonQuixote_recorded, DonQuixote_combatState))
         {
+            DonQuixote_LanceGranted.Remove(DonQuixote_player.NetId);
             return false;
         }
 
-        return DonQuixote_LanceGrantedNetId == DonQuixote_player.NetId;
+        return true;
     }
 
     private static void DonQuixote_MarkLanceGranted(Player DonQuixote_player)
     {
-        if (DonQuixote_player?.Creature?.CombatState == null)
+        MegaCrit.Sts2.Core.Combat.ICombatState DonQuixote_combatState = DonQuixote_player?.Creature?.CombatState;
+        if (DonQuixote_combatState == null)
         {
             return;
         }
 
-        DonQuixote_LanceGrantedNetId = DonQuixote_player.NetId;
-        DonQuixote_LanceGrantedCombat = DonQuixote_player.Creature.CombatState;
+        DonQuixote_LanceGranted[DonQuixote_player.NetId] = DonQuixote_combatState;
     }
 
     /// <summary>
@@ -216,6 +250,7 @@ public static class DonQuixoteLance
                         DonQuixote_SetDisplay(DonQuixote_card, "Damage", 6m + DonQuixote_forge);
                         DonQuixote_SetDisplay(DonQuixote_card, "Hits", 1m + DonQuixote_technique);
                         DonQuixote_SetDisplay(DonQuixote_card, "Triggers", 1m + DonQuixote_amplify);
+                        DonQuixote_SetDisplay(DonQuixote_card, "Bleed", 1m + DonQuixote_technique + DonQuixote_amplify);
                     }
                 }
             }
@@ -321,13 +356,13 @@ public static class DonQuixoteLance
     }
 
     /// <summary>
-    /// 把「骑士长枪」放进手牌（手牌里已经有一张就不再重复给）。
+    /// 把「骑士长枪」放进手牌（已经有长枪时返回 true，不再重复给）。
     /// </summary>
-    public static async Task DonQuixote_EnsureLanceInHand(Player DonQuixote_player, CardModel DonQuixote_source)
+    public static async Task<bool> DonQuixote_EnsureLanceInHand(Player DonQuixote_player, CardModel DonQuixote_source)
     {
         if (DonQuixote_player?.Creature == null || DonQuixote_player.Creature.CombatState == null)
         {
-            return;
+            return false;
         }
 
         try
@@ -335,13 +370,18 @@ public static class DonQuixoteLance
             // 去重：手牌 / 抽牌堆 / 弃牌堆 / 消耗堆 / 打出区 里只要已经有一把长枪 （本体「骑士长枪」或堕落版「饱食鲜血的长枪」）就不再发。
             if (DonQuixote_HasLance(DonQuixote_player))
             {
-                return;
+                return true;
             }
 
             CardPile DonQuixote_hand = PileType.Hand.GetPile(DonQuixote_player);
 
             // 规范模型本身没有牌局作用域，必须借用一张正在战斗里的卡的 CardScope 派生实例。
             MegaCrit.Sts2.Core.Runs.ICardScope DonQuixote_scope = DonQuixote_source?.CardScope;
+            if (DonQuixote_scope == null)
+            {
+                DonQuixote_scope = DonQuixote_player.Creature.CombatState as MegaCrit.Sts2.Core.Runs.ICardScope;
+            }
+
             if (DonQuixote_scope == null && DonQuixote_hand != null)
             {
                 DonQuixote_scope = DonQuixote_hand.Cards.FirstOrDefault()?.CardScope;
@@ -351,14 +391,16 @@ public static class DonQuixoteLance
             {
                 DonQuixoteModEntry.DonQuixote_Logger?.Warn(
                     "[DonQuixote] ensure lance in hand skipped: no card scope available", 0);
-                return;
+                return false;
             }
 
             CardModel DonQuixote_canonical = ModelDb.Card<DonQuixoteKnightLance>();
             CardModel DonQuixote_lance = DonQuixote_scope.CreateCard(DonQuixote_canonical, DonQuixote_player);
             if (DonQuixote_lance == null)
             {
-                return;
+                DonQuixoteModEntry.DonQuixote_Logger?.Warn(
+                    "[DonQuixote] ensure lance in hand failed: CreateCard returned null", 0);
+                return false;
             }
 
             if (DonQuixote_HasLanceReplay(DonQuixote_player.Creature))
@@ -369,14 +411,26 @@ public static class DonQuixoteLance
             // 消耗堆里如果躺着上一把长枪，新的一把继承它的数值（升级状态 / 卡面数值 / 重放）。
             DonQuixote_InheritExhaustedLance(DonQuixote_player, DonQuixote_lance);
 
-            await CardPileCmd.Add(DonQuixote_lance, PileType.Hand, CardPilePosition.Top, null, false);
+            var DonQuixote_result =
+                await CardPileCmd.Add(DonQuixote_lance, PileType.Hand, CardPilePosition.Top, null, false);
+
+            // 没真的进手牌就不算发出去，让下一次血铸/技巧/增幅重试。
+            if (DonQuixote_result.cardAdded == null)
+            {
+                DonQuixoteModEntry.DonQuixote_Logger?.Warn(
+                    "[DonQuixote] ensure lance in hand failed: add to hand rejected", 0);
+                return false;
+            }
+
             DonQuixote_RefreshLanceStats(DonQuixote_player);
             DonQuixoteModEntry.DonQuixote_Logger?.Info("[DonQuixote] knight lance added to hand");
+            return true;
         }
         catch (Exception DonQuixote_error)
         {
             DonQuixoteModEntry.DonQuixote_Logger?.Warn(
                 "[DonQuixote] ensure lance in hand failed: " + DonQuixote_error.Message, 0);
+            return false;
         }
     }
 
