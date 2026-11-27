@@ -843,6 +843,27 @@ internal static class DonQuixoteFeastReward
                 return;
             }
 
+            Relics.DonQuixoteBloodElderInstinct? DonQuixote_elder = null;
+            Relics.DonQuixoteBloodInstinct? DonQuixote_basic = null;
+
+            foreach (RelicModel DonQuixote_relic in DonQuixote_player.Relics)
+            {
+                if (DonQuixote_relic is Relics.DonQuixoteBloodElderInstinct DonQuixote_foundElder)
+                {
+                    DonQuixote_elder = DonQuixote_foundElder;
+                }
+                else if (DonQuixote_relic is Relics.DonQuixoteBloodInstinct DonQuixote_foundBasic)
+                {
+                    DonQuixote_basic = DonQuixote_foundBasic;
+                }
+            }
+
+            // 进度只能记在血魔遗物上（状态栏的计数在 BaseLib 下存不进存档）。两件都不在就不发。
+            if (DonQuixote_elder == null && DonQuixote_basic == null)
+            {
+                return;
+            }
+
             int DonQuixote_total = DonQuixoteBloodMagic.DonQuixote_FeastTotal(DonQuixote_creature);
             int DonQuixote_steps = DonQuixote_total / DonQuixote_Threshold;
             if (DonQuixote_steps <= 0)
@@ -850,39 +871,34 @@ internal static class DonQuixoteFeastReward
                 return;
             }
 
-            // 进度记在「消耗血宴总数」这个战斗内状态上：初始遗物被欧洛巴斯之触或其它效果换掉也不会丢。
-            Powers.DonQuixotePowerFeastTotal? DonQuixote_container =
-                DonQuixoteBloodMagic.DonQuixote_Find<Powers.DonQuixotePowerFeastTotal>(DonQuixote_creature);
-            if (DonQuixote_container == null)
-            {
-                return;
-            }
-
-            // 长老遗物在身时发升级版；遗物被换掉时降级为普通版，但奖励照发。
-            bool DonQuixote_upgrade = false;
-            foreach (RelicModel DonQuixote_relic in DonQuixote_player.Relics)
-            {
-                if (DonQuixote_relic is Relics.DonQuixoteBloodElderInstinct)
-                {
-                    DonQuixote_upgrade = true;
-                    break;
-                }
-            }
-
             DonQuixoteModEntry.DonQuixote_Logger?.Info(
                 "[DonQuixote] feast reward check: total=" + DonQuixote_total
                 + " steps=" + DonQuixote_steps
-                + " granted=" + DonQuixote_container.DonQuixote_RewardSteps
-                + (DonQuixote_upgrade ? " elder=yes" : " elder=no"),
+                + " relic=" + (DonQuixote_elder != null ? "elder" : "basic"),
                 0);
+
+            if (DonQuixote_elder != null)
+            {
+                // 长老优先：两件都在时按长老结算，普通那件不再单独发货。
+                await DonQuixote_GrantUpTo(
+                    DonQuixote_player,
+                    DonQuixote_steps,
+                    DonQuixote_elder.DonQuixote_FeastRewardSteps,
+                    DonQuixote_value => DonQuixote_elder.DonQuixote_FeastRewardSteps = DonQuixote_value,
+                    DonQuixote_total,
+                    false,
+                    true);
+                return;
+            }
 
             await DonQuixote_GrantUpTo(
                 DonQuixote_player,
                 DonQuixote_steps,
-                DonQuixote_container,
+                DonQuixote_basic.DonQuixote_FeastRewardSteps,
+                DonQuixote_value => DonQuixote_basic.DonQuixote_FeastRewardSteps = DonQuixote_value,
                 DonQuixote_total,
                 false,
-                DonQuixote_upgrade);
+                false);
         }
         catch (Exception DonQuixote_Exception)
         {
@@ -897,12 +913,12 @@ internal static class DonQuixoteFeastReward
     private static async Task DonQuixote_GrantUpTo(
         Player DonQuixote_player,
         int DonQuixote_steps,
-        Powers.DonQuixotePowerFeastTotal DonQuixote_container,
+        int DonQuixote_granted,
+        Action<int> DonQuixote_write,
         int DonQuixote_total,
         bool DonQuixote_nightmare,
         bool DonQuixote_upgrade)
     {
-        int DonQuixote_granted = DonQuixote_container.DonQuixote_RewardSteps;
         if (DonQuixote_steps <= DonQuixote_granted)
         {
             return;
@@ -939,7 +955,7 @@ internal static class DonQuixoteFeastReward
             }
 
             DonQuixote_granted++;
-            DonQuixote_container.DonQuixote_RewardSteps = DonQuixote_granted;
+            DonQuixote_write(DonQuixote_granted);
         }
     }
 }

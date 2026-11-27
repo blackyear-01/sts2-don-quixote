@@ -33,7 +33,7 @@ public sealed class DonQuixoteBloodInstinct : ModRelicTemplate
     public override string CustomBigIconPath => "res://DonQuixote/images/relics/blood_instinct_big.png";
 
     /// <summary>
-    /// 已经发放过几次舞台卡。旧版用来记进度，现在进度存在「消耗血宴总数」状态上，这里只为兼容旧存档保留。
+    /// 已经发放过几次舞台卡（按「消耗血宴总数 / 325」计）。
     /// </summary>
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     public int DonQuixote_FeastRewardSteps { get; set; }
@@ -119,8 +119,10 @@ public sealed class DonQuixoteBloodInstinct : ModRelicTemplate
 
 /// <summary>
 /// 血魔长老的本能：欧洛巴斯之触把「血魔的本能」精炼成的初始遗物。
+/// 已经是最终形态，再被欧洛巴斯精炼时仍映射回自身，避免游戏本体把它回落成原版遗物。
 /// </summary>
 [RegisterRelic(typeof(DonQuixoteRelicPool))]
+[RegisterTouchOfOrobasRefinement(typeof(DonQuixoteBloodElderInstinct))]
 public sealed class DonQuixoteBloodElderInstinct : ModRelicTemplate
 {
     public override RelicRarity Rarity => RelicRarity.Starter;
@@ -132,7 +134,7 @@ public sealed class DonQuixoteBloodElderInstinct : ModRelicTemplate
     public override string CustomBigIconPath => "res://DonQuixote/images/relics/elder_instinct_big.png";
 
     /// <summary>
-    /// 升级版「幸福笑容如鲜花般绽放之地」的发货进度。旧版用来记进度，现在进度存在「消耗血宴总数」状态上。
+    /// 精炼后发的是升级版「幸福笑容如鲜花般绽放之地」；同样按消耗血宴总数发货，所以另记一个计数。
     /// </summary>
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     public int DonQuixote_FeastRewardSteps { get; set; }
