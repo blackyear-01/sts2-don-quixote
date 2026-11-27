@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -368,6 +369,12 @@ public sealed class DonQuixotePowerFeastTotal : ModPowerTemplate
     public override string CustomIconPath => "res://DonQuixote/images/powers/feast_total.png";
 
     public override string CustomBigIconPath => "res://DonQuixote/images/powers/feast_total_big.png";
+
+    /// <summary>
+    /// 本场战斗已经发放过几次舞台卡（消耗血宴总数每满 325 发一次）。
+    /// </summary>
+    [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
+    public int DonQuixote_RewardSteps { get; set; }
 
     /// <summary>
     /// 每 1 点让「施加流血」的卡最终伤害 +1%（无上限）。

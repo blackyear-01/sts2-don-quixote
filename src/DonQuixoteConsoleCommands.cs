@@ -266,6 +266,65 @@ public sealed class DonQuixoteBloodFeastConsoleCmd : AbstractConsoleCmd
 }
 
 /// <summary>
+/// 控制台命令：dq_feast_total &lt;value:int&gt; — 把「消耗血宴总数」设为指定值，并立刻结算一次血宴奖励（每 325 点一张舞台卡）。
+/// </summary>
+public sealed class DonQuixoteFeastTotalConsoleCmd : AbstractConsoleCmd
+{
+    public override string CmdName => "dq_feast_total";
+
+    public override string Args => "<value:int>";
+
+    public override string Description =>
+        "Set 消耗血宴总数 and immediately run the 325-point stage card reward check.";
+
+    public override bool IsNetworked => false;
+
+    public override CmdResult Process(Player issuingPlayer, string[] args)
+    {
+        if (args == null || args.Length < 1 || !int.TryParse(args[0], out int DonQuixote_value) || DonQuixote_value < 0)
+        {
+            return new CmdResult(false, "usage: dq_feast_total <value:int>");
+        }
+
+        Creature DonQuixote_creature = issuingPlayer?.Creature;
+        if (DonQuixote_creature == null)
+        {
+            return new CmdResult(false, "no player creature in the current room");
+        }
+
+        DonQuixotePowerFeastTotal DonQuixote_power =
+            DonQuixoteBloodMagic.DonQuixote_Find<DonQuixotePowerFeastTotal>(DonQuixote_creature);
+        if (DonQuixote_power == null)
+        {
+            return new CmdResult(false, "feast total power is not on this creature yet - consume some 血宴 first");
+        }
+
+        int DonQuixote_before = DonQuixote_power.Amount;
+        int DonQuixote_delta = DonQuixote_value - DonQuixote_before;
+        Task DonQuixote_task = DonQuixote_ApplyAsync(DonQuixote_creature, DonQuixote_power, DonQuixote_delta);
+        return new CmdResult(
+            DonQuixote_task,
+            true,
+            $"消耗血宴总数 {DonQuixote_before} -> {DonQuixote_value}, reward check queued");
+    }
+
+    private static async Task DonQuixote_ApplyAsync(
+        Creature DonQuixote_creature,
+        DonQuixotePowerFeastTotal DonQuixote_power,
+        int DonQuixote_delta)
+    {
+        PlayerChoiceContext DonQuixote_ctx = new BlockingPlayerChoiceContext();
+        if (DonQuixote_delta != 0)
+        {
+            await PowerCmd.ModifyAmount(
+                DonQuixote_ctx, DonQuixote_power, DonQuixote_delta, DonQuixote_creature, null, false);
+        }
+
+        await DonQuixoteFeastReward.DonQuixote_Check(DonQuixote_creature);
+    }
+}
+
+/// <summary>
 /// 控制台命令：dq_degenerate &lt;increase|decrease&gt; &lt;amount&gt; — 增减「向本能堕落的骑士」的堕落计数（遗物下方显示的数字）。
 /// </summary>
 public sealed class DonQuixoteDegenerateConsoleCmd : AbstractConsoleCmd
