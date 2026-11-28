@@ -6,3 +6,5 @@ build/
 assets/art/heavy_backup/
 __pycache__/
 *.pyc
+assets/animations/*.bak_*
+assets/animations/frames_backup/

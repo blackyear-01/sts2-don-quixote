@@ -278,6 +278,34 @@ TEXTURES = {
     'card_knightly_protection.png': 'DonQuixote/images/cards/knightly_protection.png',
     'card_blood_sweep.png': 'DonQuixote/images/cards/blood_sweep.png',
     'card_sancho_blood_imitation.png': 'DonQuixote/images/cards/sancho_blood_imitation.png',
+    # 资源\卡牌 下 2026-11-28 补齐剩余卡面（20 张卡图）
+    'card_duel_declaration.png': 'DonQuixote/images/cards/duel_declaration.png',
+    'card_condense_blood.png': 'DonQuixote/images/cards/condense_blood.png',
+    'card_blood_recast.png': 'DonQuixote/images/cards/blood_recast.png',
+    'card_wound_destruction.png': 'DonQuixote/images/cards/wound_destruction.png',
+    'card_clot_into_armor.png': 'DonQuixote/images/cards/clot_into_armor.png',
+    'card_blood_backflow.png': 'DonQuixote/images/cards/blood_backflow.png',
+    'card_knight_charge.png': 'DonQuixote/images/cards/knight_charge.png',
+    'card_giant_charge.png': 'DonQuixote/images/cards/giant_charge.png',
+    'card_just_a_windmill.png': 'DonQuixote/images/cards/just_a_windmill.png',
+    'card_clad_in_blood.png': 'DonQuixote/images/cards/clad_in_blood.png',
+    'card_fair_duel.png': 'DonQuixote/images/cards/fair_duel.png',
+    'card_wound_bloom.png': 'DonQuixote/images/cards/wound_bloom.png',
+    'card_no_reflection.png': 'DonQuixote/images/cards/no_reflection.png',
+    'card_duel_with_lance.png': 'DonQuixote/images/cards/duel_with_lance.png',
+    'card_must_abandon.png': 'DonQuixote/images/cards/must_abandon.png',
+    'card_three_day_duel.png': 'DonQuixote/images/cards/three_day_duel.png',
+    'card_end_foolish_fight.png': 'DonQuixote/images/cards/end_foolish_fight.png',
+    'card_guard_riposte_strike.png': 'DonQuixote/images/cards/guard_riposte_strike.png',
+    'card_adventure_sight.png': 'DonQuixote/images/cards/adventure_sight.png',
+    # 资源\卡牌 下 2026-11-28 14:49 后补的 4 张
+    'card_forged_of_blood.png': 'DonQuixote/images/cards/forged_of_blood.png',
+    'card_betrayal_of_kin.png': 'DonQuixote/images/cards/betrayal_of_kin.png',
+    'card_father_death.png': 'DonQuixote/images/cards/father_death.png',
+    'card_no_longer_waver.png': 'DonQuixote/images/cards/no_longer_waver.png',
+    # 资源\效果 里的效果图直接当卡面（望 / 心-勇敢的骑士）
+    'card_hope.png': 'DonQuixote/images/cards/hope.png',
+    'card_resolute_heart.png': 'DonQuixote/images/cards/resolute_heart.png',
     'frame1.png': 'DonQuixote/images/cards/frame1.png',
     'frame2.png': 'DonQuixote/images/cards/frame2.png',
     'energy_icon.png': 'DonQuixote/images/ui/energy_icon.png',
@@ -403,6 +431,7 @@ AUDIO_PLAIN = {
 # is shipped as a plain file that the spine resource loaders read directly.
 SPINE_TEXTURES = {
     "don_quixote.png": "DonQuixote/animations/don_quixote.png",
+    # 第二张图集页：血宴时刻演出的 16 帧（tools/add_feast_spine.py）
     # 白月骑士-巴里：帧图集（tools/barry_spine.py）
     "barry.png": "DonQuixote/animations/barry.png",
 }

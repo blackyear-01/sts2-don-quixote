@@ -462,6 +462,35 @@ internal static class DonQuixoteConsoleReflection
 /// <summary>
 /// 把自定义控制台命令注册进游戏的命令表（命令表来自源生成器，只能靠补丁追加）。
 /// </summary>
+public sealed class DonQuixoteHeartConsoleCmd : AbstractConsoleCmd
+{
+    public override string CmdName => "dq_heart";
+
+    public override string Args => "";
+
+    public override string Description => "Grant Don Quixote's Brave Heart (\u5fc3-\u52c7\u6562\u7684\u9a91\u58eb).";
+
+    public override bool IsNetworked => false;
+
+    public override CmdResult Process(Player issuingPlayer, string[] args)
+    {
+        Creature DonQuixote_player = issuingPlayer?.Creature;
+        if (DonQuixote_player == null)
+        {
+            return new CmdResult(false, "no player creature in the current room");
+        }
+
+        Task DonQuixote_task = DonQuixote_ApplyAsync(DonQuixote_player);
+        return new CmdResult(DonQuixote_task, true, "granted \u5fc3-\u52c7\u6562\u7684\u9a91\u58eb");
+    }
+
+    private static async Task DonQuixote_ApplyAsync(Creature DonQuixote_creature)
+    {
+        await PowerCmd.Apply<Powers.DonQuixotePowerBraveHeart>(
+            new BlockingPlayerChoiceContext(), DonQuixote_creature, 1m, DonQuixote_creature, null, false);
+    }
+}
+
 [HarmonyPatch(typeof(AbstractConsoleCmdSubtypes), nameof(AbstractConsoleCmdSubtypes.All), MethodType.Getter)]
 internal static class DonQuixoteConsoleCommandPatch
 {
@@ -483,6 +512,7 @@ internal static class DonQuixoteConsoleCommandPatch
             typeof(DonQuixoteDegenerateConsoleCmd),
             typeof(DonQuixoteBloodFeastConsoleCmd),
             typeof(DonQuixoteEnchantConsoleCmd),
+        typeof(DonQuixoteHeartConsoleCmd),
         };
 
         __result = DonQuixote_types;

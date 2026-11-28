@@ -48,6 +48,11 @@ public abstract class DonQuixoteHardBloodCard : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteForgedOfBlood : DonQuixoteBloodFeastCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌\由血所铸就）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/forged_of_blood.png";
+
     public DonQuixoteForgedOfBlood()
         : base(1, CardType.Skill, CardRarity.Common, TargetType.Self)
     {
@@ -90,6 +95,11 @@ public sealed class DonQuixoteForgedOfBlood : DonQuixoteBloodFeastCard
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteClotIntoArmor : DonQuixoteBloodFeastCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/clot_into_armor.png";
+
     public DonQuixoteClotIntoArmor()
         : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.Self)
     {
@@ -402,6 +412,11 @@ public sealed class DonQuixoteBeRunThrough : DonQuixoteBloodFeastCard
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodBackflow : DonQuixoteBloodFeastCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_backflow.png";
+
     public DonQuixoteBloodBackflow()
         : base(1, CardType.Skill, CardRarity.Common, TargetType.Self)
     {

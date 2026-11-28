@@ -134,6 +134,11 @@ public sealed class DonQuixoteGuardRiposte : ModCardTemplate
 public sealed class DonQuixoteGuardRiposteStrike : ModCardTemplate
 {
     /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/guard_riposte_strike.png";
+
+    /// <summary>
     /// 援护防御判定用的固定伤害（不吃任何加成，只用来比较大小）。
     /// </summary>
     public const int DonQuixote_BaseDamage = 6;
@@ -189,6 +194,11 @@ public sealed class DonQuixoteGuardRiposteStrike : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteResoluteHeart : ModCardTemplate, IDonQuixoteCorruptible
 {
+    /// <summary>
+    /// 卡面插画（资源\效果 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/resolute_heart.png";
+
     public const int DonQuixote_CorruptionThreshold = 40;
 
     public int DonQuixote_CorruptAt => DonQuixote_CorruptionThreshold;
@@ -238,6 +248,11 @@ public sealed class DonQuixoteResoluteHeart : ModCardTemplate, IDonQuixoteCorrup
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteHope : ModCardTemplate, IDonQuixoteCorruptedCard
 {
+    /// <summary>
+    /// 卡面插画（资源\效果 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/hope.png";
+
     public DonQuixoteHope()
         : base(2, CardType.Skill, CardRarity.Rare, TargetType.Self)
     {
@@ -409,6 +424,11 @@ public sealed class DonQuixoteHardBloodTeaching : ModCardTemplate, IDonQuixoteHa
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteAdventureSight : DonQuixoteBloodFeastCard, IDonQuixoteCorruptible
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/adventure_sight.png";
+
     public const int DonQuixote_CorruptionThreshold = 40;
 
     public int DonQuixote_CorruptAt => DonQuixote_CorruptionThreshold;

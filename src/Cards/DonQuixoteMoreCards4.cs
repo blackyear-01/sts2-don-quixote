@@ -483,6 +483,11 @@ public sealed class DonQuixoteSetOutOnAdventure : ModCardTemplate, IDonQuixoteCo
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBetrayalOfKin : DonQuixoteBloodFeastCard, IDonQuixoteCorruptedCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌\来自亲族的背叛）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/betrayal_of_kin.png";
+
     public DonQuixoteBetrayalOfKin()
         : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.Self)
     {
@@ -789,6 +794,11 @@ public sealed class DonQuixoteAllClottedBlood : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteCladInBlood : ModCardTemplate
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/clad_in_blood.png";
+
     public DonQuixoteCladInBlood()
         : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.Self)
     {
@@ -951,6 +961,11 @@ public sealed class DonQuixoteBloodAbsorb : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteFairDuel : ModCardTemplate, IDonQuixoteCorruptible
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/fair_duel.png";
+
     /// <summary>
     /// 优先复制的增益（按卡面顺序）。
     /// </summary>

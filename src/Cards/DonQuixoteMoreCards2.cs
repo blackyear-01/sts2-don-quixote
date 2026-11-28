@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,6 +23,11 @@ namespace DonQuixote.Cards;
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteKnightCharge : ModCardTemplate, IDonQuixoteCorruptible
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/knight_charge.png";
+
     public const int DonQuixote_CorruptionThreshold = 80;
 
     public int DonQuixote_CorruptAt => DonQuixote_CorruptionThreshold;
@@ -229,6 +234,9 @@ public sealed class DonQuixoteFeastMoment : DonQuixoteBloodFeastCard
 
     protected override async Task OnPlay(PlayerChoiceContext DonQuixote_choiceContext, CardPlay DonQuixote_cardPlay)
     {
+        // 演出：血宴时刻的 16 帧血光（feast_moment），在结算前先播。
+        DonQuixoteFeastPose.DonQuixote_Play(Owner.Creature);
+
         await PowerCmd.Apply<DonQuixotePowerBloodImpulse>(
             DonQuixote_choiceContext, Owner.Creature, DonQuixote_Var("Impulse"), Owner.Creature, this, false);
 
@@ -417,6 +425,11 @@ public sealed class DonQuixoteBloodCarousel : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteGiantCharge : ModCardTemplate, IDonQuixoteCorruptible
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/giant_charge.png";
+
     public const int DonQuixote_CorruptionThreshold = 40;
 
     public int DonQuixote_CorruptAt => DonQuixote_CorruptionThreshold;
@@ -476,6 +489,11 @@ public sealed class DonQuixoteGiantCharge : ModCardTemplate, IDonQuixoteCorrupti
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteJustAWindmill : DonQuixoteBloodFeastCard, IDonQuixoteCorruptedCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/just_a_windmill.png";
+
     public DonQuixoteJustAWindmill()
         : base(1, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy)
     {

@@ -244,6 +244,11 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteCondenseBlood : ModCardTemplate, IDonQuixoteBloodForgeCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/condense_blood.png";
+
     public int DonQuixote_ForgeCost => DynamicVars["Forge"].IntValue;
 
     public DonQuixoteCondenseBlood()
@@ -474,6 +479,11 @@ public sealed class DonQuixoteBloodSweep : ModCardTemplate, IDonQuixoteCorrupted
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteBloodRecast : ModCardTemplate
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/blood_recast.png";
+
     public DonQuixoteBloodRecast()
         : base(2, CardType.Power, CardRarity.Uncommon, TargetType.Self)
     {
@@ -705,6 +715,11 @@ public sealed class DonQuixoteHardBloodRaid : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteWoundDestruction : ModCardTemplate, IDonQuixoteCorruptedCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/wound_destruction.png";
+
     public DonQuixoteWoundDestruction()
         : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.AnyEnemy)
     {

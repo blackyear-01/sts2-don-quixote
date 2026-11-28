@@ -153,6 +153,11 @@ public sealed class DonQuixoteRottenLazyDream : ModCardTemplate, IDonQuixoteCorr
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteDuelDeclaration : ModCardTemplate, IDonQuixoteCorruptible
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/duel_declaration.png";
+
     public const int DonQuixote_CorruptionThreshold = 80;
 
     public int DonQuixote_CorruptAt => DonQuixote_CorruptionThreshold;

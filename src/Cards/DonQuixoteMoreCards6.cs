@@ -412,6 +412,11 @@ public sealed class DonQuixoteLookBackFather : ModCardTemplate, IDonQuixoteCorru
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteMustAbandon : ModCardTemplate
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/must_abandon.png";
+
     public DonQuixoteMustAbandon()
         : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.Self)
     {
@@ -455,6 +460,11 @@ public sealed class DonQuixoteMustAbandon : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteThreeDayDuel : ModCardTemplate, IDonQuixoteCorruptible
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/three_day_duel.png";
+
     public const int DonQuixote_CorruptionThreshold = 80;
 
     public int DonQuixote_CorruptAt => DonQuixote_CorruptionThreshold;
@@ -515,6 +525,11 @@ public override IEnumerable<CardKeyword> CanonicalKeywords => new[] { DonQuixote
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteEndFoolishFight : ModCardTemplate, IDonQuixoteCorruptedCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/end_foolish_fight.png";
+
     public DonQuixoteEndFoolishFight()
         : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.AllEnemies)
     {
@@ -583,6 +598,11 @@ public sealed class DonQuixoteEndFoolishFight : ModCardTemplate, IDonQuixoteCorr
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteNoLongerWaver : ModCardTemplate, IDonQuixoteBloodForgeCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌\为了不再动摇）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/no_longer_waver.png";
+
     public int DonQuixote_ForgeCost => DynamicVars["Forge"].IntValue;
 
     public DonQuixoteNoLongerWaver()

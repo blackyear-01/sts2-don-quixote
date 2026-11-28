@@ -26,6 +26,11 @@ namespace DonQuixote.Cards;
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteWoundBloom : ModCardTemplate, IDonQuixoteCorruptedCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/wound_bloom.png";
+
     public DonQuixoteWoundBloom()
         : base(2, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy)
     {
@@ -381,6 +386,11 @@ public sealed class DonQuixoteCallOfKin : ModCardTemplate
 [RegisterCard(typeof(ColorlessCardPool))]
 public sealed class DonQuixoteFatherDeath : ModCardTemplate
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌\爹死亡）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/father_death.png";
+
     public DonQuixoteFatherDeath()
         : base(1, CardType.Skill, CardRarity.None, TargetType.Self)
     {
@@ -421,6 +431,11 @@ public sealed class DonQuixoteFatherDeath : ModCardTemplate
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteNoReflection : ModCardTemplate
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/no_reflection.png";
+
     public DonQuixoteNoReflection()
         : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.Self)
     {
@@ -508,6 +523,11 @@ public sealed class DonQuixoteSanchoBloodImitation : ModCardTemplate, IDonQuixot
 [RegisterCard(typeof(DonQuixoteCardPool))]
 public sealed class DonQuixoteDuelWithLance : ModCardTemplate, IDonQuixoteBloodForgeCard
 {
+    /// <summary>
+    /// 卡面插画（资源\卡牌 对应 png）。
+    /// </summary>
+    public override string CustomPortraitPath => "res://DonQuixote/images/cards/duel_with_lance.png";
+
     public DonQuixoteDuelWithLance()
         : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.AnyEnemy)
     {

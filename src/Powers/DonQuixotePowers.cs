@@ -1034,7 +1034,19 @@ public sealed class DonQuixotePowerDuelTarget : ModPowerTemplate
 
         if (ReferenceEquals(dealer, Owner))
         {
-            return ReferenceEquals(target, DonQuixote_duelist) ? 1.5m : 0m;
+            if (!ReferenceEquals(target, DonQuixote_duelist))
+            {
+                return 0m;
+            }
+
+            // 决斗对象自带 +50%；带「骑士」关键词的卡再额外 +50%（两者相乘）。
+            decimal DonQuixote_bonus = 1.5m;
+            if (DonQuixoteKeywords.DonQuixote_IsKnightCard(cardSource))
+            {
+                DonQuixote_bonus *= 1.5m;
+            }
+
+            return DonQuixote_bonus;
         }
 
         if (ReferenceEquals(target, Owner))
